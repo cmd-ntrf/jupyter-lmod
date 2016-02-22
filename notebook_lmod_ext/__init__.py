@@ -4,6 +4,9 @@ import re
 from collections import OrderedDict
 from subprocess import Popen, PIPE
 
+from notebook.utils import url_path_join as ujoin
+from notebook.base.handlers import IPythonHandler
+
 from jinja2 import Template
 import tornado.ioloop
 import tornado.web
@@ -61,16 +64,18 @@ def module_avail():
 def module_list():
     return set(module('list').split())
 
-class MainHandler(tornado.web.RequestHandler):
+class LmodHandler(IPythonHandler):
     template = Template(modules_template)
 
     def initialize(self):
         self.module_list = module_list()
 
+    @tornado.web.authenticated
     def get(self):
         self.write(self.template.render(moduleavail=module_avail(),
                                         modulelist=self.module_list))
 
+    @tornado.web.authenticated
     def post(self):
         checked_modules = self.request.arguments['module']
         new_modulelist = set(map(bytes.decode, checked_modules))
@@ -85,7 +90,21 @@ class MainHandler(tornado.web.RequestHandler):
         self.write(self.template.render(moduleavail=module_avail(),
                                         modulelist=self.module_list))
 
+def load_jupyter_server_extension(app):
+    """
+    Called when the extension is loaded.
+
+    Args:
+        nb_server_app (NotebookWebApplication): handle to the Notebook webserver instance.
+    """
+    app.log.info("Loading lmod extension")
+    web_app = nb_server_app.web_app
+    host_pattern = '.*$'
+    route_pattern = url_path_join(web_app.settings['base_url'], '/lmod')
+    web_app.add_handlers(host_pattern, [(route_pattern, LmodHandler)])
+
+
 if __name__ == "__main__":
-    app = tornado.web.Application([ (r"/", MainHandler), ])
+    app = tornado.web.Application([ (r"/", LmodHandler), ])
     app.listen(12345)
     tornado.ioloop.IOLoop.current().start()
