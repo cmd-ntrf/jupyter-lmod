@@ -48,7 +48,7 @@ setup_args = dict(
         'Programming Language :: Python :: 3',
     ],
     install_requires   = [
-    'jupyterhub>=0.5.1.dev0',
+    'jupyter>=1.0.0',
     'ipython',
     ],
 )
