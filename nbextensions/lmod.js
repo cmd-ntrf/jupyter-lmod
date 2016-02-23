@@ -45,9 +45,14 @@ define(function(require) {
             success: function(data, textStatus, jqXHR) {
                 $("#lmod_list").html("")
                 for (var key in data) {
+		    var header = $("<h3/>");
+		    header.append(key);
+		    $("#lmod_list").append(header);
+	            var table = $("<table/>");
                     for (var j = 0; j < data[key].length; j++) {
-                        var row = $("<tr />")
-                        $("#lmod_list").append(row);
+		        if ( j % 4 == 0) {
+			    var row = $("<tr />")
+			}
 
                         var container = $("<td/>")
 
@@ -65,7 +70,11 @@ define(function(require) {
                         container.append(label);
 
                         row.append(container);
+		        if ( j % 4 == 3 || j == data[key].length - 1) {
+                            table.append(row);
+			}
                     }
+	            $("#lmod_list").append(table)
                 }
             }
         });
