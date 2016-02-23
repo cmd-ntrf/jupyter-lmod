@@ -50,9 +50,9 @@ define(function(require) {
 		    $("#lmod_list").append(header);
 	            var table = $("<table/>");
                     for (var j = 0; j < data[key].length; j++) {
-		        if ( j % 4 == 0) {
-			    var row = $("<tr />")
-			}
+        		        if ( j % 4 == 0) {
+            			    var row = $("<tr />")
+            			}
 
                         var container = $("<td/>")
 
@@ -62,17 +62,19 @@ define(function(require) {
                         checkbox.value = data[key][j];
                         checkbox.id = data[key][j];
                         checkbox.onclick = module_change
+
                         var label = document.createElement('label')
                         label.htmlFor = data[key][j];
                         label.appendChild(document.createTextNode(data[key][j]));
 
                         container.append(checkbox);
+                        container.append(" ")
                         container.append(label);
 
                         row.append(container);
-		        if ( j % 4 == 3 || j == data[key].length - 1) {
+		                if ( j % 4 == 3 || j == data[key].length - 1) {
                             table.append(row);
-			}
+			            }
                     }
 	            $("#lmod_list").append(table)
                 }
