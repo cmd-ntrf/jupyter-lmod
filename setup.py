@@ -28,7 +28,7 @@ from setuptools import setup
 
 setup_args = dict(
     name                = 'notebook_lmod_ext',
-    packages            = ['notebook_lmod_ext'],
+    packages            = ['notebook_lmod_ext', 'lmod'],
     data_files          = [],
     version             = "0.1.0.dev0",
     description         = """notebook_lmod_ext: A custom handler to use lmod through Jupyter.""",
@@ -48,7 +48,7 @@ setup_args = dict(
         'Programming Language :: Python :: 3',
     ],
     install_requires   = [
-    'jupyterhub>=0.5.1.dev0',
+    'jupyter>=1.0.0',
     'ipython',
     ],
 )
