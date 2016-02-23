@@ -4,7 +4,7 @@ import re
 from collections import OrderedDict
 from subprocess import Popen, PIPE
 
-from notebook.utils import url_path_join as ujoin
+from notebook.utils import url_path_join
 from notebook.base.handlers import IPythonHandler
 
 from jinja2 import Template
@@ -90,15 +90,15 @@ class LmodHandler(IPythonHandler):
         self.write(self.template.render(moduleavail=module_avail(),
                                         modulelist=self.module_list))
 
-def load_jupyter_server_extension(app):
+def load_jupyter_server_extension(nbapp):
     """
     Called when the extension is loaded.
 
     Args:
         nb_server_app (NotebookWebApplication): handle to the Notebook webserver instance.
     """
-    app.log.info("Loading lmod extension")
-    web_app = nb_server_app.web_app
+    nbapp.log.info("Loading lmod extension")
+    web_app = nbapp.web_app
     host_pattern = '.*$'
     route_pattern = url_path_join(web_app.settings['base_url'], '/lmod')
     web_app.add_handlers(host_pattern, [(route_pattern, LmodHandler)])
