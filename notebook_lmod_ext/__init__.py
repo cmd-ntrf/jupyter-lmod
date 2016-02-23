@@ -1,15 +1,13 @@
-import os
-import re
+import json
 
-from collections import OrderedDict
-from subprocess import Popen, PIPE
+import tornado.ioloop
+import tornado.web
+import lmod
 
 from notebook.utils import url_path_join
 from notebook.base.handlers import IPythonHandler
 
 from jinja2 import Template
-import tornado.ioloop
-import tornado.web
 
 modules_template = """
 <html><body><form method="POST">
@@ -30,39 +28,21 @@ modules_template = """
 </form></body></html>
 """
 
-def module(command, arguments=""):
-    result = Popen('$LMOD_CMD python --terse {} {}'.format(command,
-                                                           arguments),
-                   shell=True,
-                   stdout=PIPE,
-                   stderr=PIPE,
-                   bufsize=-1)
-    if command == 'load' or command == 'unload':
-        exec(result.stdout.read())
+class LmodActionHandler(IPythonHandler):
+    @tornado.web.authenticated
+    def get(self, action):
+        if action == 'avail':
+            self.finish(json.dumps(lmod.module_avail()))
+        elif action == 'list':
+            self.finish(json.dumps(lmod.module_list()))
 
-    return result.stderr.read().decode()
-
-def module_avail():
-    string = module('avail')
-    list_ = string.split()
-    locations = OrderedDict()
-    cur_location = None
-    for i, entry in enumerate(list_):
-        if entry.startswith('/'):
-            if entry.startswith('/software6/modulefiles'):
-                entry = os.path.relpath(entry, '/software6/modulefiles')
-            cur_location = entry
-            locations[cur_location] = []
-        elif (re.match("[A-Za-z\/]*", entry) and
-              i != (len(list_) - 1) and
-              list_[i+1].startswith(entry)):
-            continue
-        else:
-            locations[cur_location].append(entry)
-    return locations
-
-def module_list():
-    return set(module('list').split())
+    @tornado.web.authenticated
+    def post(self, action):
+        if action in ('load', 'unload'):
+            module = self.get_argument('module', default=None)
+            if module:
+                lmod.module(action, module)
+                self.finish(json.dumps('SUCCESS'))
 
 class LmodHandler(IPythonHandler):
     template = Template(modules_template)
@@ -83,12 +63,23 @@ class LmodHandler(IPythonHandler):
         to_load = new_modulelist - self.module_list
         to_unload = self.module_list - new_modulelist
 
-        module('load', " ".join(to_load))
-        module('unload', " ".join(to_unload))
+        lmod.module('load', " ".join(to_load))
+        lmod.module('unload', " ".join(to_unload))
 
-        self.module_list = module_list()
+        self.module_list = lmod.module_list()
         self.write(self.template.render(moduleavail=module_avail(),
                                         modulelist=self.module_list))
+
+
+#-----------------------------------------------------------------------------
+# URL to handler mappings
+#-----------------------------------------------------------------------------
+_lmod_action_regex = r"(?P<action>load|unload|avail|list)"
+
+default_handlers = [
+    (r"/lmod", LmodHandler),
+    (r"/lmod/%s" % (_lmod_action_regex), LmodActionHandler),
+]
 
 def load_jupyter_server_extension(nbapp):
     """
@@ -100,9 +91,9 @@ def load_jupyter_server_extension(nbapp):
     nbapp.log.info("Loading lmod extension")
     web_app = nbapp.web_app
     host_pattern = '.*$'
-    route_pattern = url_path_join(web_app.settings['base_url'], '/lmod')
-    web_app.add_handlers(host_pattern, [(route_pattern, LmodHandler)])
-
+    for handler in default_handlers:
+        route_pattern = url_path_join(web_app.settings['base_url'], handler[0])
+        web_app.add_handlers(host_pattern, [(route_pattern, handler[1])])
 
 if __name__ == "__main__":
     app = tornado.web.Application([ (r"/", LmodHandler), ])
