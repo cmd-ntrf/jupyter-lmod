@@ -66,7 +66,7 @@ class LmodHandler(IPythonHandler):
         lmod.module('load', " ".join(to_load))
         lmod.module('unload', " ".join(to_unload))
 
-        self.module_list = lmod.module_list()
+        self.module_list = set(lmod.module_list())
         self.write(self.template.render(moduleavail=module_avail(),
                                         modulelist=self.module_list))
 

@@ -37,4 +37,4 @@ def module_avail():
     return locations
 
 def module_list():
-    return set(module('list').split())
+    return module('list').split()
