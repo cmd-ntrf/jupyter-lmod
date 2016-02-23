@@ -16,7 +16,7 @@ define(function(require) {
             var checkbox = event.target;
             if (checkbox.checked) {
                 $.ajax({
-                    url: '/lmod/load',
+                    url: 'lmod/load',
                     type: "POST",
                     dataType: "json",
                     data: {"module" : checkbox.id},
@@ -26,7 +26,7 @@ define(function(require) {
                 });
             } else {
                 $.ajax({
-                    url: '/lmod/unload',
+                    url: 'lmod/unload',
                     type: "POST",
                     dataType: "json",
                     data: {"module" : checkbox.id},
@@ -39,7 +39,7 @@ define(function(require) {
 
         // Refresh available module list
         $.ajax({
-            url: '/lmod/avail/',
+            url: 'lmod/avail/',
             type: "get",
             dataType: "json",
             success: function(data, textStatus, jqXHR) {
@@ -83,7 +83,7 @@ define(function(require) {
 
         // Refresh selected list
         $.ajax({
-            url: '/lmod/list/',
+            url: 'lmod/list/',
             type: "get",
             dataType: "json",
             success: function(data, textStatus, jqXHR) {
