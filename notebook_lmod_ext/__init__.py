@@ -95,6 +95,9 @@ def load_jupyter_server_extension(nbapp):
         route_pattern = url_path_join(web_app.settings['base_url'], handler[0])
         web_app.add_handlers(host_pattern, [(route_pattern, handler[1])])
 
+    # Load javascript extension
+    nbapp.config_manager.update('tree', {"load_extensions": {"lmod": True}})
+
 if __name__ == "__main__":
     app = tornado.web.Application([ (r"/", LmodHandler), ])
     app.listen(12345)
