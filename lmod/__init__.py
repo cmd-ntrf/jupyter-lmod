@@ -46,6 +46,9 @@ def module_avail(filter_=colosse_filter):
             continue
         else:
             locations[cur_location].append(entry)
+
+    for location in locations.keys():
+        locations[location].sort()
     return locations
 
 def module_list():
