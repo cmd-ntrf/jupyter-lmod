@@ -12,7 +12,7 @@ def module(command, arguments=""):
                    stdout=PIPE,
                    stderr=PIPE,
                    bufsize=-1)
-    if command == 'load' or command == 'unload':
+    if command in ('load', 'unload', 'restore', 'save'):
         exec(result.stdout.read())
 
     return result.stderr.read().decode()
