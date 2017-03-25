@@ -1,3 +1,8 @@
+function getCookie(name) {
+    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+    return r ? r[1] : undefined;
+}
+
 define(function(require) {
     var $ = require('jquery');
     var IPython = require('base/js/namespace');
@@ -54,7 +59,7 @@ define(function(require) {
             url: base_url + (checkbox.checked ? 'lmod/load' : 'lmod/unload'),
             type: "POST",
             dataType: "json",
-            data: {"module" : checkbox.id},
+            data: {"module" : checkbox.id, "_xsrf" : getCookie("_xsrf")},
             success: refresh_view
         });
     }
