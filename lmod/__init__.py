@@ -4,14 +4,12 @@ import re
 from collections import OrderedDict
 from subprocess import Popen, PIPE
 
+LMOD_CMD = os.environ['LMOD_CMD']
+def module(command, arguments=()):
+    cmd = [LMOD_CMD, 'python', '--terse', command]
+    cmd.extend(arguments)
 
-def module(command, arguments=""):
-    result = Popen('$LMOD_CMD python --terse {} {}'.format(command,
-                                                           arguments),
-                   shell=True,
-                   stdout=PIPE,
-                   stderr=PIPE,
-                   bufsize=-1)
+    result = Popen(cmd, stdout=PIPE, stderr=PIPE)
     if command in ('load', 'unload', 'restore', 'save'):
         exec(result.stdout.read())
 
