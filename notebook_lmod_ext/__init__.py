@@ -18,9 +18,9 @@ class LmodActionHandler(IPythonHandler):
     @tornado.web.authenticated
     def post(self, action):
         if action in ('load', 'unload'):
-            module = self.get_argument('module', default=None)
-            if module:
-                lmod.module(action, module)
+            modules = self.get_arguments('modules')
+            if modules:
+                lmod.module(action, modules)
                 self.finish(json.dumps('SUCCESS'))
 
 #-----------------------------------------------------------------------------

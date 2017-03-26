@@ -59,8 +59,9 @@ define(function(require) {
             url: base_url + (checkbox.checked ? 'lmod/load' : 'lmod/unload'),
             type: "POST",
             dataType: "json",
-            data: {"module" : checkbox.id, "_xsrf" : getCookie("_xsrf")},
-            success: refresh_view
+            data: {"modules" : [checkbox.id], "_xsrf" : getCookie("_xsrf")},
+            success: refresh_view,
+            traditional:true
         });
     }
 
