@@ -15,39 +15,21 @@ def module(command, arguments=()):
 
     return result.stderr.read().decode()
 
-def colosse_filter(entry):
-    if entry.startswith('/software6/modulefiles'):
-        entry = os.path.relpath(entry, '/software6/modulefiles')
-    elif entry.startswith('/rap'):
-        entry = 'Your groups\' modules'
-    elif entry.startswith('/home'):
-        entry = 'Your personal modules'
-    if entry.startswith('Compilers'):
-        entry = 'Compiler-dependent modules'
-    if entry.startswith('Core'):
-        entry = 'Core Modules'
-    return entry
-
-def module_avail(filter_=colosse_filter):
+def module_avail():
     string = module('avail')
     list_ = string.split()
-    locations = OrderedDict()
-    cur_location = None
+    modules = []
     for i, entry in enumerate(list_):
-        if entry.startswith('/'):
-            cur_location = filter_(entry)
-            if not cur_location in locations:
-                locations[cur_location] = []
-        elif (re.match("[A-Za-z\/]*", entry) and
-              i != (len(list_) - 1) and
-              list_[i+1].startswith(entry)):
+        if entry.startswith('/') or (re.match("[A-Za-z\/]*", entry) and
+                                     i != (len(list_) - 1) and
+                                     list_[i+1].startswith(entry)):
             continue
         else:
-            locations[cur_location].append(entry)
-
-    for location in locations.keys():
-        locations[location].sort()
-    return locations
+            modules.append(entry)
+    return modules
 
 def module_list():
-    return module('list').split()
+    string = module('list').strip()
+    if string != "No modules loaded":
+        return string.split()
+    return []
