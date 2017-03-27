@@ -6,6 +6,7 @@ function getCookie(name) {
 define(function(require) {
     var $ = require('jquery');
     var ui = require('jquery-ui');
+    var dialog = require('base/js/dialog');
     var IPython = require('base/js/namespace');
     var base_url = IPython.notebook_list.base_url;
     var utils = require('base/js/utils');
@@ -53,13 +54,59 @@ define(function(require) {
         });
     }
 
+    function save_collection(event) {
+        var that = this;
+        var dialog_body = $('<div/>').append(
+            $("<p/>").addClass("save-message")
+                .text('Enter a new collection name:')
+        ).append(
+            $("<br/>")
+        ).append(
+            $('<input/>').attr('type','text').attr('size','25').addClass('form-control').attr('placeholder', 'default')
+        );
+        var d = dialog.modal({
+            title: "Save Collection",
+            body: dialog_body,
+            keyboard_manager: this.keyboard_manager,
+            default_button: "Cancel",
+            buttons : {
+                "Cancel": {},
+                "Save": {
+                    class: "btn-primary",
+                    click: function () {
+                        var name = d.find('input').val();
+                        module_change([name ? name : 'default'], 'save');
+                    }
+                }
+            },
+            open : function () {
+                /**
+                 * Upon ENTER, click the OK button.
+                 */
+                d.find('input[type="text"]').keydown(function (event) {
+                    if (event.which === keyboard.keycodes.enter) {
+                        d.find('.btn-primary').first().click();
+                        return false;
+                    }
+                });
+                d.find('input[type="text"]').focus().select();
+            }            
+        });
+    }
+
     function init_list_view() {
         var list = $("#lmod_list");
         list.html("");
-        list.append($('<div>').addClass('row').addClass('list_header')
+        list.append($('<div>').addClass('row list_header')
                       .append($('<div>').addClass("col-sm-8").text("Loaded modules"))
                       .append($('<div>').addClass("col-sm-4 no-padding tree-buttons")
                                         .append($('<div>').addClass('pull-right')
+                                                          .append($('<div>').attr('id', 'save-button')
+                                                                            .addClass('btn-group')
+                                                                            .append($('<button>').addClass('btn btn-default btn-xs')
+                                                                                                 .text('Save')
+                                                                                                 .click(save_collection)))
+                                                          .append(" ")
                                                           .append($('<div>').attr('id', 'restore-buttons')
                                                                             .addClass('btn-group')
                                                                             .append($('<button>').addClass('dropdown-toggle btn btn-default btn-xs')
