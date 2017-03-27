@@ -58,7 +58,6 @@ define(function(require) {
         data.map(function(item) {
             var li = $('<div>').addClass("list_item").addClass("row");
             var col = $('<div>').addClass("col-md-12");
-            col.append($('<input>').attr('type', 'checkbox').attr('title', 'Click here to mark for unload'));
             col.append($('<a>').addClass('item_link')
                                .attr('href', "#lmod_list")
                                .text(item));
