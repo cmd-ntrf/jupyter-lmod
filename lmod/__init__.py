@@ -5,6 +5,8 @@ from collections import OrderedDict
 from subprocess import Popen, PIPE
 
 LMOD_CMD = os.environ['LMOD_CMD']
+LMOD_SYSTEM_NAME = os.environ.get('LMOD_SYSTEM_NAME', '')
+
 def module(command, arguments=()):
     cmd = [LMOD_CMD, 'python', '--terse', command]
     cmd.extend(arguments)
@@ -33,3 +35,11 @@ def module_list():
     if string != "No modules loaded":
         return string.split()
     return []
+
+def module_savelist(system=LMOD_SYSTEM_NAME):
+    names = module('savelist').split()
+    if system:
+        suffix = '.{}'.format(system)
+        n = len(suffix)
+        names = [name[:-n] for name in names if name.endswith(suffix)]
+    return names

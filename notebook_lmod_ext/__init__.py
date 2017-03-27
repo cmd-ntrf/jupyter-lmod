@@ -14,10 +14,12 @@ class LmodActionHandler(IPythonHandler):
             self.finish(json.dumps(lmod.module_avail()))
         elif action == 'list':
             self.finish(json.dumps(lmod.module_list()))
+        elif action == 'savelist':
+            self.finish(json.dumps(lmod.module_savelist()))
 
     @tornado.web.authenticated
     def post(self, action):
-        if action in ('load', 'unload'):
+        if action in ('load', 'unload', 'restore'):
             modules = self.get_arguments('modules')
             if modules:
                 lmod.module(action, modules)
@@ -26,7 +28,7 @@ class LmodActionHandler(IPythonHandler):
 #-----------------------------------------------------------------------------
 # URL to handler mappings
 #-----------------------------------------------------------------------------
-_lmod_action_regex = r"(?P<action>load|unload|avail|list)"
+_lmod_action_regex = r"(?P<action>load|unload|avail|list|savelist|restore)"
 
 default_handlers = [
     (r"/lmod/%s" % (_lmod_action_regex), LmodActionHandler),

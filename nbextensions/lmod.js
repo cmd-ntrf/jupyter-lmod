@@ -28,14 +28,17 @@ define(function(require) {
 
     function refresh_view() {
         $.when($.get(base_url + 'lmod/avail/', {}, null, "json"),
-        $.get(base_url + 'lmod/list/', {}, null, "json"))
-        .done(function(avail, list) {
+               $.get(base_url + 'lmod/list/', {}, null, "json"),
+               $.get(base_url + 'lmod/savelist/', {}, null, "json"))
+        .done(function(avail, list, savelist) {
             moduleavail = new Set(avail[0]);
             modulelist = list[0];
             modulelist.map(function(item){ moduleavail.delete(item) });
             modulelist.sort();
             moduleavail = Array.from(moduleavail);
-            update_list(modulelist);
+            init_list_view();
+            update_list_view(modulelist);
+            update_restore_view(savelist[0]);
         });
     }
 
@@ -50,13 +53,39 @@ define(function(require) {
         });
     }
 
-    function update_list(data) {
+    function init_list_view() {
         var list = $("#lmod_list");
         list.html("");
         list.append($('<div>').addClass('row').addClass('list_header')
-                              .append($('<div>').addClass("col-md-12").text("Loaded modules")));
+                      .append($('<div>').addClass("col-sm-8").text("Loaded modules"))
+                      .append($('<div>').addClass("col-sm-4 no-padding tree-buttons")
+                                        .append($('<div>').addClass('pull-right')
+                                                          .append($('<div>').attr('id', 'restore-buttons')
+                                                                            .addClass('btn-group')
+                                                                            .append($('<button>').addClass('dropdown-toggle btn btn-default btn-xs')
+                                                                                                 .attr("data-toggle", "dropdown")
+                                                                                                 .append($('<span>').text('Restore '))
+                                                                                                 .append($('<span>').addClass('caret')))
+                                                                            .append($('<ul>').addClass('dropdown-menu')
+                                                                                             .attr('id', 'restore-menu'))))));
+    }
+
+    function update_restore_view(data) {
+        var list = $("#restore-menu");
         data.map(function(item) {
-            var li = $('<div>').addClass("list_item").addClass("row");
+            var li = $('<li>').attr('id', 'savelist-'+item)
+                              .append($('<a>').attr('href', '#')
+                                              .text(item))
+                              .click(function(e) { module_change([item], 'restore') });
+            list.append(li);
+        })
+    }
+
+    function update_list_view(data) {
+        var list = $("#lmod_list");
+
+        data.map(function(item) {
+            var li = $('<div>').addClass("list_item row");
             var col = $('<div>').addClass("col-md-12");
             col.append($('<a>').addClass('item_link')
                                .attr('href', "#lmod_list")
