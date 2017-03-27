@@ -61,8 +61,13 @@ define(function(require) {
             col.append($('<input>').attr('type', 'checkbox').attr('title', 'Click here to mark for unload'));
             col.append($('<a>').addClass('item_link')
                                .attr('href', "#lmod_list")
-                               .text(item)
-                               .click(function(e) { module_change(item, 'unload') }));
+                               .text(item));
+            col.append($('<div>').addClass('item_buttons pull-right')
+                                 .append($('<button>').addClass('btn')
+                                                      .addClass('btn-warning')
+                                                      .addClass('btn-xs')
+                                                      .text('Unload')
+                                                      .click(function(e) { module_change(item, 'unload') })))
             li.append(col);
             list.append(li);
         });
