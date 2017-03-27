@@ -27,11 +27,11 @@ if os.name in ('nt', 'dos'):
 from setuptools import setup
 
 setup_args = dict(
-    name                = 'notebook_lmod_ext',
-    packages            = ['notebook_lmod_ext', 'lmod', 'kernel_spec_lmod_manager'],
-    data_files          = [('share/jupyter/nbextensions', ['nbextensions/lmod.js'])],
-    version             = "0.3.1.dev0",
-    description         = """notebook_lmod_ext: A custom handler to use lmod through Jupyter.""",
+    name                = 'jupyterlmod',
+    packages            = ['jupyterlmod', 'lmod'],
+    data_files          = [('share/jupyter/nbextensions', ['nbextensions/lmod.js','nbextensions/jquery-ui.min.js'])],
+    version             = "1.0.0.dev0",
+    description         = """jupyterlmod: A custom handler to use lmod through Jupyter.""",
     long_description    = "",
     author              = "Félix-Antoine Fortin",
     author_email        = "felix-antoine.fortin@calculquebec.ca",
