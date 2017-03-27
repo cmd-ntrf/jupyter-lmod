@@ -16,13 +16,12 @@ define(function(require) {
     var lmod_tab_html = $([
         '<div id="lmod" class="tab-pane">',
         '  <div id="lmod_toolbar" class="row list_toolbar">',
-        '    <div class="col-sm-8 no-padding">',
-        '      <label id="running_list_info">Software modules</label>',
-        '      <input id="modules" size="100">',
+        '    <div class="col-sm-18 no-padding">',
+        '      <input id="modules" class="form-control input-lg" placeholder="Search available modules..." style="width:100%">',
         '    </div>',
         '  </div>',
-        '  <div class="panel-group" id="lmod_list" >',
-        '     Place holder',
+        '  <div class="list_container" id="lmod_list">',
+        '     <div class="row list_header">Loaded module list</div>',
         '  </div>',
         '</div>'
     ].join('\n'));
@@ -34,6 +33,7 @@ define(function(require) {
             moduleavail = new Set(avail[0]);
             modulelist = list[0];
             modulelist.map(function(item){ moduleavail.delete(item) });
+            modulelist.sort();
             moduleavail = Array.from(moduleavail);
             update_list(modulelist);
         });
@@ -46,17 +46,24 @@ define(function(require) {
             dataType: "json",
             data: {"modules" : modules, "_xsrf" : getCookie("_xsrf")},
             success: refresh_view,
-            traditional:true
+            traditional: true
         });
     }
 
     function update_list(data) {
-        $("#lmod_list").html("");
-        var list = $("#lmod_list").append('<ul>');
+        var list = $("#lmod_list");
+        list.html("");
+        list.append($('<div>').addClass('row').addClass('list_header')
+                              .append($('<div>').addClass("col-md-12").text("Loaded modules")));
         data.map(function(item) {
-            var li = $('<li>').text(item+ " ");
-            li.append($('<a>').text('[ X ]')
-                              .click(function(e) { module_change(item, 'unload') }));
+            var li = $('<div>').addClass("list_item").addClass("row");
+            var col = $('<div>').addClass("col-md-12");
+            col.append($('<input>').attr('type', 'checkbox').attr('title', 'Click here to mark for unload'));
+            col.append($('<a>').addClass('item_link')
+                               .attr('href', "#lmod_list")
+                               .text(item)
+                               .click(function(e) { module_change(item, 'unload') }));
+            li.append(col);
             list.append(li);
         });
     }
