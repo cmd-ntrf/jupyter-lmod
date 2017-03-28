@@ -162,7 +162,7 @@ define(function(require) {
                                                       .addClass('btn-warning')
                                                       .addClass('btn-xs')
                                                       .text('Unload')
-                                                      .click(function(e) { module_change(item, 'unload') })))
+                                                      .click(function(e) { module_change(item, 'unload') })));
             li.append(col);
             list.append(li);
         });
@@ -178,7 +178,7 @@ define(function(require) {
     function load() {
         if (!IPython.notebook_list) return;
         $(".tab-content").append(lmod_tab_html);
-        refresh_view()
+        refresh_view();
         $("#tabs").append(
             $('<li>')
             .append(
