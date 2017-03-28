@@ -155,8 +155,8 @@ define(function(require) {
             var col = $('<div>').addClass("col-md-12");
             col.append($('<a>').addClass('item_link')
                                .attr('href', "#lmod_list")
-                               .text(item))
-                               .click(function(e) { show_module(item) });
+                               .text(item)
+                               .click(function(e) { show_module(item) }));
             col.append($('<div>').addClass('item_buttons pull-right')
                                  .append($('<button>').addClass('btn')
                                                       .addClass('btn-warning')
