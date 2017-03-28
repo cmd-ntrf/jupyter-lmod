@@ -16,6 +16,9 @@ class LmodActionHandler(IPythonHandler):
             self.finish(json.dumps(lmod.module_list()))
         elif action == 'savelist':
             self.finish(json.dumps(lmod.module_savelist()))
+        elif action == 'show':
+            modules = self.get_arguments("modules")
+            self.finish(json.dumps(lmod.module('show', modules)))
 
     @tornado.web.authenticated
     def post(self, action):
@@ -32,6 +35,7 @@ _lmod_action_regex = r"(?P<action>load|unload|avail|list|savelist|restore|save)"
 
 default_handlers = [
     (r"/lmod/%s" % (_lmod_action_regex), LmodActionHandler),
+    (r"/lmod/(?P<action>show).*", LmodActionHandler)
 ]
 
 def load_jupyter_server_extension(nbapp):

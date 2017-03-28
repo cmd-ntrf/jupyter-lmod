@@ -54,6 +54,25 @@ define(function(require) {
         });
     }
 
+    function show_module(module) {
+        $.get(base_url + 'lmod/show', {"modules" : module}, function(data){
+            var datalist = data.split('\n');
+            var textarea = $('<pre/>').text($.trim(datalist.slice(3).join('\n')));
+            var dialogform = $('<div/>').append(textarea);
+            var path = datalist[1].slice(0, -1)
+            var d = dialog.modal({
+                title: path,
+                body: dialogform,
+                keyboard_manager: this.keyboard_manager,
+                default_button: "Ok",
+                buttons : {
+                    "Ok" : {}
+                }
+            });
+        }, "json")
+
+    }
+
     function save_collection(event) {
         var that = this;
         var dialog_body = $('<div/>').append(
@@ -136,7 +155,8 @@ define(function(require) {
             var col = $('<div>').addClass("col-md-12");
             col.append($('<a>').addClass('item_link')
                                .attr('href', "#lmod_list")
-                               .text(item));
+                               .text(item))
+                               .click(function(e) { show_module(item) });
             col.append($('<div>').addClass('item_buttons pull-right')
                                  .append($('<button>').addClass('btn')
                                                       .addClass('btn-warning')
