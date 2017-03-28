@@ -19,14 +19,9 @@ def module(command, arguments=()):
 
 def module_avail():
     string = module('avail')
-    list_ = string.split()
     modules = []
-    for i, entry in enumerate(list_):
-        if entry.startswith('/') or (re.match("[A-Za-z\/]*", entry) and
-                                     i != (len(list_) - 1) and
-                                     list_[i+1].startswith(entry)):
-            continue
-        else:
+    for entry in string.split():
+        if not (entry.startswith('/') or entry.endswith('/')):
             modules.append(entry)
     return modules
 
