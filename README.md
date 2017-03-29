@@ -6,7 +6,7 @@ to select modules to load before launching kernels.
 ## requirements
 
 - [jupyter notebook](https://github.com/jupyter/notebook) >= 4.0
-- jquery-ui (autocomplete) >= 1.9.0
+- [jquery-ui](https://jqueryui.com/) (autocomplete) >= 1.9.0
 - [Lmod](https://github.com/TACC/Lmod) >= 6.0
 
 ## demo
