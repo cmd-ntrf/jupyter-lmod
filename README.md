@@ -11,12 +11,17 @@ to select modules to load before launching kernels.
 
 ## setup
 
-Install :
+### Install
 ```
 pip https://github.com/cmd-ntrf/jupyter-lmod.git
 ```
 
-Run: 
+Download [jquery-ui](https://jqueryui.com/) and copy the file `jquery-ui.min.js` in the folder returned by the following command
+```
+echo $(jupyter --data-dir)/nbextensions
+```
+
+### Execute
 ```
 jupyter notebook  --NotebookApp.server_extensions='["jupyterlmod"]'
 ```
