@@ -1,7 +1,4 @@
 import os
-import re
-
-from collections import OrderedDict
 from subprocess import Popen, PIPE
 
 LMOD_CMD = os.environ['LMOD_CMD']
