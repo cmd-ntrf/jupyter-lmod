@@ -29,7 +29,7 @@ from setuptools import setup
 setup_args = dict(
     name                = 'jupyterlmod',
     packages            = ['jupyterlmod', 'lmod'],
-    data_files          = [('share/jupyter/nbextensions', ['nbextensions/lmod.js','nbextensions/jquery-ui.min.js'])],
+    data_files          = [('share/jupyter/nbextensions', ['nbextensions/lmod.js'])],
     version             = "1.0.0",
     description         = """jupyterlmod: A custom handler to use lmod through Jupyter.""",
     long_description    = "",
