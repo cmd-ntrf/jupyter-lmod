@@ -12,7 +12,7 @@ to select modules to load before launching kernels.
 
 ### Install
 ```
-pip https://github.com/cmd-ntrf/jupyter-lmod.git
+pip git+https://github.com/cmd-ntrf/jupyter-lmod.git
 ```
 
 ### Execute
