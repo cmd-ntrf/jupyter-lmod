@@ -49,7 +49,6 @@ setup_args = dict(
     ],
     install_requires   = [
     'jupyter>=1.0.0',
-    'ipython',
     ],
 )
 
