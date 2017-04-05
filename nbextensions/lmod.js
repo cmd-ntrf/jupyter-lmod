@@ -1,18 +1,15 @@
-function getCookie(name) {
-    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
-    return r ? r[1] : undefined;
-}
-
 define(function(require) {
+    "use strict";
     var $ = require('jquery');
     var ui = require('jquery-ui');
     var dialog = require('base/js/dialog');
-    var IPython = require('base/js/namespace');
-    var base_url = IPython.notebook_list.base_url;
+    var lmod_class = require('./lmod_class.js');
     var utils = require('base/js/utils');
-    var _ = require('underscore');
-    var moduleavail = null;
-    var modulelist = null;
+
+    var base_url = utils.get_body_data("baseUrl");
+
+    var lmod = new lmod_class.Lmod({'base_url' : base_url});
+    var search_source = null;
 
     var lmod_tab_html = $([
         '<div id="lmod" class="tab-pane">',
@@ -28,53 +25,38 @@ define(function(require) {
     ].join('\n'));
 
     function refresh_view() {
-        $.when($.get(base_url + 'lmod/avail/', {}, null, "json"),
-               $.get(base_url + 'lmod/list/', {}, null, "json"),
-               $.get(base_url + 'lmod/savelist/', {}, null, "json"))
+        $.when(lmod.avail(),
+               lmod.list(),
+               lmod.savelist())
         .done(function(avail, list, savelist) {
-            moduleavail = new Set(avail[0]);
-            modulelist = list[0];
-            modulelist.map(function(item){ moduleavail.delete(item) });
+            let avail_set = new Set(avail[0]);
+            let modulelist = list[0];
+            modulelist.map(function(item){ avail_set.delete(item) });
             modulelist.sort();
-            moduleavail = Array.from(moduleavail);
+            search_source = Array.from(avail_set);
             init_list_view();
             update_list_view(modulelist);
             update_restore_view(savelist[0]);
         });
     }
 
-    function module_change(modules, action) {
-        $.ajax({
-            url: base_url + 'lmod/' + action,
-            type: "POST",
-            dataType: "json",
-            data: {"modules" : modules, "_xsrf" : getCookie("_xsrf")},
-            success: refresh_view,
-            traditional: true
+    async function show_module(module) {
+        var data = await lmod.show(module);
+        var datalist = data.split('\n');
+        var textarea = $('<pre/>').text($.trim(datalist.slice(3).join('\n')));
+        var dialogform = $('<div/>').append(textarea);
+        var path = datalist[1].slice(0, -1);
+        dialog.modal({
+            title: path,
+            body: dialogform,
+            default_button: "Ok",
+            buttons : {
+                "Ok" : {}
+            }
         });
     }
 
-    function show_module(module) {
-        $.get(base_url + 'lmod/show', {"modules" : module}, function(data){
-            var datalist = data.split('\n');
-            var textarea = $('<pre/>').text($.trim(datalist.slice(3).join('\n')));
-            var dialogform = $('<div/>').append(textarea);
-            var path = datalist[1].slice(0, -1)
-            var d = dialog.modal({
-                title: path,
-                body: dialogform,
-                keyboard_manager: this.keyboard_manager,
-                default_button: "Ok",
-                buttons : {
-                    "Ok" : {}
-                }
-            });
-        }, "json")
-
-    }
-
     function save_collection(event) {
-        var that = this;
         var dialog_body = $('<div/>').append(
             $("<p/>").addClass("save-message")
                 .text('Enter a new collection name:')
@@ -94,7 +76,7 @@ define(function(require) {
                     class: "btn-primary",
                     click: function () {
                         var name = d.find('input').val();
-                        module_change([name ? name : 'default'], 'save');
+                        lmod.save(name ? name : 'default').then(refresh_view);
                     }
                 }
             },
@@ -142,7 +124,7 @@ define(function(require) {
             var li = $('<li>').attr('id', 'savelist-'+item)
                               .append($('<a>').attr('href', '#')
                                               .text(item))
-                              .click(function(e) { module_change([item], 'restore') });
+                              .click(function(e) { lmod.restore(item) });
             list.append(li);
         })
     }
@@ -158,11 +140,9 @@ define(function(require) {
                                .text(item)
                                .click(function(e) { show_module(item) }));
             col.append($('<div>').addClass('item_buttons pull-right')
-                                 .append($('<button>').addClass('btn')
-                                                      .addClass('btn-warning')
-                                                      .addClass('btn-xs')
+                                 .append($('<button>').addClass('btn btn-warning btn-xs')
                                                       .text('Unload')
-                                                      .click(function(e) { module_change(item, 'unload') })));
+                                                      .click(function(e) { lmod.unload(item) })));
             li.append(col);
             list.append(li);
         });
@@ -204,7 +184,7 @@ define(function(require) {
                 var modules = split($.trim(event.target.value));
                 modules.pop();
 
-                module_change(modules, 'load');
+                lmod.load(modules).then(refresh_view);
                 event.target.value = "";
             }
         })
@@ -213,7 +193,7 @@ define(function(require) {
             source: function( request, response ) {
               // delegate back to autocomplete, but extract the last term
               response( $.ui.autocomplete.filter(
-                moduleavail, extractLast( request.term ) ) );
+                search_source, extractLast( request.term ) ) );
             },
             focus: function() {
               // prevent value inserted on focus
