@@ -12,16 +12,32 @@ define(function(require) {
     var search_source = null;
 
     var lmod_tab_html = $([
-        '<div id="lmod" class="tab-pane">',
-        '  <div id="lmod_toolbar" class="row list_toolbar">',
-        '    <div class="col-sm-18 no-padding">',
-        '      <input id="modules" class="form-control input-lg" placeholder="Search available modules..." style="width:100%">',
-        '    </div>',
-        '  </div>',
-        '  <div class="list_container" id="lmod_list">',
-        '     <div class="row list_header">Loaded module list</div>',
-        '  </div>',
-        '</div>'
+'<div id="lmod" class="tab-pane">',
+'    <div id="lmod_toolbar" class="row list_toolbar">',
+'        <div class="col-sm-18 no-padding">',
+'            <input id="modules" class="form-control input-lg" placeholder="Search available modules..." style="width:100%">',
+'        </div>',
+'    </div>',
+'    <div class="list_container" id="lmod_list">',
+'        <div class="row list_header" id="list_header">',
+'            <div class="col-sm-8">Loaded Modules</div>',
+'            <div class="col-sm-4 no-padding tree-buttons">',
+'                <div class="pull-right">',
+'                    <div class="btn-group">',
+'                        <button class="btn btn-default btn-xs" id="save-button">Save</button>',
+'                    </div> ',
+'                    <div class="btn-group">',
+'                        <button class="dropdown-toggle btn btn-default btn-xs" id="restore-buttons">',
+'                            <span>Restore </span>',
+'                            <span class="caret"/>',
+'                        </button>',
+'                        <ul class="dropdown-menu", id="restore-menu"/>',
+'                    </div>',
+'                </div>',
+'            </div>',
+'        </div>',
+'    </div>',
+'</div>',
     ].join('\n'));
 
     function refresh_view() {
@@ -34,7 +50,6 @@ define(function(require) {
             modulelist.map(function(item){ avail_set.delete(item) });
             modulelist.sort();
             search_source = Array.from(avail_set);
-            init_list_view();
             update_list_view(modulelist);
             update_restore_view(savelist[0]);
         });
@@ -95,29 +110,6 @@ define(function(require) {
         });
     }
 
-    function init_list_view() {
-        var list = $("#lmod_list");
-        list.html("");
-        list.append($('<div>').addClass('row list_header')
-                      .append($('<div>').addClass("col-sm-8").text("Loaded modules"))
-                      .append($('<div>').addClass("col-sm-4 no-padding tree-buttons")
-                                        .append($('<div>').addClass('pull-right')
-                                                          .append($('<div>').attr('id', 'save-button')
-                                                                            .addClass('btn-group')
-                                                                            .append($('<button>').addClass('btn btn-default btn-xs')
-                                                                                                 .text('Save')
-                                                                                                 .click(save_collection)))
-                                                          .append(" ")
-                                                          .append($('<div>').attr('id', 'restore-buttons')
-                                                                            .addClass('btn-group')
-                                                                            .append($('<button>').addClass('dropdown-toggle btn btn-default btn-xs')
-                                                                                                 .attr("data-toggle", "dropdown")
-                                                                                                 .append($('<span>').text('Restore '))
-                                                                                                 .append($('<span>').addClass('caret')))
-                                                                            .append($('<ul>').addClass('dropdown-menu')
-                                                                                             .attr('id', 'restore-menu'))))));
-    }
-
     function update_restore_view(data) {
         var list = $("#restore-menu");
         data.map(function(item) {
@@ -130,6 +122,7 @@ define(function(require) {
     }
 
     function update_list_view(data) {
+        $("#list_header").nextAll().remove();
         var list = $("#lmod_list");
 
         data.map(function(item) {
@@ -158,7 +151,7 @@ define(function(require) {
     function load() {
         if (!IPython.notebook_list) return;
         $(".tab-content").append(lmod_tab_html);
-        refresh_view();
+        $("#save-button").click(save_collection);
         $("#tabs").append(
             $('<li>')
             .append(
@@ -211,6 +204,8 @@ define(function(require) {
               return false;
             }
         });
+        
+        refresh_view();
     }
     return {
         load_ipython_extension: load
