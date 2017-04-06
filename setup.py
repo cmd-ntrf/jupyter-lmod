@@ -7,8 +7,9 @@ setup_args = dict(
     name                = 'jupyterlmod',
     packages            = ['jupyterlmod', 'lmod'],
     package_data        = {'jupyterlmod' : ['static/*']},
-    version             = "1.1.1",
-    description         = "jupyterlmod: A custom handler to use lmod through Jupyter.",
+    version             = "1.1.2",
+    description         = """jupyterlmod: Jupyter interactive notebook server extension that allows user
+to select software modules to load with Lmod before launching kernels.""",
     long_description    = "",
     author              = "Félix-Antoine Fortin",
     author_email        = "felix-antoine.fortin@calculquebec.ca",
