@@ -136,7 +136,7 @@ define(function(require) {
             col.append($('<div>').addClass('item_buttons pull-right')
                                  .append($('<button>').addClass('btn btn-warning btn-xs')
                                                       .text('Unload')
-                                                      .click(function(e) { lmod.unload(item) })));
+                                                      .click(function(e) { lmod.unload(item).then(refresh_view) })));
             li.append(col);
             list.append(li);
         });
