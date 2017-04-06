@@ -11,7 +11,7 @@ to select modules to load before launching kernels.
 ## setup
 
 ```
-pip git+https://github.com/cmd-ntrf/jupyter-lmod.git
+pip install jupyterlmod
 jupyter nbextension install --py jupyterlmod [--sys-prefix|--user]
 jupyter nbextension enable --py jupyterlmod [--sys-prefix|--system]
 jupyter serverextension enable --py jupyterlmod [--sys-prefix|--system]
