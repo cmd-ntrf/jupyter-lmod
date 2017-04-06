@@ -6,9 +6,9 @@ from setuptools import setup
 setup_args = dict(
     name                = 'jupyterlmod',
     packages            = ['jupyterlmod', 'lmod'],
-    data_files          = [('share/jupyter/nbextensions', ['nbextensions/lmod.js', 'nbextensions/lmod-ui.js'])],
+    package_data        = {'jupyterlmod' : ['static/*']},
     version             = "1.1.0",
-    description         = """jupyterlmod: A custom handler to use lmod through Jupyter.""",
+    description         = "jupyterlmod: A custom handler to use lmod through Jupyter.",
     long_description    = "",
     author              = "Félix-Antoine Fortin",
     author_email        = "felix-antoine.fortin@calculquebec.ca",
