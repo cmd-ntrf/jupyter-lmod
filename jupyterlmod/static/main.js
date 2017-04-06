@@ -27,7 +27,7 @@ define(function(require) {
 '                        <button class="btn btn-default btn-xs" id="save-button">Save</button>',
 '                    </div> ',
 '                    <div class="btn-group">',
-'                        <button class="dropdown-toggle btn btn-default btn-xs" id="restore-buttons">',
+'                        <button class="dropdown-toggle btn btn-default btn-xs" id="restore-buttons" data-toggle="dropdown">',
 '                            <span>Restore </span>',
 '                            <span class="caret"/>',
 '                        </button>',
@@ -112,11 +112,12 @@ define(function(require) {
 
     function update_restore_view(data) {
         var list = $("#restore-menu");
+        list.html("");
         data.map(function(item) {
             var li = $('<li>').attr('id', 'savelist-'+item)
                               .append($('<a>').attr('href', '#')
                                               .text(item))
-                              .click(function(e) { lmod.restore(item) });
+                              .click(function(e) { lmod.restore(item).then(refresh_view) });
             list.append(li);
         })
     }
@@ -204,7 +205,7 @@ define(function(require) {
               return false;
             }
         });
-        
+
         refresh_view();
     }
     return {
