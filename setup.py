@@ -8,9 +8,8 @@ setup_args = dict(
     packages            = ['jupyterlmod', 'lmod'],
     package_data        = {'jupyterlmod' : ['static/*']},
     version             = "1.1.2",
-    description         = """jupyterlmod: Jupyter interactive notebook server extension that allows user
-to select software modules to load with Lmod before launching kernels.""",
-    long_description    = "",
+    description         = "jupyterlmod: notebook server extension to interact with Lmod system",
+    long_description    = "Jupyter interactive notebook server extension that allows user to select software modules to load with Lmod before launching kernels.",
     author              = "Félix-Antoine Fortin",
     author_email        = "felix-antoine.fortin@calculquebec.ca",
     url                 = "http://www.calculquebec.ca",
