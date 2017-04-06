@@ -42,16 +42,14 @@ define(function(require) {
 
     function refresh_view() {
         $.when(lmod.avail(),
-               lmod.list(),
-               lmod.savelist())
-        .done(function(avail, list, savelist) {
+               lmod.list())
+        .done(function(avail, list) {
             let avail_set = new Set(avail[0]);
             let modulelist = list[0];
             modulelist.map(function(item){ avail_set.delete(item) });
             modulelist.sort();
             search_source = Array.from(avail_set);
             update_list_view(modulelist);
-            update_restore_view(savelist[0]);
         });
     }
 
@@ -91,7 +89,7 @@ define(function(require) {
                     class: "btn-primary",
                     click: function () {
                         var name = d.find('input').val();
-                        lmod.save(name ? name : 'default').then(refresh_view);
+                        lmod.save(name ? name : 'default').then(refresh_restore_list);
                     }
                 }
             },
@@ -110,16 +108,18 @@ define(function(require) {
         });
     }
 
-    function update_restore_view(data) {
-        var list = $("#restore-menu");
-        list.html("");
-        data.map(function(item) {
-            var li = $('<li>').attr('id', 'savelist-'+item)
-                              .append($('<a>').attr('href', '#')
-                                              .text(item))
-                              .click(function(e) { lmod.restore(item).then(refresh_view) });
-            list.append(li);
-        })
+    function refresh_restore_list() {
+        lmod.savelist().then(function(data) {
+            var list = $("#restore-menu");
+            list.html("");
+            data.map(function(item) {
+                var li = $('<li>').attr('id', 'savelist-'+item)
+                                  .append($('<a>').attr('href', '#')
+                                                  .text(item))
+                                  .click(function(e) { lmod.restore(item).then(refresh_view) });
+                list.append(li);
+            })
+        });
     }
 
     function update_list_view(data) {
@@ -207,6 +207,7 @@ define(function(require) {
         });
 
         refresh_view();
+        refresh_restore_list();
     }
     return {
         load_ipython_extension: load
