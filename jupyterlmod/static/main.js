@@ -40,19 +40,6 @@ define(function(require) {
 '</div>',
     ].join('\n'));
 
-    function refresh_view() {
-        $.when(lmod.avail(),
-               lmod.list())
-        .done(function(avail, list) {
-            let avail_set = new Set(avail[0]);
-            let modulelist = list[0];
-            modulelist.map(function(item){ avail_set.delete(item) });
-            modulelist.sort();
-            search_source = Array.from(avail_set);
-            update_list_view(modulelist);
-        });
-    }
-
     async function show_module(module) {
         var data = await lmod.show(module);
         var datalist = data.split('\n');
@@ -109,36 +96,47 @@ define(function(require) {
     }
 
     function refresh_restore_list() {
-        lmod.savelist().then(function(data) {
+        lmod.savelist()
+        .then(values => {
             var list = $("#restore-menu");
             list.html("");
-            data.map(function(item) {
+            values.map(item => {
                 var li = $('<li>').attr('id', 'savelist-'+item)
                                   .append($('<a>').attr('href', '#')
                                                   .text(item))
-                                  .click(function(e) { lmod.restore(item).then(refresh_view) });
+                                  .click(function(e) { lmod.restore(item).then(refresh_module_list) });
                 list.append(li);
             })
         });
     }
 
-    function update_list_view(data) {
-        $("#list_header").nextAll().remove();
-        var list = $("#lmod_list");
+    function refresh_module_list() {
+        Promise.all([lmod.avail(), lmod.list()])
+        .then(values => {
+            let avail_set = new Set(values[0]);
+            let modulelist = values[1];
 
-        data.map(function(item) {
-            var li = $('<div>').addClass("list_item row");
-            var col = $('<div>').addClass("col-md-12");
-            col.append($('<a>').addClass('item_link')
-                               .attr('href', "#lmod_list")
-                               .text(item)
-                               .click(function(e) { show_module(item) }));
-            col.append($('<div>').addClass('item_buttons pull-right')
-                                 .append($('<button>').addClass('btn btn-warning btn-xs')
-                                                      .text('Unload')
-                                                      .click(function(e) { lmod.unload(item).then(refresh_view) })));
-            li.append(col);
-            list.append(li);
+            modulelist.map(function(item){ avail_set.delete(item) });
+            modulelist.sort();
+            search_source = Array.from(avail_set);
+
+            $("#list_header").nextAll().remove();
+            var list = $("#lmod_list");
+
+            modulelist.map(function(item) {
+                var li = $('<div>').addClass("list_item row");
+                var col = $('<div>').addClass("col-md-12");
+                col.append($('<a>').addClass('item_link')
+                                   .attr('href', "#lmod_list")
+                                   .text(item)
+                                   .click(function(e) { show_module(item) }));
+                col.append($('<div>').addClass('item_buttons pull-right')
+                                     .append($('<button>').addClass('btn btn-warning btn-xs')
+                                                          .text('Unload')
+                                                          .click(function(e) { lmod.unload(item).then(refresh_module_list) })));
+                li.append(col);
+                list.append(li);
+            });
         });
     }
  
@@ -178,7 +176,7 @@ define(function(require) {
                 var modules = split($.trim(event.target.value));
                 modules.pop();
 
-                lmod.load(modules).then(refresh_view);
+                lmod.load(modules).then(refresh_module_list);
                 event.target.value = "";
             }
         })
@@ -206,7 +204,7 @@ define(function(require) {
             }
         });
 
-        refresh_view();
+        refresh_module_list();
         refresh_restore_list();
     }
     return {
