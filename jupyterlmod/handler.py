@@ -1,6 +1,5 @@
 import json
 
-import tornado.ioloop
 import tornado.web
 import lmod
 
@@ -38,6 +37,7 @@ default_handlers = [
 ]
 
 if __name__ == "__main__":
+    import tornado.ioloop
     app = tornado.web.Application([ (r"/", LmodActionHandler), ])
     app.listen(12345)
     tornado.ioloop.IOLoop.current().start()
