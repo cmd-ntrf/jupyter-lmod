@@ -11,7 +11,7 @@ define(function(require) {
     var lmod = new lmod_class.Lmod({'base_url' : base_url});
     var search_source = null;
 
-    var lmod_tab_html = $([
+    const lmod_tab_html = $([
 '<div id="lmod" class="tab-pane">',
 '    <div id="lmod_toolbar" class="row list_toolbar">',
 '        <div class="col-sm-18 no-padding">',
@@ -40,34 +40,29 @@ define(function(require) {
 '</div>',
     ].join('\n'));
 
-    async function show_module(module) {
-        var data = await lmod.show(module);
-        var datalist = data.split('\n');
-        var textarea = $('<pre/>').text($.trim(datalist.slice(3).join('\n')));
-        var dialogform = $('<div/>').append(textarea);
-        var path = datalist[1].slice(0, -1);
-        dialog.modal({
-            title: path,
-            body: dialogform,
-            default_button: "Ok",
-            buttons : {
-                "Ok" : {}
-            }
-        });
-    }
+    const lmod_list_line = $([
+'<div class="list_item row">',
+'   <div class="col-md-12">',
+'       <a href="#lmod_list"/>',
+'       <div class="item_buttons pull-right">',
+'           <button class="btn btn-warning btn-xs">Unload</button>',
+'       </div>',
+'   </div>',
+'</div>',
+    ].join('\n'));
+
+    const save_dialog_body = $([
+'<div>',
+'   <p class="save-message">Enter a new collection name:</p>',
+'   <br/>',
+'   <input type="text" size="25" class="form-control" placeholder="default">',
+'</div>'
+    ].join('\n'));
 
     function save_collection(event) {
-        var dialog_body = $('<div/>').append(
-            $("<p/>").addClass("save-message")
-                .text('Enter a new collection name:')
-        ).append(
-            $("<br/>")
-        ).append(
-            $('<input/>').attr('type','text').attr('size','25').addClass('form-control').attr('placeholder', 'default')
-        );
         var d = dialog.modal({
             title: "Save Collection",
-            body: dialog_body,
+            body: save_dialog_body,
             keyboard_manager: this.keyboard_manager,
             default_button: "Cancel",
             buttons : {
@@ -81,9 +76,6 @@ define(function(require) {
                 }
             },
             open : function () {
-                /**
-                 * Upon ENTER, click the OK button.
-                 */
                 d.find('input[type="text"]').keydown(function (event) {
                     if (event.which === keyboard.keycodes.enter) {
                         d.find('.btn-primary').first().click();
@@ -98,13 +90,10 @@ define(function(require) {
     function refresh_restore_list() {
         lmod.savelist()
         .then(values => {
-            var list = $("#restore-menu");
-            list.html("");
+            let list = $("#restore-menu").html("");
             values.map(item => {
-                var li = $('<li>').attr('id', 'savelist-'+item)
-                                  .append($('<a>').attr('href', '#')
-                                                  .text(item))
-                                  .click(function(e) { lmod.restore(item).then(refresh_module_list) });
+                let li = $('<li>').append($('<a>', {'href': '#', "text" : item}))
+                                  .click(e => lmod.restore(item).then(refresh_module_list));
                 list.append(li);
             })
         });
@@ -114,29 +103,36 @@ define(function(require) {
         Promise.all([lmod.avail(), lmod.list()])
         .then(values => {
             let avail_set = new Set(values[0]);
-            let modulelist = values[1];
-
-            modulelist.map(function(item){ avail_set.delete(item) });
-            modulelist.sort();
-            search_source = Array.from(avail_set);
+            let modulelist = values[1].sort();
 
             $("#list_header").nextAll().remove();
-            var list = $("#lmod_list");
+            let list = $("#lmod_list");
 
-            modulelist.map(function(item) {
-                var li = $('<div>').addClass("list_item row");
-                var col = $('<div>').addClass("col-md-12");
-                col.append($('<a>').addClass('item_link')
-                                   .attr('href', "#lmod_list")
-                                   .text(item)
-                                   .click(function(e) { show_module(item) }));
-                col.append($('<div>').addClass('item_buttons pull-right')
-                                     .append($('<button>').addClass('btn btn-warning btn-xs')
-                                                          .text('Unload')
-                                                          .click(function(e) { lmod.unload(item).then(refresh_module_list) })));
-                li.append(col);
+            modulelist.map(item => {
+                let li = lmod_list_line.clone();
+                li.find('a').text(item).click(e => show_module(item));
+                li.find('button').click(e => lmod.unload(item).then(refresh_module_list));
                 list.append(li);
+                avail_set.delete(item)
             });
+
+            search_source = Array.from(avail_set);
+        });
+    }
+
+    async function show_module(module) {
+        let data = await lmod.show(module);
+        let datalist = data.split('\n');
+        let textarea = $('<pre/>').text($.trim(datalist.slice(3).join('\n')));
+        let dialogform = $('<div/>').append(textarea);
+        let path = datalist[1].slice(0, -1);
+        dialog.modal({
+            title: path,
+            body: dialogform,
+            default_button: "Ok",
+            buttons : {
+                "Ok" : {}
+            }
         });
     }
  
