@@ -3,7 +3,7 @@ define(function(require) {
     var $ = require('jquery');
     var ui = require('jquery-ui');
     var dialog = require('base/js/dialog');
-    var lmod_class = require('./lmod.js');
+    var lmod_class = require('./lmod');
     var utils = require('base/js/utils');
 
     var base_url = utils.get_body_data("baseUrl");
