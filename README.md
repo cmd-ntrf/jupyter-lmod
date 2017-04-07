@@ -2,7 +2,6 @@
 
 Jupyter interactive notebook server extension that allows user 
 to interact with environment modules before launching kernels.
-
 The extension use Lmod's Python interface to accomplish module
 related task like loading, unloading, saving collection, etc.
 
