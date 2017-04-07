@@ -10,9 +10,14 @@ to select modules to load before launching kernels.
 
 ## setup
 
+### install
 ```
 pip install jupyterlmod
 jupyter nbextension install --py jupyterlmod [--sys-prefix|--user]
+```
+
+### enable
+```
 jupyter nbextension enable --py jupyterlmod [--sys-prefix|--system]
 jupyter serverextension enable --py jupyterlmod [--sys-prefix|--system]
 ```
