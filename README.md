@@ -1,7 +1,10 @@
 # Jupyter Lmod
 
 Jupyter interactive notebook server extension that allows user 
-to select modules to load before launching kernels.
+to interact with environment modules before launching kernels.
+
+The extension use Lmod's Python interface to accomplish module
+related task like loading, unloading, saving collection, etc.
 
 ## requirements
 
