@@ -1,3 +1,5 @@
+import os # require by lmod output evaluated by exec()
+
 from functools import partial
 from os import environ
 from subprocess import Popen, PIPE
