@@ -3,11 +3,12 @@ import json
 import tornado.web
 import lmod
 
+from functools import partial
 from notebook.base.handlers import IPythonHandler
 
 ACTIONS = {
     "avail"    : lmod.avail,
-    "list"     : lmod.list,
+    "list"     : partial(lmod.list, hidden=False),
     "show"     : lmod.show,
     "load"     : lmod.load,
     "unload"   : lmod.unload,
