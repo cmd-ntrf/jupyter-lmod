@@ -23,10 +23,13 @@ def avail():
             modules.append(entry)
     return modules
 
-def list():
+def list(hidden=True):
     string = module('list').strip()
     if string != "No modules loaded":
-        return string.split()
+        modules = string.split()
+        if hidden:
+            modules = [m for m in modules if m.rsplit('/', 1)[-1][0] != '.']
+        return modules
     return []
 
 def savelist(system=LMOD_SYSTEM_NAME):
