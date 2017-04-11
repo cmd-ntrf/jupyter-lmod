@@ -5,28 +5,33 @@ import lmod
 
 from notebook.base.handlers import IPythonHandler
 
-#-----------------------------------------------------------------------------
-# URL to handler mappings
-#-----------------------------------------------------------------------------
+ACTIONS = {
+    "avail"    : lmod.module_avail,
+    "list"     : lmod.module_list,
+    "show"     : lmod.module_show,
+    "load"     : lmod.module_load,
+    "unload"   : lmod.module_unload,
+    "savelist" : lmod.module_savelist,
+    "save"     : lmod.module_save,
+    "restore"  : lmod.module_restore
+}
+
 class LmodActionHandler(IPythonHandler):
     @tornado.web.authenticated
     def get(self, action):
-        if action == 'avail':
-            self.finish(json.dumps(lmod.module_avail()))
-        elif action == 'list':
-            self.finish(json.dumps(lmod.module_list()))
-        elif action == 'savelist':
-            self.finish(json.dumps(lmod.module_savelist()))
-        elif action == 'show':
-            modules = self.get_arguments("modules")
-            self.finish(json.dumps(lmod.module('show', modules)))
+        func = ACTIONS.get(action, None)
+        if func:
+            args = self.get_arguments("modules")
+            result = func(*args)
+            self.finish(json.dumps(result))
 
     @tornado.web.authenticated
     def post(self, action):
-        if action in ('load', 'unload', 'restore', 'save'):
-            modules = self.get_arguments('modules')
-            if modules:
-                lmod.module(action, modules)
+        func = ACTIONS.get(action, None)
+        if func:
+            args = self.get_arguments('modules')
+            if args:
+                func(*args)
                 self.finish(json.dumps('SUCCESS'))
 
 _lmod_action_regex = r"(?P<action>load|unload|avail|list|savelist|restore|save)"

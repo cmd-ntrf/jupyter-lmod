@@ -1,13 +1,13 @@
+from functools import partial
 from os import environ
 from subprocess import Popen, PIPE
 
 LMOD_SYSTEM_NAME = environ.get('LMOD_SYSTEM_NAME', '')
 
-def module(command, arguments=()):
-    cmd = [environ['LMOD_CMD'], 'python', '--terse', command]
-    cmd.extend(arguments)
+def module(command, *args):
+    cmd = (environ['LMOD_CMD'], 'python', '--terse', command)
 
-    result = Popen(cmd, stdout=PIPE, stderr=PIPE)
+    result = Popen(cmd + args, stdout=PIPE, stderr=PIPE)
     if command in ('load', 'unload', 'restore', 'save'):
         exec(result.stdout.read())
 
@@ -34,3 +34,9 @@ def module_savelist(system=LMOD_SYSTEM_NAME):
         n = len(suffix)
         names = [name[:-n] for name in names if name.endswith(suffix)]
     return names
+
+module_show = partial(module, 'show')
+module_load = partial(module, 'load')
+module_unload = partial(module, 'unload')
+module_restore = partial(module, 'restore')
+module_save = partial(module, 'save')
