@@ -34,12 +34,8 @@ class LmodActionHandler(IPythonHandler):
                 func(*args)
                 self.finish(json.dumps('SUCCESS'))
 
-_lmod_action_regex = r"(?P<action>load|unload|avail|list|savelist|restore|save)"
-
-default_handlers = [
-    (r"/lmod/%s" % (_lmod_action_regex), LmodActionHandler),
-    (r"/lmod/(?P<action>show).*", LmodActionHandler)
-]
+_action_regex = r"/lmod/(?P<action>{})".format("|".join(ACTIONS.keys()))
+default_handlers = [(_action_regex, LmodActionHandler)]
 
 if __name__ == "__main__":
     import tornado.ioloop
