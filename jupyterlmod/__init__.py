@@ -20,7 +20,7 @@ def load_jupyter_server_extension(nbapp):
     Called when the extension is loaded.
 
     Args:
-        nb_server_app (NotebookWebApplication): handle to the Notebook webserver instance.
+        nbapp : handle to the Notebook webserver instance.
     """
     nbapp.log.info("Loading lmod extension")
     web_app = nbapp.web_app
