@@ -21,7 +21,7 @@ class LmodActionHandler(IPythonHandler):
     def get(self, action):
         func = ACTIONS.get(action, None)
         if func:
-            args = self.get_arguments("modules")
+            args = self.get_arguments("args")
             result = func(*args)
             self.finish(json.dumps(result))
 
@@ -29,7 +29,7 @@ class LmodActionHandler(IPythonHandler):
     def post(self, action):
         func = ACTIONS.get(action, None)
         if func:
-            args = self.get_arguments('modules')
+            args = self.get_arguments('args')
             if args:
                 func(*args)
                 self.finish(json.dumps('SUCCESS'))

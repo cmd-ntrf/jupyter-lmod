@@ -37,18 +37,18 @@ define([
 		load(modules) {
 			this._available = null;
 			this._loaded = null;
-			return this.post('load', {'modules' : modules});
+			return this.post('load', {'args' : modules});
 		}
 
 		restore(name) {
 			this._available = null;
 			this._loaded = null;
-			return this.post('restore', {'modules' : name});
+			return this.post('restore', {'args' : name});
 		}
 
 		save(name) {
 			this._savelist = null;
-			return this.post('save', {'modules' : name});
+			return this.post('save', {'args' : name});
 		}
 
 		savelist() {
@@ -59,13 +59,13 @@ define([
 		}
 
 		show(module) {
-			return this.get('show', {'modules' : module});
+			return this.get('show', {'args' : module});
 		}
 
 		unload(modules) {
 			this._available = null;
 			this._loaded = null;
-			return this.post('unload', {'modules' : modules});
+			return this.post('unload', {'args' : modules});
 		}
 
 		get(action, options) {
