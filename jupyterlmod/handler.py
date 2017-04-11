@@ -6,14 +6,14 @@ import lmod
 from notebook.base.handlers import IPythonHandler
 
 ACTIONS = {
-    "avail"    : lmod.module_avail,
-    "list"     : lmod.module_list,
-    "show"     : lmod.module_show,
-    "load"     : lmod.module_load,
-    "unload"   : lmod.module_unload,
-    "savelist" : lmod.module_savelist,
-    "save"     : lmod.module_save,
-    "restore"  : lmod.module_restore
+    "avail"    : lmod.avail,
+    "list"     : lmod.list,
+    "show"     : lmod.show,
+    "load"     : lmod.load,
+    "unload"   : lmod.unload,
+    "savelist" : lmod.savelist,
+    "save"     : lmod.save,
+    "restore"  : lmod.restore
 }
 
 class LmodActionHandler(IPythonHandler):

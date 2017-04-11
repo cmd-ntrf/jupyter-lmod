@@ -13,7 +13,7 @@ def module(command, *args):
 
     return result.stderr.read().decode()
 
-def module_avail():
+def avail():
     string = module('avail')
     modules = []
     for entry in string.split():
@@ -21,13 +21,13 @@ def module_avail():
             modules.append(entry)
     return modules
 
-def module_list():
+def list():
     string = module('list').strip()
     if string != "No modules loaded":
         return string.split()
     return []
 
-def module_savelist(system=LMOD_SYSTEM_NAME):
+def savelist(system=LMOD_SYSTEM_NAME):
     names = module('savelist').split()
     if system:
         suffix = '.{}'.format(system)
@@ -35,8 +35,8 @@ def module_savelist(system=LMOD_SYSTEM_NAME):
         names = [name[:-n] for name in names if name.endswith(suffix)]
     return names
 
-module_show = partial(module, 'show')
-module_load = partial(module, 'load')
-module_unload = partial(module, 'unload')
-module_restore = partial(module, 'restore')
-module_save = partial(module, 'save')
+show = partial(module, 'show')
+load = partial(module, 'load')
+unload = partial(module, 'unload')
+restore = partial(module, 'restore')
+save = partial(module, 'save')
