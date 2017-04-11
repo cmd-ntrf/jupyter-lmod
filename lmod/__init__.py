@@ -1,11 +1,10 @@
-import os
+from os import environ
 from subprocess import Popen, PIPE
 
-LMOD_CMD = os.environ['LMOD_CMD']
-LMOD_SYSTEM_NAME = os.environ.get('LMOD_SYSTEM_NAME', '')
+LMOD_SYSTEM_NAME = environ.get('LMOD_SYSTEM_NAME', '')
 
 def module(command, arguments=()):
-    cmd = [LMOD_CMD, 'python', '--terse', command]
+    cmd = [environ['LMOD_CMD'], 'python', '--terse', command]
     cmd.extend(arguments)
 
     result = Popen(cmd, stdout=PIPE, stderr=PIPE)
