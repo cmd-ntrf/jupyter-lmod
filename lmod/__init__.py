@@ -23,11 +23,11 @@ def avail():
             modules.append(entry)
     return modules
 
-def list(hidden=True):
+def list(hide_hidden=False):
     string = module('list').strip()
     if string != "No modules loaded":
         modules = string.split()
-        if hidden:
+        if hide_hidden:
             modules = [m for m in modules if m.rsplit('/', 1)[-1][0] != '.']
         return modules
     return []

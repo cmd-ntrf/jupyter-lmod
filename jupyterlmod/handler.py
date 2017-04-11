@@ -8,7 +8,7 @@ from notebook.base.handlers import IPythonHandler
 
 ACTIONS = {
     "avail"    : lmod.avail,
-    "list"     : partial(lmod.list, hidden=False),
+    "list"     : partial(lmod.list, hide_hidden=True),
     "show"     : lmod.show,
     "load"     : lmod.load,
     "unload"   : lmod.unload,
