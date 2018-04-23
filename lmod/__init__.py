@@ -32,13 +32,8 @@ def list(hide_hidden=False):
         return modules
     return []
 
-def savelist(system=LMOD_SYSTEM_NAME):
-    names = module('savelist').split()
-    if system:
-        suffix = '.{}'.format(system)
-        n = len(suffix)
-        names = [name[:-n] for name in names if name.endswith(suffix)]
-    return names
+def savelist():
+    return module('savelist').split()
 
 show = partial(module, 'show')
 load = partial(module, 'load')
