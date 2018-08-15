@@ -241,7 +241,7 @@ class RestoreWidget extends Widget {
 class ModuleWidget extends Widget {
   constructor(content) {
     let body = document.createElement('div');
-    let text = document.createElement('label');
+    let text = document.createElement('pre');
     text.innerHTML = content;
     body.appendChild(text);
 
