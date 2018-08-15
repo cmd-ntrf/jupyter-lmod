@@ -108,8 +108,8 @@ function restore_collection(event): Promise<void | undefined> {
   }).then(result => {
     if (result.button.label === 'Restore') {
       let name = result.value;
-      console.log(name);
       lmod.restore(name);
+      refresh_module_list();
     }
     return;
   });
