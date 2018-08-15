@@ -45,7 +45,9 @@ def avail():
     string = module('avail')
     modules = []
     for entry in string.split():
-        if not (entry.startswith('/') or entry.endswith('/')):
+        if not (entry.startswith('/') or
+                entry.endswith('/') or
+                "@" in entry):
             modules.append(entry)
     return modules
 
