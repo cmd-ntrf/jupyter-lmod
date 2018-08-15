@@ -49,6 +49,12 @@ def list(hide_hidden=False):
         return modules
     return []
 
+def freeze():
+    header = "import lmod"
+    modules = list(hide_hidden=True)
+    return "\n".join([header] +
+                     ["lmod.load('{}')".format(m) for m in modules])
+
 @update_sys_path
 def load(*args):
     return module('load', *args)

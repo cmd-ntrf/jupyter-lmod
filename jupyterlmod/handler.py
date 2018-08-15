@@ -9,6 +9,7 @@ from notebook.base.handlers import IPythonHandler
 ACTIONS = {
     "avail"    : lmod.avail,
     "list"     : partial(lmod.list, hide_hidden=True),
+    "freeze"   : lmod.freeze,
     "show"     : lmod.show,
     "load"     : lmod.load,
     "unload"   : lmod.unload,
