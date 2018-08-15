@@ -1,6 +1,7 @@
 import os # require by lmod output evaluated by exec()
+import sys
 
-from functools import partial
+from functools import partial, wraps
 from os import environ
 from subprocess import Popen, PIPE
 
@@ -14,6 +15,22 @@ def module(command, *args):
         exec(result.stdout.read())
 
     return result.stderr.read().decode()
+
+def update_sys_path(function):
+    @wraps(function)
+    def wrapper(*args):
+        orig_python_path = os.environ['PYTHONPATH'].split(':')
+        output = function(*args)
+        python_path = os.environ['PYTHONPATH'].split(':')
+
+        paths_to_del = set(orig_python_path) - set(python_path)
+        paths_to_add = set(python_path) - set(orig_python_path)
+        paths_to_add = [path for path in python_path if path in paths_to_add]
+        for path in paths_to_del:
+            sys.path.remove(path)
+        sys.path.extend(paths_to_add)
+        return output
+    return wrapper
 
 def avail():
     string = module('avail')
@@ -32,11 +49,20 @@ def list(hide_hidden=False):
         return modules
     return []
 
+@update_sys_path
+def load(*args):
+    return module('load', *args)
+
+@update_sys_path
+def restore(*args):
+    return module('restore', *args)
+
 def savelist():
     return module('savelist').split()
 
+@update_sys_path
+def unload(*args):
+    return module('unload', *args)
+
 show = partial(module, 'show')
-load = partial(module, 'load')
-unload = partial(module, 'unload')
-restore = partial(module, 'restore')
 save = partial(module, 'save')
