@@ -11,7 +11,7 @@ def module(command, *args):
     cmd = (environ['LMOD_CMD'], 'python', '--terse', command)
 
     result = Popen(cmd + args, stdout=PIPE, stderr=PIPE)
-    if command in ('load', 'unload', 'restore', 'save'):
+    if command in ('load', 'unload', 'purge', 'restore', 'save'):
         exec(result.stdout.read())
 
     return result.stderr.read().decode()
