@@ -20,7 +20,10 @@ var lmod_list_line = $(`
      <button class="jp-RunningSessions-itemShutdown jp-mod-styled"></button>
   </li>`)
 
-var lmod = new Lmod.Lmod(window.location.origin + "/");
+var lmod = new Lmod.Lmod(
+  window.location.origin + 
+	JSON.parse(document.getElementById('jupyter-config-data').innerHTML).baseUrl
+);
 
 var search_source = [];
 
