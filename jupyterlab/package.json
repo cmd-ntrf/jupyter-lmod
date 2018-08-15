@@ -1,0 +1,43 @@
+{
+  "name": "lmod-jupyterlab",
+  "version": "0.1.0",
+  "description": "Lmod JupyterLab extension.",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/cmd-ntrf/jupyter-lmod",
+  "bugs": {
+    "url": "https://github.com/cmd-ntrf/jupyter-lmod/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "etienned",
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}"
+  ],
+  "main": "lib/jupyterlab/src/index.js",
+  "types": "lib/jupyterlab/src/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmd-ntrf/jupyter-lmod.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf lib",
+    "watch": "tsc -w",
+    "prepare": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^0.17.0",
+    "@types/jquery": "^3.3.5",
+    "jquery": "^3.3.1"
+  },
+  "devDependencies": {
+    "rimraf": "^2.6.1",
+    "typescript": "~2.9.2"
+  },
+  "jupyterlab": {
+    "extension": true
+  }
+}

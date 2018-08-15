@@ -1,14 +1,13 @@
-define(function(require) {
     "use strict";
     var $ = require('jquery');
     var ui = require('jquery-ui');
-    var dialog = require('base/js/dialog');
-    var lmod_class = require('./lmod');
-    var utils = require('base/js/utils');
+    // var dialog = require('base/js/dialog');
+    var lmod_class = require('./lmod.js');
+    // var utils = require('base/js/utils');
 
-    var base_url = utils.get_body_data("baseUrl");
+    var base_url = "http://localhost:8888"
 
-    var lmod = new lmod_class.Lmod(base_url);
+    var lmod = new lmod_class.Lmod({'base_url' : base_url});
     var search_source = null;
 
     const lmod_tab_html = $([
@@ -60,31 +59,32 @@ define(function(require) {
     ].join('\n'));
 
     function save_collection(event) {
-        var d = dialog.modal({
-            title: "Save Collection",
-            body: save_dialog_body,
-            keyboard_manager: this.keyboard_manager,
-            default_button: "Cancel",
-            buttons : {
-                "Cancel": {},
-                "Save": {
-                    class: "btn-primary",
-                    click: function () {
-                        var name = d.find('input').val();
-                        lmod.save(name ? name : 'default').then(refresh_restore_list);
-                    }
-                }
-            },
-            open : function () {
-                d.find('input[type="text"]').keydown(function (event) {
-                    if (event.which === keyboard.keycodes.enter) {
-                        d.find('.btn-primary').first().click();
-                        return false;
-                    }
-                });
-                d.find('input[type="text"]').focus().select();
-            }
-        });
+        console.log("Save button");
+        // var d = dialog.modal({
+        //     title: "Save Collection",
+        //     body: save_dialog_body,
+        //     keyboard_manager: this.keyboard_manager,
+        //     default_button: "Cancel",
+        //     buttons : {
+        //         "Cancel": {},
+        //         "Save": {
+        //             class: "btn-primary",
+        //             click: function () {
+        //                 var name = d.find('input').val();
+        //                 lmod.save(name ? name : 'default').then(refresh_restore_list);
+        //             }
+        //         }
+        //     },
+        //     open : function () {
+        //         d.find('input[type="text"]').keydown(function (event) {
+        //             if (event.which === keyboard.keycodes.enter) {
+        //                 d.find('.btn-primary').first().click();
+        //                 return false;
+        //             }
+        //         });
+        //         d.find('input[type="text"]').focus().select();
+        //     }
+        // });
     }
 
     function refresh_restore_list() {
@@ -143,9 +143,9 @@ define(function(require) {
       return split( term ).pop();
     }
 
-    function load() {
-        if (!IPython.notebook_list) return;
-        $(".tab-content").append(lmod_tab_html);
+    var Load = function load() {
+        // if (!IPython.notebook_list) return;
+        $(".jp-lmodWidget").append(lmod_tab_html);
         $("#save-button").click(save_collection);
         $("#tabs").append(
             $('<li>')
@@ -203,7 +203,4 @@ define(function(require) {
         refresh_module_list();
         refresh_restore_list();
     }
-    return {
-        load_ipython_extension: load
-    };
-});
+module.exports = Load;
