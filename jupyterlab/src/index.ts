@@ -131,7 +131,7 @@ class LmodWidget extends Widget {
               <input id="modules" class="p-CommandPalette-input" placeholder="Search available modules..." >
           </div>
       </div>
-      <div id="lmod" class="tab-pane">
+      <div id="lmod" class="p-CommandPalette-content">
           <div class="jp-RunningSessions-section">
               <div class="jp-RunningSessions-sectionHeader">Loaded Modules
                   <button 
