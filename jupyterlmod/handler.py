@@ -13,6 +13,7 @@ ACTIONS = {
     "show"     : lmod.show,
     "load"     : lmod.load,
     "unload"   : lmod.unload,
+    "purge"    : lmod.purge,
     "savelist" : lmod.savelist,
     "save"     : lmod.save,
     "restore"  : lmod.restore
