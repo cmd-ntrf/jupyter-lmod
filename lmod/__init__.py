@@ -50,9 +50,9 @@ def list(hide_hidden=False):
     return []
 
 def freeze():
-    header = "import lmod"
+    header = ["import lmod", "lmod.purge(force=True)"]
     modules = list(hide_hidden=True)
-    return "\n".join([header] +
+    return "\n".join(header +
                      ["lmod.load('{}')".format(m) for m in modules])
 
 @update_sys_path
@@ -69,6 +69,14 @@ def savelist():
 @update_sys_path
 def unload(*args):
     return module('unload', *args)
+
+@update_sys_path
+def purge(force=False):
+    if force:
+        args = ('--force',)
+    else:
+        args = ()
+    return module('purge', *args)
 
 show = partial(module, 'show')
 save = partial(module, 'save')
