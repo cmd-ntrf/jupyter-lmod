@@ -18,9 +18,9 @@ def module(command, *args):
 
 def update_sys_path(function):
     @wraps(function)
-    def wrapper(*args):
+    def wrapper(*args, **kargs):
         orig_python_path = os.environ['PYTHONPATH'].split(':')
-        output = function(*args)
+        output = function(*args, **kargs)
         python_path = os.environ['PYTHONPATH'].split(':')
 
         paths_to_del = set(orig_python_path) - set(python_path)
