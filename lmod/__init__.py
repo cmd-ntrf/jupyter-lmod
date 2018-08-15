@@ -12,7 +12,10 @@ def module(command, *args):
 
     result = Popen(cmd + args, stdout=PIPE, stderr=PIPE)
     if command in ('load', 'unload', 'purge', 'restore', 'save'):
-        exec(result.stdout.read())
+        try:
+            exec(result.stdout.read())
+        except NameError:
+            pass
 
     return result.stderr.read().decode()
 
