@@ -22,9 +22,15 @@ def module(command, *args):
 def update_sys_path(function):
     @wraps(function)
     def wrapper(*args, **kargs):
-        orig_python_path = os.environ['PYTHONPATH'].split(':')
+        if 'PYTHONPATH' in os.environ:
+            orig_python_path = os.environ['PYTHONPATH'].split(':')
+        else:
+            orig_python_path = []
         output = function(*args, **kargs)
-        python_path = os.environ['PYTHONPATH'].split(':')
+        if 'PYTHONPATH' in os.environ:
+            python_path = os.environ['PYTHONPATH'].split(':')
+        else:
+            python_path = []
 
         paths_to_del = set(orig_python_path) - set(python_path)
         paths_to_add = set(python_path) - set(orig_python_path)
