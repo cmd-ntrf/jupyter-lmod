@@ -56,6 +56,10 @@ class Lmod {
     return this.get('show', {'args' : module});
   }
 
+  freeze() {
+    return this.get('freeze', {});
+  }
+
   unload(modules) {
     this._available = null;
     this._loaded = null;

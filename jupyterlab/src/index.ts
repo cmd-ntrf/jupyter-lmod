@@ -72,8 +72,19 @@ async function show_module(module) {
     let text = $.trim(datalist.slice(3).join('\n'));
     let path = datalist[1].slice(0, -1);
     showDialog({
-          title: path,
-          body: new ModuleWidget(text),
+          title: module,
+          body: new ModuleWidget(path, text),
+          buttons: [
+            Dialog.okButton()
+          ]
+    });
+}
+
+async function export_module() {
+    let data = await lmod.freeze();
+    showDialog({
+          title: "Export modules",
+          body: new ModuleWidget("Copy this in your notebook to restore the same state :", data),
           buttons: [
             Dialog.okButton()
           ]
@@ -137,12 +148,20 @@ class LmodWidget extends Widget {
                   <button 
                     title="Save" 
                     class="jp-RunningSessions-itemShutdown jp-mod-styled jp-RunningSessions-shutdownAll"
-                    style="background-image:var(--jp-icon-save);" id="save-button"
+                    style="background-image:var(--jp-icon-save); margin: 0px 0px;"
+                    id="save-button"
                   ></button>
                   <button 
                     title="Restore" 
                     class="jp-RunningSessions-itemShutdown jp-mod-styled jp-RunningSessions-shutdownAll" 
-                    style="background-image:var(--jp-icon-refresh);" id="restore-button"
+                    style="background-image:var(--jp-icon-refresh); margin: 0px 0px;"
+                    id="restore-button"
+                  ></button>
+                  <button 
+                    title="Export" 
+                    class="jp-RunningSessions-itemShutdown jp-mod-styled jp-RunningSessions-shutdownAll" 
+                    style="background-image:var(--jp-icon-upload); margin: 0px 0px;"
+                    id="export-button"
                   ></button>
               </div>
               <div class="jp-RunningSessions-sectionContainer">
@@ -163,6 +182,7 @@ class LmodWidget extends Widget {
     let buttons = this.node.getElementsByClassName('jp-RunningSessions-itemShutdown')
     buttons['save-button'].addEventListener('click', function(e) {return save_collection(e);});
     buttons['restore-button'].addEventListener('click', function(e) {return restore_collection(e);});
+    buttons['export-button'].addEventListener('click', function(e) {return export_module();});
     this.node.getElementsByClassName('p-CommandPalette-input')['modules']
       .addEventListener('keyup', function(e) {return refresh_avail_list();});
     refresh_module_list();
@@ -239,11 +259,20 @@ class RestoreWidget extends Widget {
 }
 
 class ModuleWidget extends Widget {
-  constructor(content) {
+  constructor(labelText, content) {
     let body = document.createElement('div');
+
+    let label = document.createElement('label');
+    label.innerHTML = labelText;
+    body.appendChild(label);
+
+    let div = document.createElement('div');
+    div.classList.add('jp-JSONEditor-host');
     let text = document.createElement('pre');
+    text.setAttribute("style", "margin:10px 10px;");
     text.innerHTML = content;
-    body.appendChild(text);
+    div.appendChild(text);
+    body.appendChild(div);
 
     super({ node: body });
   }
