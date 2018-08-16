@@ -48,8 +48,8 @@ def update_sys_path(env_var, postfix=''):
         return wrapper
     return decorator
 
-def avail():
-    string = module('avail')
+def avail(*args):
+    string = module('avail', *args)
     modules = []
     for entry in string.split():
         if not (entry.startswith('/') or
