@@ -16,14 +16,22 @@ related task like loading, unloading, saving collection, etc.
 ```
 pip install jupyterlmod
 jupyter nbextension install --py jupyterlmod [--sys-prefix|--user]
+jupyter serverextension enable --py jupyterlmod [--sys-prefix|--system]
 ```
 
-### enable
+### jupyter notebook
 ```
 jupyter nbextension enable --py jupyterlmod [--sys-prefix|--system]
-jupyter serverextension enable --py jupyterlmod [--sys-prefix|--system]
+```
+
+### jupyterlab
+
+```
+jupyter labextension install lmod-jupyterlab
 ```
 
 ## demo
 
-![Jupyter-lmod demo](http://i.imgur.com/IP9uUJp.gif)
+![Jupyter notebook demo](http://i.imgur.com/IP9uUJp.gif)
+
+![JupyterLab demo](https://i.imgur.com/1HDH7iN.gif)
