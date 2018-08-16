@@ -27,7 +27,7 @@ jupyter nbextension enable --py jupyterlmod [--sys-prefix|--system]
 ### jupyterlab
 
 ```
-jupyter labextension install lmod-jupyterlab
+jupyter labextension install jupyterlab-lmod
 ```
 
 ## demo
