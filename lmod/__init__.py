@@ -56,6 +56,7 @@ def avail(*args):
                 entry.endswith('/') or
                 "@" in entry):
             modules.append(entry)
+    modules.sort(key=lambda v: v.split('/')[0])
     return modules
 
 def list(hide_hidden=False):
