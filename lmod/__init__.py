@@ -76,20 +76,28 @@ def freeze():
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
 def load(*args):
-    return module('load', *args)
+    output = module('load', *args)
+    if output:
+        print(output)
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
 def restore(*args):
-    return module('restore', *args)
+    output = module('restore', *args)
+    if output:
+        print(output)
 
 def savelist():
-    return module('savelist').split()
+    output = module('savelist').split()
+    if output:
+        print(output)
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
 def unload(*args):
-    return module('unload', *args)
+    output = module('unload', *args)
+    if output:
+        print(output)
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
@@ -98,7 +106,9 @@ def purge(force=False):
         args = ('--force',)
     else:
         args = ()
-    return module('purge', *args)
+    output = module('purge', *args)
+    if output:
+        print(output)
 
 show = partial(module, 'show')
 save = partial(module, 'save')
