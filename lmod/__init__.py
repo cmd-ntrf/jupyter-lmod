@@ -39,7 +39,10 @@ def update_sys_path(env_var, postfix=''):
             paths_to_add = set(new_paths) - set(orig_paths)
             paths_to_add = [path for path in new_paths if path in paths_to_add]
             for path in paths_to_del:
-                sys.path.remove(path)
+                try:
+                    sys.path.remove(path)
+                except ValueError:
+                    continue
             sys.path.extend(paths_to_add)
             return output
         return wrapper
