@@ -2,13 +2,13 @@ import os # require by lmod output evaluated by exec()
 import sys
 
 from functools import partial, wraps
-from os import environ
 from subprocess import Popen, PIPE
 
-LMOD_SYSTEM_NAME = environ.get('LMOD_SYSTEM_NAME', '')
+LMOD_SYSTEM_NAME = os.environ.get('LMOD_SYSTEM_NAME', '')
+SITE_POSTFIX = os.path.join('lib', 'python'+sys.version[:3], 'site-packages')
 
 def module(command, *args):
-    cmd = (environ['LMOD_CMD'], 'python', '--terse', command)
+    cmd = (os.environ['LMOD_CMD'], 'python', '--terse', command)
 
     result = Popen(cmd + args, stdout=PIPE, stderr=PIPE)
     if command in ('load', 'unload', 'purge', 'restore', 'save'):
@@ -19,27 +19,31 @@ def module(command, *args):
 
     return result.stderr.read().decode()
 
-def update_sys_path(function):
-    @wraps(function)
-    def wrapper(*args, **kargs):
-        if 'PYTHONPATH' in os.environ:
-            orig_python_path = os.environ['PYTHONPATH'].split(':')
-        else:
-            orig_python_path = []
-        output = function(*args, **kargs)
-        if 'PYTHONPATH' in os.environ:
-            python_path = os.environ['PYTHONPATH'].split(':')
-        else:
-            python_path = []
+def update_sys_path(env_var, postfix=''):
+    def decorator(function):
+        @wraps(function)
+        def wrapper(*args, **kargs):
+            if env_var in os.environ:
+                orig_paths = os.environ[env_var].split(os.pathsep)
+                orig_paths = [os.path.join(path, postfix) for path in orig_paths]
+            else:
+                orig_paths = []
+            output = function(*args, **kargs)
+            if env_var in os.environ:
+                new_paths = os.environ[env_var].split(os.pathsep)
+                new_paths = [os.path.join(path, postfix) for path in new_paths]
+            else:
+                new_paths = []
 
-        paths_to_del = set(orig_python_path) - set(python_path)
-        paths_to_add = set(python_path) - set(orig_python_path)
-        paths_to_add = [path for path in python_path if path in paths_to_add]
-        for path in paths_to_del:
-            sys.path.remove(path)
-        sys.path.extend(paths_to_add)
-        return output
-    return wrapper
+            paths_to_del = set(orig_paths) - set(new_paths)
+            paths_to_add = set(new_paths) - set(orig_paths)
+            paths_to_add = [path for path in new_paths if path in paths_to_add]
+            for path in paths_to_del:
+                sys.path.remove(path)
+            sys.path.extend(paths_to_add)
+            return output
+        return wrapper
+    return decorator
 
 def avail():
     string = module('avail')
@@ -66,22 +70,26 @@ def freeze():
     return "\n".join(header +
                      ["lmod.load('{}')".format(m) for m in modules])
 
-@update_sys_path
+@update_sys_path('PYTHONPATH')
+@update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
 def load(*args):
     return module('load', *args)
 
-@update_sys_path
+@update_sys_path('PYTHONPATH')
+@update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
 def restore(*args):
     return module('restore', *args)
 
 def savelist():
     return module('savelist').split()
 
-@update_sys_path
+@update_sys_path('PYTHONPATH')
+@update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
 def unload(*args):
     return module('unload', *args)
 
-@update_sys_path
+@update_sys_path('PYTHONPATH')
+@update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
 def purge(force=False):
     if force:
         args = ('--force',)
