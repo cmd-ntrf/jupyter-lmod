@@ -88,9 +88,7 @@ def restore(*args):
         print(output)
 
 def savelist():
-    output = module('savelist').split()
-    if output:
-        print(output)
+    return module('savelist').split()
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
