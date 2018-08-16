@@ -84,7 +84,7 @@ async function export_module() {
     let data = await lmod.freeze();
     showDialog({
           title: "Export modules",
-          body: new ModuleWidget("Copy this in your notebook to restore the same state :", data),
+          body: new ModuleWidget("Add this in a notebook to load the same modules :", data),
           buttons: [
             Dialog.okButton()
           ]
@@ -268,8 +268,9 @@ class ModuleWidget extends Widget {
 
     let div = document.createElement('div');
     div.classList.add('jp-JSONEditor-host');
+    div.setAttribute("style", "min-height:inherit;");
     let text = document.createElement('pre');
-    text.setAttribute("style", "margin:10px 10px;");
+    text.setAttribute("style", "margin:10px 10px; white-space:pre-wrap;");
     text.innerHTML = content;
     div.appendChild(text);
     body.appendChild(div);
