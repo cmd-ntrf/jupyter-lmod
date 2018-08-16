@@ -8,7 +8,7 @@ define(function(require) {
 
     var base_url = utils.get_body_data("baseUrl");
 
-    var lmod = new lmod_class.Lmod({'base_url' : base_url});
+    var lmod = new lmod_class.Lmod(base_url);
     var search_source = null;
 
     const lmod_tab_html = $([
@@ -83,7 +83,7 @@ define(function(require) {
                     }
                 });
                 d.find('input[type="text"]').focus().select();
-            }            
+            }
         });
     }
 
@@ -135,14 +135,14 @@ define(function(require) {
             }
         });
     }
- 
+
     function split( val ) {
       return val.split( /,\s*/ );
     }
     function extractLast( term ) {
       return split( term ).pop();
     }
- 
+
     function load() {
         if (!IPython.notebook_list) return;
         $(".tab-content").append(lmod_tab_html);
