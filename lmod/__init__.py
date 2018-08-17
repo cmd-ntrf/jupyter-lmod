@@ -83,6 +83,13 @@ def load(*args):
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
+def reset():
+    output = module('reset')
+    if output:
+        print(output)
+
+@update_sys_path('PYTHONPATH')
+@update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
 def restore(*args):
     output = module('restore', *args)
     if output:

@@ -16,7 +16,8 @@ ACTIONS = {
     "purge"    : lmod.purge,
     "savelist" : lmod.savelist,
     "save"     : lmod.save,
-    "restore"  : lmod.restore
+    "restore"  : lmod.restore,
+    "reset"    : lmod.reset
 }
 
 class LmodActionHandler(IPythonHandler):
