@@ -93,13 +93,13 @@ define(function(require) {
             let list = $("#restore-menu").html("");
             values.map(item => {
                 let li = $('<li>').append($('<a>', {'href': '#', "text" : item}))
-                                  .click(e => lmod.restore(item).then(refresh_module_list));
+                                  .click(e => lmod.restore(item).then(refresh_module_ui));
                 list.append(li);
             })
         });
     }
 
-    function refresh_module_list() {
+    function refresh_module_ui() {
         Promise.all([lmod.avail(), lmod.list()])
         .then(values => {
             let avail_set = new Set(values[0]);
@@ -111,10 +111,12 @@ define(function(require) {
             modulelist.map(item => {
                 let li = lmod_list_line.clone();
                 li.find('a').text(item).click(e => show_module(item));
-                li.find('button').click(e => lmod.unload(item).then(refresh_module_list));
+                li.find('button').click(e => lmod.unload(item).then(refresh_module_ui));
                 list.append(li);
                 avail_set.delete(item)
             });
+
+
 
             search_source = Array.from(avail_set);
         });
@@ -172,7 +174,7 @@ define(function(require) {
                 var modules = split($.trim(event.target.value));
                 modules.pop();
 
-                lmod.load(modules).then(refresh_module_list);
+                lmod.load(modules).then(refresh_module_ui);
                 event.target.value = "";
             }
         })
@@ -200,7 +202,7 @@ define(function(require) {
             }
         });
 
-        refresh_module_list();
+        refresh_module_ui();
         refresh_restore_list();
     }
     return {
