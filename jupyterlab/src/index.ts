@@ -144,7 +144,7 @@ class LmodWidget extends Widget {
       </div>
       <div id="lmod" class="p-CommandPalette-content">
           <div class="jp-RunningSessions-section">
-              <div class="jp-RunningSessions-sectionHeader">Loaded Modules
+              <div class="jp-RunningSessions-sectionHeader"><H2>Loaded Modules</H2>
                   <button 
                     title="Save" 
                     class="jp-RunningSessions-itemShutdown jp-mod-styled jp-RunningSessions-shutdownAll"
@@ -170,7 +170,7 @@ class LmodWidget extends Widget {
               </div>
           </div>
           <div class="jp-RunningSessions-section">
-              <div class="jp-RunningSessions-sectionHeader" id="avail_header">Available Modules
+              <div class="jp-RunningSessions-sectionHeader" id="avail_header"><H2>Available Modules</H2>
               </div>
               <div class="jp-RunningSessions-sectionContainer">
                   <ul class="jp-RunningSessions-sectionList" id="avail_list">
