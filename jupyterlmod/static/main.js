@@ -116,10 +116,20 @@ define(function(require) {
                 avail_set.delete(item)
             });
 
-
+            refresh_kernel_menu(modulelist);
 
             search_source = Array.from(avail_set);
         });
+    }
+
+    function refresh_kernel_menu(modulelist) {
+        if (modulelist.some(module => { return module.toLowerCase().includes("rstudio") })) {
+            $('a:contains("RStudio Session")').attr("href", base_url + 'rstudio/');
+            $("li.new-rstudio").removeClass("disabled");
+        } else {
+            $("li.new-rstudio").addClass("disabled");
+            $('a:contains("RStudio Session")').removeAttr("href");
+        }
     }
 
     async function show_module(module) {
