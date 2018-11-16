@@ -27,6 +27,10 @@ var lmod = new Lmod.Lmod(
 
 var search_source = [];
 
+var is_rstudio_enable = false;
+
+var rstudio_id = "rsession:launch";
+
 function refresh_module_list() {
     Promise.all([lmod.avail(), lmod.list()])
     .then(values => {
@@ -44,6 +48,7 @@ function refresh_module_list() {
             avail_set.delete(item)
         });
 
+        is_rstudio_enable = modulelist.some(module => { return module.toLowerCase().includes("rstudio") })
         search_source = Array.from(avail_set);
         refresh_avail_list();
     });
@@ -203,6 +208,14 @@ function activate(app: JupyterLab, palette: ICommandPalette, restorer: ILayoutRe
 
 	restorer.add(widget, 'lmod-sessions');
   app.shell.addToLeftArea(widget, { rank: 1000 });
+
+  try {
+    // @ts-ignore Allow access to private variable
+    app.commands._commands[rstudio_id].isEnabled = () => {return is_rstudio_enable};
+  }
+  catch(e) {
+    //jupyterlab-rsessionproxy is not activated
+  }
 };
 
 const extension: JupyterLabPlugin<void> = {
