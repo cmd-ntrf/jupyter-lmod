@@ -7,7 +7,7 @@ related task like loading, unloading, saving collection, etc.
 
 ## requirements
 
-- [jupyter notebook](https://github.com/jupyter/notebook) >= 4.0
+- [jupyter notebook](https://github.com/jupyter/notebook) >= 5.3
 - [Lmod](https://github.com/TACC/Lmod) >= 6.0
 
 ## setup
@@ -15,13 +15,6 @@ related task like loading, unloading, saving collection, etc.
 ### install
 ```
 pip install jupyterlmod
-jupyter nbextension install --py jupyterlmod [--sys-prefix|--user]
-jupyter serverextension enable --py jupyterlmod [--sys-prefix|--system]
-```
-
-### jupyter notebook
-```
-jupyter nbextension enable --py jupyterlmod [--sys-prefix|--system]
 ```
 
 ### jupyterlab

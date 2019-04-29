@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+from glob import glob
 from setuptools import setup
 
 setup_args = dict(
     name                = 'jupyterlmod',
     packages            = ['jupyterlmod', 'lmod'],
-    package_data        = {'jupyterlmod' : ['static/*']},
-    version             = "1.7.1",
+    version             = "1.7.2",
     description         = "jupyterlmod: notebook server extension to interact with Lmod system",
     long_description    = "Jupyter interactive notebook server extension that allows user to select software modules to load with Lmod before launching kernels.",
     author              = "Félix-Antoine Fortin",
@@ -25,7 +24,12 @@ setup_args = dict(
         'Programming Language :: Python :: 3',
     ],
     install_requires   = [
-    'jupyter>=1.0.0',
+        'notebook>=5.3.0',
+    ],
+    data_files=[
+        ('share/jupyter/nbextensions/jupyterlmod', glob('jupyterlmob/static/*')),
+        ('etc/jupyter/jupyter_notebook_config.d', ['jupyterlmod/etc/serverextension.json']),
+        ('etc/jupyter/nbconfig/notebook.d', ['jupyterlmod/etc/nbextension.json'])
     ],
 )
 

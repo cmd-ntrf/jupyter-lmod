@@ -1,0 +1,5 @@
+{
+    "load_extensions": {
+        "jupyterlmod/main": true
+    }
+}
