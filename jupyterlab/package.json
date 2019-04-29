@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-lmod",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Lmod JupyterLab extension.",
   "keywords": [
     "jupyter",
@@ -30,8 +30,8 @@
   },
   "dependencies": {
     "@jupyterlab/application": ">=0.17.0",
-    "@types/jquery": "^3.3.5",
-    "jquery": "^3.3.1"
+    "@types/jquery": "^3.3.29",
+    "jquery": "^3.4.0"
   },
   "devDependencies": {
     "rimraf": "^2.6.1",
