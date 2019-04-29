@@ -6,7 +6,7 @@ from setuptools import setup
 setup_args = dict(
     name                = 'jupyterlmod',
     packages            = ['jupyterlmod', 'lmod'],
-    version             = "1.7.2",
+    version             = "1.7.3",
     description         = "jupyterlmod: notebook server extension to interact with Lmod system",
     long_description    = "Jupyter interactive notebook server extension that allows user to select software modules to load with Lmod before launching kernels.",
     author              = "Félix-Antoine Fortin",
@@ -28,8 +28,8 @@ setup_args = dict(
     ],
     data_files=[
         ('share/jupyter/nbextensions/jupyterlmod', glob('jupyterlmob/static/*')),
-        ('etc/jupyter/jupyter_notebook_config.d', ['jupyterlmod/etc/serverextension.json']),
-        ('etc/jupyter/nbconfig/notebook.d', ['jupyterlmod/etc/nbextension.json'])
+        ('etc/jupyter/jupyter_notebook_config.d', ['jupyterlmod/etc/jupyterlmod_serverextension.json']),
+        ('etc/jupyter/nbconfig/notebook.d', ['jupyterlmod/etc/jupyterlmod_nbextension.json'])
     ],
 )
 
