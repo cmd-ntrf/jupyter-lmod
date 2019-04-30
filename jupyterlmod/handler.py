@@ -1,9 +1,11 @@
 import json
+import os
 
 import tornado.web
 import lmod
 
 from functools import partial
+from jupyter_core.paths import jupyter_path
 from notebook.base.handlers import IPythonHandler
 
 ACTIONS = {
@@ -35,7 +37,12 @@ class LmodActionHandler(IPythonHandler):
         if func:
             args = self.get_arguments('args')
             if args:
+                jpath_old = os.environ.get('JUPYTER_PATH')
                 func(*args)
+                # If JUPYTER_PATH has been modified by func
+                # the kernel directory list is updated.
+                if jpath_old != os.environ.get('JUPYTER_PATH'):
+                    self.kernel_spec_manager.kernel_dirs = jupyter_path('kernels')
                 self.finish(json.dumps('SUCCESS'))
 
 _action_regex = r"/lmod/(?P<action>{})".format("|".join(ACTIONS.keys()))
