@@ -1,5 +1,5 @@
 import {
-  JupyterLab, JupyterLabPlugin, ILayoutRestorer
+  JupyterFrontEnd, JupyterFrontEndPlugin, ILayoutRestorer
 } from '@jupyterlab/application';
 
 import {
@@ -133,7 +133,8 @@ class LmodWidget extends Widget {
     super();
 
     this.id = 'lmod-jupyterlab';
-    this.title.label = 'Softwares';
+    this.title.caption = 'Softwares';
+    this.title.iconClass = 'jp-LmodIcon jp-SideBar-tabIcon'
     this.addClass('jp-RunningSessions');
 
     this.node.insertAdjacentHTML('afterbegin',
@@ -193,8 +194,8 @@ class LmodWidget extends Widget {
 /**
  * Activate the lmod widget extension.
  */
-function activate(app: JupyterLab, palette: ICommandPalette, restorer: ILayoutRestorer) {
-  console.log('JupyterLab extension lmod is activated!');
+function activate(app: JupyterFrontEnd, palette: ICommandPalette, restorer: ILayoutRestorer) {
+  console.log('JupyterFrontEnd extension lmod is activated!');
 
   let widget: LmodWidget;
 
@@ -202,10 +203,10 @@ function activate(app: JupyterLab, palette: ICommandPalette, restorer: ILayoutRe
   app.shell.activateById(widget.id);
 
 	restorer.add(widget, 'lmod-sessions');
-  app.shell.addToLeftArea(widget, { rank: 1000 });
+  app.shell.add(widget, 'left', { rank: 1000 });
 };
 
-const extension: JupyterLabPlugin<void> = {
+const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab_lmod',
   autoStart: true,
   requires: [ICommandPalette, ILayoutRestorer],
