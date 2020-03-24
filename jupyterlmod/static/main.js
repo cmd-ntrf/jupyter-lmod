@@ -123,6 +123,8 @@ define(function(require) {
     }
 
     function refresh_kernel_menu(modulelist) {
+        $('[id^="kernel-"]').remove();
+        IPython.new_notebook_widget.request_kernelspecs()
         if (modulelist.some(module => { return module.toLowerCase().includes("rstudio") })) {
             $('a:contains("RStudio Session")').attr("href", base_url + 'rstudio/');
             $("li.new-rstudio").removeClass("disabled");
