@@ -8,9 +8,9 @@ import {
 
 import {
   Widget
-} from '@phosphor/widgets';
+} from '@lumino/widgets';
 
-import * as $ from 'jquery';
+import $ from "jquery";
 
 import * as Lmod from '../../jupyterlmod/static/lmod.js';
 
@@ -21,7 +21,7 @@ var lmod_list_line = $(`
   </li>`)
 
 var lmod = new Lmod.Lmod(
-  window.location.origin + 
+  window.location.origin +
 	JSON.parse(document.getElementById('jupyter-config-data').innerHTML).baseUrl
 );
 
@@ -138,30 +138,27 @@ class LmodWidget extends Widget {
     this.addClass('jp-RunningSessions');
 
     this.node.insertAdjacentHTML('afterbegin',
-      `<div class="p-CommandPalette-search">
-          <div class="p-CommandPalette-wrapper">
-              <input id="modules" class="p-CommandPalette-input" placeholder="Search available modules..." >
+      `<div class="lm-CommandPalette-search">
+          <div class="lm-CommandPalette-wrapper">
+              <input id="modules" class="lm-CommandPalette-input" placeholder="Search available modules..." >
           </div>
       </div>
-      <div id="lmod" class="p-CommandPalette-content">
+      <div id="lmod" class="lm-CommandPalette-content">
           <div class="jp-RunningSessions-section">
               <div class="jp-RunningSessions-sectionHeader"><H2>Loaded Modules</H2>
-                  <button 
-                    title="Save" 
-                    class="jp-RunningSessions-itemShutdown jp-mod-styled jp-RunningSessions-shutdownAll"
-                    style="background-image:var(--jp-icon-save); margin: 0px 0px;"
+                  <button
+                    title="Create collection"
+                    class="jp-Lmod-collectionButton jp-mod-styled jp-AddIcon"
                     id="save-button"
                   ></button>
-                  <button 
-                    title="Restore" 
-                    class="jp-RunningSessions-itemShutdown jp-mod-styled jp-RunningSessions-shutdownAll" 
-                    style="background-image:var(--jp-icon-refresh); margin: 0px 0px;"
+                  <button
+                    title="Restore collection"
+                    class="jp-Lmod-collectionButton jp-mod-styled jp-UndoIcon"
                     id="restore-button"
                   ></button>
-                  <button 
-                    title="Export" 
-                    class="jp-RunningSessions-itemShutdown jp-mod-styled jp-RunningSessions-shutdownAll" 
-                    style="background-image:var(--jp-icon-upload); margin: 0px 0px;"
+                  <button
+                    title="Generate Python code"
+                    class="jp-Lmod-collectionButton jp-mod-styled jp-CopyIcon"
                     id="export-button"
                   ></button>
               </div>
@@ -180,11 +177,11 @@ class LmodWidget extends Widget {
           </div>
       </div>`);
 
-    let buttons = this.node.getElementsByClassName('jp-RunningSessions-itemShutdown')
+    let buttons = this.node.getElementsByClassName('jp-Lmod-collectionButton')
     buttons['save-button'].addEventListener('click', function(e) {return save_collection(e);});
     buttons['restore-button'].addEventListener('click', function(e) {return restore_collection(e);});
     buttons['export-button'].addEventListener('click', function(e) {return export_module();});
-    this.node.getElementsByClassName('p-CommandPalette-input')['modules']
+    this.node.getElementsByClassName('lm-CommandPalette-input')['modules']
       .addEventListener('keyup', function(e) {return refresh_avail_list();});
     refresh_module_list();
   }

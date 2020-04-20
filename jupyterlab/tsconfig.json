@@ -2,6 +2,7 @@
   "compilerOptions": {
     "lib": ["es2017", "dom"],
     "module": "commonjs",
+    "esModuleInterop" : true,
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noUnusedLocals": true,
