@@ -26,6 +26,7 @@ var lmod = new Lmod.Lmod(
 );
 
 var search_source = [];
+var kernelspecs = null;
 
 function refresh_module_list() {
     Promise.all([lmod.avail(), lmod.list()])
@@ -47,6 +48,7 @@ function refresh_module_list() {
         search_source = Array.from(avail_set);
         refresh_avail_list();
     });
+    kernelspecs.refreshSpecs();
 }
 
 function refresh_avail_list() {
@@ -195,6 +197,8 @@ function activate(app: JupyterFrontEnd, palette: ICommandPalette, restorer: ILay
   console.log('JupyterFrontEnd extension lmod is activated!');
 
   let widget: LmodWidget;
+
+  kernelspecs = app.serviceManager.kernelspecs;
 
   widget = new LmodWidget();
   app.shell.activateById(widget.id);
