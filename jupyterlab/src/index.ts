@@ -10,6 +10,7 @@ import {
   Widget
 } from '@lumino/widgets';
 
+import { ILauncher } from '@jupyterlab/launcher';
 import { PageConfig } from '@jupyterlab/coreutils';
 
 import $ from "jquery";
@@ -24,8 +25,11 @@ var lmod_list_line = $(`
 
 var lmod = new Lmod.Lmod(PageConfig.getBaseUrl());
 
+var global_launcher = null;
 var search_source = [];
 var kernelspecs = null;
+var server_proxy_infos = {};
+var server_proxy_launcher = {};
 
 function refresh_module_list() {
     Promise.all([lmod.avail(), lmod.list()])
@@ -43,6 +47,18 @@ function refresh_module_list() {
             list.append(li);
             avail_set.delete(item)
         });
+
+        for(let server_name in server_proxy_infos) {
+          let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_name) });
+          if(is_enabled) {
+            if(!server_proxy_launcher.hasOwnProperty(server_name)) {
+              server_proxy_launcher[server_name] = global_launcher.add(server_proxy_infos[server_name])
+            }
+          } else if(server_proxy_launcher.hasOwnProperty(server_name)) {
+            server_proxy_launcher[server_name].dispose();
+            delete server_proxy_launcher[server_name];
+          }
+        }
 
         search_source = Array.from(avail_set);
         refresh_avail_list();
@@ -188,16 +204,55 @@ class LmodWidget extends Widget {
   }
 };
 
+function setup_proxy_commands(serverData, app) {
+  for (let server_process of serverData.server_processes) {
+    if (!server_process.launcher_entry.enabled) {
+      continue;
+    }
+
+    let commandId = 'server-proxy:' + server_process.name;
+    app.commands.addCommand(commandId, {
+      label: server_process.launcher_entry.title,
+      execute: () => {
+        let launch_url = PageConfig.getBaseUrl() + server_process.name + '/';
+        window.open(launch_url, '_blank');
+      }
+    });
+
+    let command : ILauncher.IItemOptions = {
+      command: commandId,
+      category: 'Notebook'
+    };
+    if (server_process.launcher_entry.icon_url) {
+      command.kernelIconUrl =  server_process.launcher_entry.icon_url;
+    }
+    server_proxy_infos[server_process.launcher_entry.title.toLowerCase()] = command;
+  }
+}
 
 /**
  * Activate the lmod widget extension.
  */
-function activate(app: JupyterFrontEnd, palette: ICommandPalette, restorer: ILayoutRestorer) {
+function activate(
+  app: JupyterFrontEnd,
+  palette: ICommandPalette,
+  restorer: ILayoutRestorer,
+  launcher: ILauncher
+) {
   console.log('JupyterFrontEnd extension lmod is activated!');
 
   let widget: LmodWidget;
 
+  global_launcher = launcher;
   kernelspecs = app.serviceManager.kernelspecs;
+
+  fetch(PageConfig.getBaseUrl() + 'server-proxy/servers-info').then(
+    response => {
+      if (response.ok) {
+        response.json().then(data => setup_proxy_commands(data, app));
+      }
+    }
+  )
 
   widget = new LmodWidget();
   app.shell.activateById(widget.id);
@@ -209,7 +264,7 @@ function activate(app: JupyterFrontEnd, palette: ICommandPalette, restorer: ILay
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab_lmod',
   autoStart: true,
-  requires: [ICommandPalette, ILayoutRestorer],
+  requires: [ICommandPalette, ILayoutRestorer, ILauncher],
   activate: activate
 };
 
