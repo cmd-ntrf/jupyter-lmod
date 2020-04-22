@@ -10,6 +10,8 @@ import {
   Widget
 } from '@lumino/widgets';
 
+import { PageConfig } from '@jupyterlab/coreutils';
+
 import $ from "jquery";
 
 import * as Lmod from '../../jupyterlmod/static/lmod.js';
@@ -20,10 +22,7 @@ var lmod_list_line = $(`
      <button class="jp-RunningSessions-itemShutdown jp-mod-styled"></button>
   </li>`)
 
-var lmod = new Lmod.Lmod(
-  window.location.origin +
-	JSON.parse(document.getElementById('jupyter-config-data').innerHTML).baseUrl
-);
+var lmod = new Lmod.Lmod(PageConfig.getBaseUrl());
 
 var search_source = [];
 var kernelspecs = null;
