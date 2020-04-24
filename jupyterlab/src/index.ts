@@ -204,6 +204,24 @@ class LmodWidget extends Widget {
   }
 };
 
+// tslint:disable: variable-name
+class IFrameWidget extends Widget {
+  constructor(title: string, path: string) {
+    super();
+    this.id = path;
+
+    this.title.label = title;
+    this.title.closable = true;
+
+    const div = document.createElement("div");
+    div.classList.add("iframe-widget");
+    const iframe = document.createElement("iframe");
+    iframe.src = path;
+    div.appendChild(iframe);
+    this.node.appendChild(div);
+  }
+}
+
 function setup_proxy_commands(serverData, app) {
   for (let server_process of serverData.server_processes) {
     if (!server_process.launcher_entry.enabled) {
@@ -211,11 +229,16 @@ function setup_proxy_commands(serverData, app) {
     }
 
     let commandId = 'server-proxy:' + server_process.name;
+    let launch_url = PageConfig.getBaseUrl() + server_process.name + '/';
+    let widget = new IFrameWidget(server_process.launcher_entry.title, launch_url);
+
     app.commands.addCommand(commandId, {
       label: server_process.launcher_entry.title,
       execute: () => {
-        let launch_url = PageConfig.getBaseUrl() + server_process.name + '/';
-        window.open(launch_url, '_blank');
+        if (!widget.isAttached) {
+          app.shell.add(widget);
+        }
+        app.shell.activateById(widget.id);
       }
     });
 
