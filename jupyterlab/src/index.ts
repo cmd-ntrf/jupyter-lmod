@@ -48,15 +48,15 @@ function refresh_module_list() {
             avail_set.delete(item)
         });
 
-        for(let server_name in server_proxy_infos) {
-          let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_name) });
+        for(let server_key in server_proxy_infos) {
+          let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_key) });
           if(is_enabled) {
-            if(!server_proxy_launcher.hasOwnProperty(server_name)) {
-              server_proxy_launcher[server_name] = global_launcher.add(server_proxy_infos[server_name])
+            if(!server_proxy_launcher.hasOwnProperty(server_key)) {
+              server_proxy_launcher[server_key] = global_launcher.add(server_proxy_infos[server_key])
             }
-          } else if(server_proxy_launcher.hasOwnProperty(server_name)) {
-            server_proxy_launcher[server_name].dispose();
-            delete server_proxy_launcher[server_name];
+          } else if(server_proxy_launcher.hasOwnProperty(server_key)) {
+            server_proxy_launcher[server_key].dispose();
+            delete server_proxy_launcher[server_key];
           }
         }
 
@@ -249,7 +249,7 @@ function setup_proxy_commands(serverData, app) {
     if (server_process.launcher_entry.icon_url) {
       command.kernelIconUrl =  server_process.launcher_entry.icon_url;
     }
-    server_proxy_infos[server_process.launcher_entry.title.toLowerCase()] = command;
+    server_proxy_infos[server_process.name] = command;
   }
 }
 
