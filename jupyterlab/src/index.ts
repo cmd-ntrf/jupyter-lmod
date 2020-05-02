@@ -30,6 +30,7 @@ var search_source = [];
 var kernelspecs = null;
 var server_proxy_infos = {};
 var server_proxy_launcher = {};
+var module_input = null;
 
 function refresh_module_list() {
     Promise.all([lmod.avail(), lmod.list()])
@@ -70,7 +71,7 @@ function refresh_launcher(modulelist) {
 }
 
 function refresh_avail_list() {
-    let input = (document.getElementById('modules') as HTMLInputElement).value;
+    let input = module_input.value;
     let list = $("#avail_list");
     list.children().remove();
 
@@ -157,13 +158,20 @@ class LmodWidget extends Widget {
     this.title.iconClass = 'jp-LmodIcon jp-SideBar-tabIcon'
     this.addClass('jp-RunningSessions');
 
-    this.node.insertAdjacentHTML('afterbegin',
-      `<div class="lm-CommandPalette-search">
-          <div class="lm-CommandPalette-wrapper">
-              <input id="modules" class="lm-CommandPalette-input" placeholder="Search available modules..." >
-          </div>
-      </div>
-      <div id="lmod" class="lm-CommandPalette-content">
+    const search_div = document.createElement('div');
+    const search_div_wrapper = document.createElement('div');
+    module_input = document.createElement('input');
+    search_div.setAttribute('class', 'lm-CommandPalette-search');
+    search_div_wrapper.setAttribute('class', 'lm-CommandPalette-wrapper');
+    module_input.setAttribute('id', 'modules');
+    module_input.setAttribute('class', 'lm-CommandPalette-input');
+    module_input.setAttribute('placeholder', 'Search available modules...')
+    search_div.appendChild(search_div_wrapper);
+    search_div_wrapper.appendChild(module_input);
+    this.node.insertAdjacentElement('afterbegin', search_div);
+
+    this.node.insertAdjacentHTML('beforeend',
+      `<div id="lmod" class="lm-CommandPalette-content">
           <div class="jp-RunningSessions-section">
               <div class="jp-RunningSessions-sectionHeader"><H2>Loaded Modules</H2>
                   <button
@@ -201,9 +209,7 @@ class LmodWidget extends Widget {
     buttons['save-button'].addEventListener('click', function(e) {return save_collection(e);});
     buttons['restore-button'].addEventListener('click', function(e) {return restore_collection(e);});
     buttons['export-button'].addEventListener('click', function(e) {return export_module();});
-    this.node.getElementsByClassName('lm-CommandPalette-input')['modules']
-      .addEventListener('keyup', function(e) {return refresh_avail_list();});
-    refresh_module_list();
+    module_input.addEventListener('keyup', function(e) {return refresh_avail_list();});
   }
 };
 
@@ -265,9 +271,7 @@ function activate(
   restorer: ILayoutRestorer,
   launcher: ILauncher
 ) {
-  console.log('JupyterFrontEnd extension lmod is activated!');
-
-  let widget: LmodWidget;
+  const widget = new LmodWidget();
 
   global_launcher = launcher;
   kernelspecs = app.serviceManager.kernelspecs;
@@ -280,11 +284,10 @@ function activate(
     }
   )
 
-  widget = new LmodWidget();
-  app.shell.activateById(widget.id);
-
 	restorer.add(widget, 'lmod-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });
+  refresh_module_list();
+  console.log('JupyterFrontEnd extension lmod is activated!');
 };
 
 const extension: JupyterFrontEndPlugin<void> = {
