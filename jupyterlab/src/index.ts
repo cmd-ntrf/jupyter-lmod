@@ -13,7 +13,7 @@ import {
 import { ILauncher } from '@jupyterlab/launcher';
 import { PageConfig } from '@jupyterlab/coreutils';
 
-import * as Lmod from '../../jupyterlmod/static/lmod.js';
+import { Lmod } from '../../jupyterlmod/static/lmod.js';
 
 function createModuleItem(label: string, button: string) {
   const lmod_list_line = document.createElement('li');
@@ -29,34 +29,12 @@ function createModuleItem(label: string, button: string) {
   return lmod_list_line;
 }
 
-var lmod = new Lmod.Lmod(PageConfig.getBaseUrl());
+var lmod = new Lmod(PageConfig.getBaseUrl());
 
 var global_launcher = null;
-var search_source = [];
 var kernelspecs = null;
 var server_proxy_infos = {};
 var server_proxy_launcher = {};
-var module_input = null;
-var lmod_list = null;
-var avail_list = null;
-
-function refresh_module_list() {
-    Promise.all([lmod.avail(), lmod.list()])
-    .then(values => {
-        const avail_set = new Set(values[0]);
-        const modulelist = values[1].sort();
-        const html_list = modulelist.map(item => createModuleItem(item, 'Unload'));
-
-        lmod_list.innerText = '';
-        lmod_list.append(...html_list);
-
-        modulelist.map(item => avail_set.delete(item));
-        search_source = Array.from(avail_set);
-        refresh_avail_list();
-        refresh_launcher(modulelist);
-    });
-    kernelspecs.refreshSpecs();
-}
 
 function refresh_launcher(modulelist) {
   for(let server_key in server_proxy_infos) {
@@ -72,23 +50,11 @@ function refresh_launcher(modulelist) {
   }
 }
 
-function refresh_avail_list() {
-    const input = module_input.value;
-    avail_list.innerText = '';
-
-    const result = search_source.filter(
-      str => str.toUpperCase().includes(input.toUpperCase())
-    );
-
-    const html_list = result.map(item => createModuleItem(item, 'Load'));
-    avail_list.append(...html_list);
-}
-
 async function show_module(module) {
-    let data = await lmod.show(module);
-    let datalist = data.split('\n');
-    let text = datalist.slice(3).join('\n').trim();
-    let path = datalist[1].slice(0, -1);
+    const data = await lmod.show(module);
+    const datalist = data.split('\n');
+    const text = datalist.slice(3).join('\n').trim();
+    const path = datalist[1].slice(0, -1);
     showDialog({
           title: module,
           body: new ModuleWidget(path, text),
@@ -99,7 +65,7 @@ async function show_module(module) {
 }
 
 async function export_module() {
-    let data = await lmod.freeze();
+    const data = await lmod.freeze();
     showDialog({
           title: "Export modules",
           body: new ModuleWidget("Add this in a notebook to load the same modules :", data),
@@ -126,42 +92,15 @@ function save_collection(event): Promise<void | undefined> {
   });
 }
 
-function restore_collection(event): Promise<void | undefined> {
-  return showDialog({
-        title: 'Restore collection',
-        body: new RestoreWidget(),
-        buttons: [
-          Dialog.cancelButton(),
-          Dialog.okButton({ label: 'Restore' })
-        ]
-  }).then(result => {
-    if (result.button.label === 'Restore') {
-      let name = result.value;
-      lmod.restore(name);
-      refresh_module_list();
-    }
-    return;
-  });
-}
 /**
  * Main widget
  */
-function clickListorAvail(event) {
-  const target = event.target;
-  if (target.tagName == 'SPAN') {
-    show_module(target.innerText);
-  } else if(target.tagName == 'BUTTON') {
-    const span = event.target.closest('li').querySelector('span');
-    const item = span.innerText;
-    if(target.innerText == 'Load') {
-      lmod.load(item).then(refresh_module_list);
-    } else if(target.innerText == 'Unload') {
-      lmod.unload(item).then(refresh_module_list);
-    }
-  }
-}
-
 class LmodWidget extends Widget {
+  protected loadedUList: HTMLUListElement;
+  protected availUList: HTMLUListElement;
+  protected searchInput: HTMLInputElement;
+  protected searchSource: Array<string>;
+
   constructor() {
     super();
 
@@ -172,14 +111,14 @@ class LmodWidget extends Widget {
 
     const search_div = document.createElement('div');
     const search_div_wrapper = document.createElement('div');
-    module_input = document.createElement('input');
+    this.searchInput = document.createElement('input');
     search_div.setAttribute('class', 'lm-CommandPalette-search');
     search_div_wrapper.setAttribute('class', 'lm-CommandPalette-wrapper');
-    module_input.setAttribute('id', 'modules');
-    module_input.setAttribute('class', 'lm-CommandPalette-input');
-    module_input.setAttribute('placeholder', 'Search available modules...')
+    this.searchInput.setAttribute('id', 'modules');
+    this.searchInput.setAttribute('class', 'lm-CommandPalette-input');
+    this.searchInput.setAttribute('placeholder', 'Search available modules...')
     search_div.appendChild(search_div_wrapper);
-    search_div_wrapper.appendChild(module_input);
+    search_div_wrapper.appendChild(this.searchInput);
     this.node.insertAdjacentElement('afterbegin', search_div);
 
     this.node.insertAdjacentHTML('beforeend',
@@ -203,7 +142,7 @@ class LmodWidget extends Widget {
                   ></button>
               </div>
               <div class="jp-RunningSessions-sectionContainer">
-                  <ul class="jp-RunningSessions-sectionList" id="lmod_list">
+                  <ul class="jp-RunningSessions-sectionList" id="lmod_loaded_list">
                   </ul>
               </div>
           </div>
@@ -211,23 +150,87 @@ class LmodWidget extends Widget {
               <div class="jp-RunningSessions-sectionHeader" id="avail_header"><H2>Available Modules</H2>
               </div>
               <div class="jp-RunningSessions-sectionContainer">
-                  <ul class="jp-RunningSessions-sectionList" id="avail_list">
+                  <ul class="jp-RunningSessions-sectionList" id="lmod_avail_list">
                   </ul>
               </div>
           </div>
       </div>`);
 
-    lmod_list = this.node.querySelector('#lmod_list');
-    avail_list = this.node.querySelector('#avail_list');
+    this.loadedUList = this.node.querySelector('#lmod_loaded_list');
+    this.availUList = this.node.querySelector('#lmod_avail_list');
 
-    lmod_list.addEventListener('click', clickListorAvail);
-    avail_list.addEventListener('click', clickListorAvail);
+    this.loadedUList.addEventListener('click', this.clickListorAvail.bind(this));
+    this.availUList.addEventListener('click', this.clickListorAvail.bind(this));
 
-    let buttons = this.node.getElementsByClassName('jp-Lmod-collectionButton')
-    buttons['save-button'].addEventListener('click', function(e) {return save_collection(e);});
-    buttons['restore-button'].addEventListener('click', function(e) {return restore_collection(e);});
-    buttons['export-button'].addEventListener('click', function(e) {return export_module();});
-    module_input.addEventListener('keyup', function(e) {return refresh_avail_list();});
+    const buttons = this.node.getElementsByClassName('jp-Lmod-collectionButton')
+    buttons['save-button'].addEventListener('click', save_collection);
+    buttons['restore-button'].addEventListener('click', this.restore_collection.bind(this));
+    buttons['export-button'].addEventListener('click', export_module);
+    this.searchInput.addEventListener('keyup', this.refresh_avail_list.bind(this));
+  }
+
+  async clickListorAvail(event) {
+    const target = event.target;
+    if (target.tagName == 'SPAN') {
+      show_module(target.innerText);
+    } else if(target.tagName == 'BUTTON') {
+      const span = event.target.closest('li').querySelector('span');
+      const item = span.innerText;
+      if(target.innerText == 'Load') {
+        await lmod.load(item);
+      } else if(target.innerText == 'Unload') {
+        await lmod.unload(item);
+      }
+      this.refresh_module_list();
+    }
+  }
+
+  public refresh_module_list() {
+    Promise.all([lmod.avail(), lmod.list()])
+    .then(values => {
+        const avail_set = new Set<string>(values[0]);
+        const modulelist = values[1].sort();
+        const html_list = modulelist.map(item => createModuleItem(item, 'Unload'));
+
+        this.loadedUList.innerText = '';
+        this.loadedUList.append(...html_list);
+
+        modulelist.map(item => avail_set.delete(item));
+        this.searchSource = Array.from(avail_set);
+        this.refresh_avail_list();
+        refresh_launcher(modulelist);
+    });
+    kernelspecs.refreshSpecs();
+  }
+
+  protected refresh_avail_list() {
+    const input = this.searchInput.value;
+    this.availUList.innerText = '';
+
+    const result = this.searchSource.filter(
+      str => str.toUpperCase().includes(input.toUpperCase())
+    );
+
+    const html_list = result.map(item => createModuleItem(item, 'Load'));
+    this.availUList.append(...html_list);
+  }
+
+  public restore_collection(event): Promise<void | undefined> {
+    return showDialog({
+          title: 'Restore collection',
+          body: new RestoreWidget(),
+          buttons: [
+            Dialog.cancelButton(),
+            Dialog.okButton({ label: 'Restore' })
+          ]
+    }).then(result => {
+      if (result.button.label === 'Restore') {
+        const name = result.value;
+        lmod.restore(name);
+        this.refresh_module_list();
+      }
+      return;
+    });
   }
 };
 
@@ -304,7 +307,7 @@ function activate(
 
 	restorer.add(widget, 'lmod-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });
-  refresh_module_list();
+  widget.refresh_module_list();
   console.log('JupyterFrontEnd extension lmod is activated!');
 };
 
