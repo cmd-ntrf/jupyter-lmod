@@ -5,3 +5,9 @@ dist/
 buildenv/
 venv/
 jupyterlmod.egg-info/
+.ipynb_checkpoints/
+*.ipynb
+.vscode/
+*.lock
+*env/
+package-lock.json
