@@ -13,15 +13,21 @@ import {
 import { ILauncher } from '@jupyterlab/launcher';
 import { PageConfig } from '@jupyterlab/coreutils';
 
-import $ from "jquery";
-
 import * as Lmod from '../../jupyterlmod/static/lmod.js';
 
-var lmod_list_line = $(`
-  <li class="jp-RunningSessions-item">
-     <span class="jp-RunningSessions-itemLabel"></span>
-     <button class="jp-RunningSessions-itemShutdown jp-mod-styled"></button>
-  </li>`)
+function createModuleItem(label: string, button: string) {
+  const lmod_list_line = document.createElement('li');
+  const lmod_list_label = document.createElement('span');
+  const lmod_list_button = document.createElement('button');
+  lmod_list_line.append(lmod_list_label);
+  lmod_list_line.append(lmod_list_button);
+  lmod_list_line.setAttribute('class', 'jp-RunningSessions-item')
+  lmod_list_label.setAttribute('class', 'jp-RunningSessions-itemLabel');
+  lmod_list_label.innerText = label;
+  lmod_list_button.setAttribute('class', 'jp-RunningSessions-itemShutdown jp-mod-styled')
+  lmod_list_button.innerHTML = button;
+  return lmod_list_line;
+}
 
 var lmod = new Lmod.Lmod(PageConfig.getBaseUrl());
 
@@ -31,24 +37,20 @@ var kernelspecs = null;
 var server_proxy_infos = {};
 var server_proxy_launcher = {};
 var module_input = null;
+var lmod_list = null;
+var avail_list = null;
 
 function refresh_module_list() {
     Promise.all([lmod.avail(), lmod.list()])
     .then(values => {
-        let avail_set = new Set(values[0]);
-        let modulelist = values[1].sort();
+        const avail_set = new Set(values[0]);
+        const modulelist = values[1].sort();
+        const html_list = modulelist.map(item => createModuleItem(item, 'Unload'));
 
-        let list = $("#lmod_list");
-        list.children().remove();
+        lmod_list.innerText = '';
+        lmod_list.append(...html_list);
 
-        modulelist.map(item => {
-            let li = lmod_list_line.clone();
-            li.find('span').text(item).click(e => show_module(item));
-            li.find('button').text('Unload').click(e => lmod.unload(item).then(refresh_module_list));
-            list.append(li);
-            avail_set.delete(item)
-        });
-
+        modulelist.map(item => avail_set.delete(item));
         search_source = Array.from(avail_set);
         refresh_avail_list();
         refresh_launcher(modulelist);
@@ -71,26 +73,21 @@ function refresh_launcher(modulelist) {
 }
 
 function refresh_avail_list() {
-    let input = module_input.value;
-    let list = $("#avail_list");
-    list.children().remove();
+    const input = module_input.value;
+    avail_list.innerText = '';
 
     const result = search_source.filter(
       str => str.toUpperCase().includes(input.toUpperCase())
     );
 
-    result.map(item => {
-        let li = lmod_list_line.clone();
-        li.find('span').text(item).click(e => show_module(item));
-        li.find('button').text('Load').click(e => lmod.load(item).then(refresh_module_list));
-        list.append(li);
-    });
+    const html_list = result.map(item => createModuleItem(item, 'Load'));
+    avail_list.append(...html_list);
 }
 
 async function show_module(module) {
     let data = await lmod.show(module);
     let datalist = data.split('\n');
-    let text = $.trim(datalist.slice(3).join('\n'));
+    let text = datalist.slice(3).join('\n').trim();
     let path = datalist[1].slice(0, -1);
     showDialog({
           title: module,
@@ -149,6 +146,21 @@ function restore_collection(event): Promise<void | undefined> {
 /**
  * Main widget
  */
+function clickListorAvail(event) {
+  const target = event.target;
+  if (target.tagName == 'SPAN') {
+    show_module(target.innerText);
+  } else if(target.tagName == 'BUTTON') {
+    const span = event.target.closest('li').querySelector('span');
+    const item = span.innerText;
+    if(target.innerText == 'Load') {
+      lmod.load(item).then(refresh_module_list);
+    } else if(target.innerText == 'Unload') {
+      lmod.unload(item).then(refresh_module_list);
+    }
+  }
+}
+
 class LmodWidget extends Widget {
   constructor() {
     super();
@@ -204,6 +216,12 @@ class LmodWidget extends Widget {
               </div>
           </div>
       </div>`);
+
+    lmod_list = this.node.querySelector('#lmod_list');
+    avail_list = this.node.querySelector('#avail_list');
+
+    lmod_list.addEventListener('click', clickListorAvail);
+    avail_list.addEventListener('click', clickListorAvail);
 
     let buttons = this.node.getElementsByClassName('jp-Lmod-collectionButton')
     buttons['save-button'].addEventListener('click', function(e) {return save_collection(e);});
