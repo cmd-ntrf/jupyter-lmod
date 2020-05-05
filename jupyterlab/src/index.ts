@@ -36,7 +36,7 @@ var kernelspecs = null;
 var server_proxy_infos = {};
 var server_proxy_launcher = {};
 
-function refresh_launcher(modulelist) {
+function updateLauncher(modulelist) {
   for(let server_key in server_proxy_infos) {
     let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_key) });
     if(is_enabled) {
@@ -198,7 +198,7 @@ class LmodWidget extends Widget {
         modulelist.map(item => avail_set.delete(item));
         this.searchSource = Array.from(avail_set);
         this.updateAvail();
-        refresh_launcher(modulelist);
+        updateLauncher(modulelist);
     });
     kernelspecs.refreshSpecs();
   }
