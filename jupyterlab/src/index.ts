@@ -232,7 +232,7 @@ class LmodWidget extends Widget {
       return;
     });
   }
-};
+}
 
 // tslint:disable: variable-name
 class IFrameWidget extends Widget {
