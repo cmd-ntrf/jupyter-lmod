@@ -166,7 +166,7 @@ class LmodWidget extends Widget {
     buttons['save-button'].addEventListener('click', save_collection);
     buttons['restore-button'].addEventListener('click', this.restore_collection.bind(this));
     buttons['export-button'].addEventListener('click', export_module);
-    this.searchInput.addEventListener('keyup', this.refresh_avail_list.bind(this));
+    this.searchInput.addEventListener('keyup', this.updateAvail.bind(this));
   }
 
   async onClickModuleList(event) {
@@ -181,11 +181,11 @@ class LmodWidget extends Widget {
       } else if(target.innerText == 'Unload') {
         await lmodAPI.unload(item);
       }
-      this.refresh_module_list();
+      this.update();
     }
   }
 
-  public refresh_module_list() {
+  public update() {
     Promise.all([lmodAPI.avail(), lmodAPI.list()])
     .then(values => {
         const avail_set = new Set<string>(values[0]);
@@ -197,13 +197,13 @@ class LmodWidget extends Widget {
 
         modulelist.map(item => avail_set.delete(item));
         this.searchSource = Array.from(avail_set);
-        this.refresh_avail_list();
+        this.updateAvail();
         refresh_launcher(modulelist);
     });
     kernelspecs.refreshSpecs();
   }
 
-  protected refresh_avail_list() {
+  protected updateAvail() {
     const input = this.searchInput.value;
     this.availUList.innerText = '';
 
@@ -227,7 +227,7 @@ class LmodWidget extends Widget {
       if (result.button.label === 'Restore') {
         const name = result.value;
         lmodAPI.restore(name);
-        this.refresh_module_list();
+        this.update();
       }
       return;
     });
@@ -307,7 +307,7 @@ function activate(
 
 	restorer.add(widget, 'lmod-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });
-  widget.refresh_module_list();
+  widget.update();
   console.log('JupyterFrontEnd extension lmod is activated!');
 };
 
