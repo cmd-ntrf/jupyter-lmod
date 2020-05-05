@@ -29,7 +29,7 @@ function createModuleItem(label: string, button: string) {
   return lmod_list_line;
 }
 
-var lmod = new Lmod(PageConfig.getBaseUrl());
+const lmodAPI = new Lmod(PageConfig.getBaseUrl());
 
 var global_launcher = null;
 var kernelspecs = null;
@@ -51,7 +51,7 @@ function refresh_launcher(modulelist) {
 }
 
 async function show_module(module) {
-    const data = await lmod.show(module);
+    const data = await lmodAPI.show(module);
     const datalist = data.split('\n');
     const text = datalist.slice(3).join('\n').trim();
     const path = datalist[1].slice(0, -1);
@@ -65,7 +65,7 @@ async function show_module(module) {
 }
 
 async function export_module() {
-    const data = await lmod.freeze();
+    const data = await lmodAPI.freeze();
     showDialog({
           title: "Export modules",
           body: new ModuleWidget("Add this in a notebook to load the same modules :", data),
@@ -86,7 +86,7 @@ function save_collection(event): Promise<void | undefined> {
   }).then(result => {
     if (result.button.label === 'Save') {
       let name = result.value;
-      lmod.save(name ? name : 'default');
+      lmodAPI.save(name ? name : 'default');
     }
     return;
   });
@@ -177,16 +177,16 @@ class LmodWidget extends Widget {
       const span = event.target.closest('li').querySelector('span');
       const item = span.innerText;
       if(target.innerText == 'Load') {
-        await lmod.load(item);
+        await lmodAPI.load(item);
       } else if(target.innerText == 'Unload') {
-        await lmod.unload(item);
+        await lmodAPI.unload(item);
       }
       this.refresh_module_list();
     }
   }
 
   public refresh_module_list() {
-    Promise.all([lmod.avail(), lmod.list()])
+    Promise.all([lmodAPI.avail(), lmodAPI.list()])
     .then(values => {
         const avail_set = new Set<string>(values[0]);
         const modulelist = values[1].sort();
@@ -226,7 +226,7 @@ class LmodWidget extends Widget {
     }).then(result => {
       if (result.button.label === 'Restore') {
         const name = result.value;
-        lmod.restore(name);
+        lmodAPI.restore(name);
         this.refresh_module_list();
       }
       return;
@@ -345,7 +345,7 @@ class RestoreWidget extends Widget {
     body.appendChild(text);
 
     let selector = document.createElement('select');
-    lmod.savelist()
+    lmodAPI.savelist()
     .then(values => {
         values.map((item, index) => {
             let opt = document.createElement("option");
