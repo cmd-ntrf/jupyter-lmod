@@ -159,8 +159,8 @@ class LmodWidget extends Widget {
     this.loadedUList = this.node.querySelector('#lmod_loaded_list');
     this.availUList = this.node.querySelector('#lmod_avail_list');
 
-    this.loadedUList.addEventListener('click', this.clickListorAvail.bind(this));
-    this.availUList.addEventListener('click', this.clickListorAvail.bind(this));
+    this.loadedUList.addEventListener('click', this.onClickModuleList.bind(this));
+    this.availUList.addEventListener('click', this.onClickModuleList.bind(this));
 
     const buttons = this.node.getElementsByClassName('jp-Lmod-collectionButton')
     buttons['save-button'].addEventListener('click', save_collection);
@@ -169,7 +169,7 @@ class LmodWidget extends Widget {
     this.searchInput.addEventListener('keyup', this.refresh_avail_list.bind(this));
   }
 
-  async clickListorAvail(event) {
+  async onClickModuleList(event) {
     const target = event.target;
     if (target.tagName == 'SPAN') {
       show_module(target.innerText);
