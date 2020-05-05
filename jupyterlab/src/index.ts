@@ -164,12 +164,12 @@ class LmodWidget extends Widget {
 
     const buttons = this.node.getElementsByClassName('jp-Lmod-collectionButton')
     buttons['save-button'].addEventListener('click', save_collection);
-    buttons['restore-button'].addEventListener('click', this.restore_collection.bind(this));
+    buttons['restore-button'].addEventListener('click', this.restore.bind(this));
     buttons['export-button'].addEventListener('click', export_module);
     this.searchInput.addEventListener('keyup', this.updateAvail.bind(this));
   }
 
-  async onClickModuleList(event) {
+  protected async onClickModuleList(event) {
     const target = event.target;
     if (target.tagName == 'SPAN') {
       show_module(target.innerText);
@@ -215,7 +215,7 @@ class LmodWidget extends Widget {
     this.availUList.append(...html_list);
   }
 
-  public restore_collection(event): Promise<void | undefined> {
+  protected restore(event): Promise<void | undefined> {
     return showDialog({
           title: 'Restore collection',
           body: new RestoreWidget(),
