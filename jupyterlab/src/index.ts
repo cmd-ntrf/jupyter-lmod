@@ -234,52 +234,36 @@ class LmodWidget extends Widget {
   }
 }
 
-// tslint:disable: variable-name
-class IFrameWidget extends Widget {
-  constructor(title: string, path: string) {
-    super();
-    this.id = path;
-
-    this.title.label = title;
-    this.title.closable = true;
-
-    const div = document.createElement("div");
-    div.classList.add("iframe-widget");
-    const iframe = document.createElement("iframe");
-    iframe.src = path;
-    div.appendChild(iframe);
-    this.node.appendChild(div);
+async function setup_proxy_commands() {
+  const response = await fetch(PageConfig.getBaseUrl() + 'server-proxy/servers-info');
+  if (!response.ok) {
+    console.log('jupyter-lmod: could not communicate with jupyter-server-proxy API.');
+    return;
   }
-}
+  const data = await response.json();
 
-function setup_proxy_commands(serverData, app) {
-  for (let server_process of serverData.server_processes) {
-    if (!server_process.launcher_entry.enabled) {
-      continue;
-    }
-
-    let commandId = 'server-proxy:' + server_process.name;
-    let launch_url = PageConfig.getBaseUrl() + server_process.name + '/';
-    let widget = new IFrameWidget(server_process.launcher_entry.title, launch_url);
-
-    app.commands.addCommand(commandId, {
-      label: server_process.launcher_entry.title,
-      execute: () => {
-        if (!widget.isAttached) {
-          app.shell.add(widget);
-        }
-        app.shell.activateById(widget.id);
-      }
-    });
-
-    let command : ILauncher.IItemOptions = {
-      command: commandId,
+  const namespace = 'server-proxy';
+  const command = namespace + ':' + 'open';
+  for (let server_process of data.server_processes) {
+    const url = PageConfig.getBaseUrl() + server_process.name + '/';
+    const title = server_process.launcher_entry.title;
+    const newBrowserTab = server_process.new_browser_tab;
+    const id = namespace + ':' + server_process.name;
+    const launcher_item : ILauncher.IItemOptions = {
+      command: command,
+      args: {
+        url: url,
+        title: title + (newBrowserTab ? ' [🡕]': ''),
+        newBrowserTab: newBrowserTab,
+        id: id
+      },
       category: 'Notebook'
     };
+
     if (server_process.launcher_entry.icon_url) {
-      command.kernelIconUrl =  server_process.launcher_entry.icon_url;
+      launcher_item.kernelIconUrl =  server_process.launcher_entry.icon_url;
     }
-    server_proxy_infos[server_process.name] = command;
+    server_proxy_infos[server_process.name] = launcher_item;
   }
 }
 
@@ -296,14 +280,7 @@ function activate(
 
   global_launcher = launcher;
   kernelspecs = app.serviceManager.kernelspecs;
-
-  fetch(PageConfig.getBaseUrl() + 'server-proxy/servers-info').then(
-    response => {
-      if (response.ok) {
-        response.json().then(data => setup_proxy_commands(data, app));
-      }
-    }
-  )
+  setup_proxy_commands();
 
 	restorer.add(widget, 'lmod-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });
