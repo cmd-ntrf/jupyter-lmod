@@ -9,5 +9,5 @@ jupyterlmod.egg-info/
 *.ipynb
 .vscode/
 *.lock
-*env/
+*env*/
 package-lock.json
