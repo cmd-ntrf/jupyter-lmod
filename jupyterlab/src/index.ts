@@ -13,7 +13,7 @@ import {
 import { ILauncher } from '@jupyterlab/launcher';
 import { PageConfig } from '@jupyterlab/coreutils';
 
-import { Lmod } from '../../jupyterlmod/static/lmod.js';
+import { Lmod } from './lmod.js';
 
 function createModuleItem(label: string, button: string) {
   const lmod_list_line = document.createElement('li');
