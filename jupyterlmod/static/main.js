@@ -11,6 +11,9 @@ define(function(require) {
     var lmod = new lmod_class.Lmod(base_url);
     var search_source = null;
 
+    var server_proxy_infos = {};
+    var server_proxy_launcher = {};
+
     const lmod_tab_html = $([
 '<div id="lmod" class="tab-pane">',
 '    <div id="lmod_toolbar" class="row list_toolbar">',
@@ -125,12 +128,20 @@ define(function(require) {
     function refresh_kernel_menu(modulelist) {
         $('[id^="kernel-"]').remove();
         IPython.new_notebook_widget.request_kernelspecs()
-        if (modulelist.some(module => { return module.toLowerCase().includes("rstudio") })) {
-            $('a:contains("RStudio Session")').attr("href", base_url + 'rstudio/');
-            $("li.new-rstudio").removeClass("disabled");
-        } else {
-            $("li.new-rstudio").addClass("disabled");
-            $('a:contains("RStudio Session")').removeAttr("href");
+
+        let menu = $('.tree-buttons').find('.dropdown-menu');
+
+        for (let server_key in server_proxy_infos) {
+            let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_key) });
+            if (is_enabled) {
+                if(!server_proxy_launcher.hasOwnProperty(server_key)) {
+                    menu.append(server_proxy_infos[server_key]);
+                    server_proxy_launcher[server_key] = $('.new-' + server_key);
+                }
+            } else if (server_key in server_proxy_launcher) {
+                server_proxy_launcher[server_key].remove();
+                delete server_proxy_launcher[server_key];
+            }
         }
     }
 
@@ -155,6 +166,32 @@ define(function(require) {
     }
     function extractLast( term ) {
       return split( term ).pop();
+    }
+
+    async function setup_proxy_infos() {
+        const response = await fetch(base_url + 'server-proxy/servers-info');
+        if (!response.ok) {
+            console.log('jupyter-lmod: could not communicate with jupyter-server-proxy API.');
+            return;
+        }
+        const data = await response.json();
+        for (let server_process of data.server_processes) {
+            /* create our list item */
+            let entry_container = $('<li>')
+                .attr('role', 'presentation')
+                .addClass('new-' + server_process.name);
+
+            /* create our list item's link */
+            let entry_link = $('<a>')
+                .attr('role', 'menuitem')
+                .attr('tabindex', '-1')
+                .attr('href', base_url + server_process.name + '/')
+                .attr('target', '_blank')
+                .text(server_process.launcher_entry.title);
+
+            entry_container.append(entry_link);
+            server_proxy_infos[server_process.name] = entry_container;
+        }
     }
 
     function load() {
@@ -213,7 +250,7 @@ define(function(require) {
               return false;
             }
         });
-
+        setup_proxy_infos();
         refresh_module_ui();
         refresh_restore_list();
     }
