@@ -9,7 +9,7 @@ related task like loading, unloading, saving collection, etc.
 
 - [jupyter notebook](https://github.com/jupyter/notebook) >= 5.3
 - [Lmod](https://github.com/TACC/Lmod) >= 6.0
-- optional: [jupyter-server-proxy](https://github.com/jupyterhub/jupyter-server-proxy) >= 1.8.0
+- optional: [jupyter-server-proxy](https://github.com/jupyterhub/jupyter-server-proxy) >= 1.5.0
 - optional: [jupyterlab-server-proxy](https://github.com/jupyterhub/jupyter-server-proxy) >= 2.1.0
 
 If jupyter-server-proxy and jupyterlab-server-proxy are detected, jupyter-lmod will add the
