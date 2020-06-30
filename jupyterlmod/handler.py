@@ -24,21 +24,21 @@ ACTIONS = {
 
 class LmodActionHandler(IPythonHandler):
     @tornado.web.authenticated
-    def get(self, action):
+    async def get(self, action):
         func = ACTIONS.get(action, None)
         if func:
             args = self.get_arguments("args")
-            result = func(*args)
+            result = await func(*args)
             self.finish(json.dumps(result))
 
     @tornado.web.authenticated
-    def post(self, action):
+    async def post(self, action):
         func = ACTIONS.get(action, None)
         if func:
             args = self.get_arguments('args')
             if args:
                 jpath_old = os.environ.get('JUPYTER_PATH')
-                func(*args)
+                await func(*args)
                 # If JUPYTER_PATH has been modified by func
                 # the kernel directory list is updated.
                 if jpath_old != os.environ.get('JUPYTER_PATH'):

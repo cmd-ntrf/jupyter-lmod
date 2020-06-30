@@ -1,23 +1,29 @@
-import os # require by lmod output evaluated by exec()
+import asyncio
+import os
 import sys
 
 from functools import partial, wraps
-from subprocess import Popen, PIPE
 
 LMOD_SYSTEM_NAME = os.environ.get('LMOD_SYSTEM_NAME', '')
 SITE_POSTFIX = os.path.join('lib', 'python'+sys.version[:3], 'site-packages')
 
-def module(command, *args):
-    cmd = (os.environ['LMOD_CMD'], 'python', '--terse', command)
+async def module(command, *args):
+    cmd = os.environ['LMOD_CMD'], 'python', '--terse', command, *args
 
-    result = Popen(cmd + args, stdout=PIPE, stderr=PIPE)
+    proc = await asyncio.create_subprocess_shell(" ".join(cmd),
+                                                stdout=asyncio.subprocess.PIPE,
+                                                stderr=asyncio.subprocess.PIPE)
+
+    stdout, stderr = await proc.communicate()
+
     if command in ('load', 'unload', 'purge', 'restore', 'save'):
         try:
-            exec(result.stdout.read())
+            exec(stdout.decode())
         except NameError:
             pass
 
-    return result.stderr.read().decode()
+    if stderr:
+        return stderr.decode()
 
 def update_sys_path(env_var, postfix=''):
     def decorator(function):
@@ -48,8 +54,8 @@ def update_sys_path(env_var, postfix=''):
         return wrapper
     return decorator
 
-def avail(*args):
-    string = module('avail', *args)
+async def avail(*args):
+    string = await module('avail', *args)
     modules = []
     for entry in string.split():
         if not (entry.startswith('/') or
@@ -59,8 +65,9 @@ def avail(*args):
     modules.sort(key=lambda v: v.split('/')[0])
     return modules
 
-def list(hide_hidden=False):
-    string = module('list').strip()
+async def list(hide_hidden=False):
+    string = await module('list')
+    string = string.strip()
     if string != "No modules loaded":
         modules = string.split()
         if hide_hidden:
@@ -68,51 +75,54 @@ def list(hide_hidden=False):
         return modules
     return []
 
-def freeze():
-    header = ["import lmod", "lmod.purge(force=True)"]
-    modules = list(hide_hidden=True)
-    return "\n".join(header +
-                     ["lmod.load('{}')".format(m) for m in modules])
+async def freeze():
+    modules = await list(hide_hidden=True)
+    return "\n".join([
+        "import lmod",
+        "await lmod.purge(force=True)",
+        "await lmod.load({})".format(str(modules)[1:-1])
+    ])
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
-def load(*args):
-    output = module('load', *args)
+async def load(*args):
+    output = await module('load', *args)
     if output:
         print(output)
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
-def reset():
-    output = module('reset')
+async def reset():
+    output = await module('reset')
     if output:
         print(output)
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
-def restore(*args):
-    output = module('restore', *args)
+async def restore(*args):
+    output = await module('restore', *args)
     if output:
         print(output)
 
-def savelist():
-    return module('savelist').split()
+async def savelist():
+    string = await module('savelist')
+    return string.split()
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
-def unload(*args):
-    output = module('unload', *args)
+async def unload(*args):
+    output = await module('unload', *args)
     if output:
         print(output)
 
 @update_sys_path('PYTHONPATH')
 @update_sys_path('EBPYTHONPREFIXES', SITE_POSTFIX)
-def purge(force=False):
+async def purge(force=False):
     if force:
         args = ('--force',)
     else:
         args = ()
-    output = module('purge', *args)
+    output = await module('purge', *args)
     if output:
         print(output)
 
