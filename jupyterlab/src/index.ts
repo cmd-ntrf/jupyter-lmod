@@ -177,9 +177,9 @@ class LmodWidget extends Widget {
       const span = event.target.closest('li').querySelector('span');
       const item = span.innerText;
       if(target.innerText == 'Load') {
-        await lmodAPI.load(item);
+        await lmodAPI.load([item]);
       } else if(target.innerText == 'Unload') {
-        await lmodAPI.unload(item);
+        await lmodAPI.unload([item]);
       }
       this.update();
     }
@@ -226,8 +226,7 @@ class LmodWidget extends Widget {
     }).then(result => {
       if (result.button.label === 'Restore') {
         const name = result.value;
-        lmodAPI.restore(name);
-        this.update();
+        lmodAPI.restore(name).then(() => this.update());
       }
       return;
     });

@@ -90,39 +90,33 @@ define(function(require) {
         });
     }
 
-    function refresh_restore_list() {
-        lmod.savelist()
-        .then(values => {
-            let list = $("#restore-menu").html("");
-            values.map(item => {
-                let li = $('<li>').append($('<a>', {'href': '#', "text" : item}))
-                                  .click(e => lmod.restore(item).then(refresh_module_ui));
-                list.append(li);
-            })
-        });
+    async function refresh_restore_list() {
+        const values = await lmod.savelist();
+        const list = $("#restore-menu").html("");
+        values.map(item => {
+            let li = $('<li>').append($('<a>', {'href': '#', "text" : item}))
+                                .click(e => lmod.restore(item).then(refresh_module_ui));
+            list.append(li);
+        })
     }
 
-    function refresh_module_ui() {
-        Promise.all([lmod.avail(), lmod.list()])
-        .then(values => {
-            let avail_set = new Set(values[0]);
-            let modulelist = values[1].sort();
+    async function refresh_module_ui() {
+        const avail_set = new Set(await lmod.avail());
+        const modulelist = (await lmod.list()).sort();
 
-            $("#list_header").nextAll().remove();
-            let list = $("#lmod_list");
+        $("#list_header").nextAll().remove();
+        const list = $("#lmod_list");
 
-            modulelist.map(item => {
-                let li = lmod_list_line.clone();
-                li.find('a').text(item).click(e => show_module(item));
-                li.find('button').click(e => lmod.unload(item).then(refresh_module_ui));
-                list.append(li);
-                avail_set.delete(item)
-            });
-
-            refresh_kernel_menu(modulelist);
-
-            search_source = Array.from(avail_set);
+        modulelist.map(item => {
+            let li = lmod_list_line.clone();
+            li.find('a').text(item).click(e => show_module(item));
+            li.find('button').click(e => lmod.unload([item]).then(refresh_module_ui));
+            list.append(li);
+            avail_set.delete(item)
         });
+
+        refresh_kernel_menu(modulelist);
+        search_source = Array.from(avail_set);
     }
 
     function refresh_kernel_menu(modulelist) {
