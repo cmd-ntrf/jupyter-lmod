@@ -84,19 +84,19 @@ class API(object):
             self.avail_cache = modules
         return self.avail_cache
 
-    async def list(self, hide_hidden=False):
+    async def list(self, include_hidden=False):
         if self.list_cache is None:
             string = await module("list")
             string = string.strip()
             if string != "No modules loaded":
-                regex = MODULE_REGEX_NO_HIDDEN if hide_hidden else MODULE_REGEX
+                regex = MODULE_REGEX_NO_HIDDEN if not include_hidden else MODULE_REGEX
                 self.list_cache = re.findall(regex, string)
             else:
                 self.list_cache = []
         return self.list_cache
 
     async def freeze(self):
-        modules = await self.list(hide_hidden=True)
+        modules = await self.list(include_hidden=False)
         return "\n".join(
             [
                 "import lmod",
