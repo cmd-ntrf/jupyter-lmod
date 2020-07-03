@@ -115,6 +115,50 @@ class Lmod {
     )
     return response.json();
   }
+
+  async paths() {
+    const response = await fetch(this.url + '/paths');
+    if (response.status == 200) {
+      return response.json();
+    }
+  }
+
+  async use(paths, append=false) {
+    const data = {
+      'paths' : paths,
+      'append' : append,
+    };
+    const response = await fetch(
+      this.url + '/paths',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRFToken': this._xsrf
+        },
+        body: JSON.stringify(data),
+      }
+    )
+    return response.json();
+  }
+
+  async unuse(paths) {
+    const data = {
+      'paths' : paths,
+    };
+    const response = await fetch(
+      this.url + '/paths',
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRFToken': this._xsrf
+        },
+        body: JSON.stringify(data),
+      }
+    )
+    return response.json();
+  }
 }
 
 define({

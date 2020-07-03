@@ -24,7 +24,7 @@ async def module(command, *args):
 
     stdout, stderr = await proc.communicate()
 
-    if command in ("load", "unload", "purge", "reset", "restore", "save"):
+    if command in ("load", "unload", "purge", "reset", "restore", "save", "use", "unuse"):
         try:
             exec(stdout.decode())
         except NameError:
@@ -173,6 +173,24 @@ class API(object):
                 self.show_cache.popitem(last = False)
         return self.show_cache[name]
 
+    @update_sys_path("PYTHONPATH")
+    @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
+    async def use(self, *paths, append=False):
+        args = paths
+        if append:
+            args = '-a', *args
+        output = await module("use", *args)
+        print("module use", paths)
+        if output:
+            print(output)
+
+    @update_sys_path("PYTHONPATH")
+    @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
+    async def unuse(self, *paths):
+        output = await module("unuse", *paths)
+        if output:
+            print(output)
+
 
 _lmod = API()
 
@@ -187,3 +205,5 @@ savelist = _lmod.savelist
 unload = _lmod.unload
 purge = _lmod.purge
 show = _lmod.show
+use = _lmod.use
+unuse = _lmod.unuse

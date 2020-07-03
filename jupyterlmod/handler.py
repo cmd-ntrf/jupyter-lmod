@@ -88,12 +88,35 @@ class LmodCollections(IPythonHandler):
         self.finish(json.dumps("SUCCESS"))
 
 class LmodPath(IPythonHandler):
-    pass
+    @web.authenticated
+    async def get(self):
+        result = os.environ["MODULEPATH"].split(':')
+        self.finish(json.dumps(result))
+
+    @web.authenticated
+    @jupyter_path_decorator
+    async def post(self):
+        paths = self.get_json_body().get('paths')
+        append = self.get_json_body().get('append', False)
+        if not paths:
+            raise web.HTTPError(400, u'paths argument missing')
+        await lmod.use(*paths, append=append)
+        self.finish(json.dumps("SUCCESS"))
+
+    @web.authenticated
+    @jupyter_path_decorator
+    async def delete(self):
+        paths = self.get_json_body().get('paths')
+        if not paths:
+            raise web.HTTPError(400, u'paths argument missing')
+        await lmod.unuse(*paths)
+        self.finish(json.dumps("SUCCESS"))
+
 
 default_handlers = [
     (r"/lmod", Lmod),
     (r"/lmod/modules", LmodModules),
     (r"/lmod/modules/(.*)", LmodModule),
     (r"/lmod/collections", LmodCollections),
-    (r"/lmod/path", LmodPath),
+    (r"/lmod/paths", LmodPath),
 ]
