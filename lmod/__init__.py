@@ -3,9 +3,12 @@ import os
 import re
 import sys
 
+from asyncio import create_subprocess_shell
+from asyncio.subprocess import PIPE
 from collections import OrderedDict
 from functools import partial, wraps
 
+LMOD_CMD = os.environ["LMOD_CMD"]
 LMOD_SYSTEM_NAME = os.environ.get("LMOD_SYSTEM_NAME", "")
 SITE_POSTFIX = os.path.join("lib", "python" + sys.version[:3], "site-packages")
 
@@ -13,15 +16,15 @@ MODULE_REGEX = re.compile(r"^([a-zA-z0-9-_+.]{1,}\/[a-zA-z0-9-_+.]{1,})$", re.M)
 MODULE_REGEX_NO_HIDDEN =  re.compile(r"^([a-zA-z0-9-_+.]{1,}\/[a-zA-z0-9-_][a-zA-z0-9-_.]*)$", re.M)
 
 async def module(command, *args):
-    cmd = os.environ["LMOD_CMD"], "python", "--terse", command, *args
+    cmd = LMOD_CMD, "python", "--terse", command, *args
 
-    proc = await asyncio.create_subprocess_shell(
-        " ".join(cmd), stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    proc = await create_subprocess_shell(
+        " ".join(cmd), stdout=PIPE, stderr=PIPE
     )
 
     stdout, stderr = await proc.communicate()
 
-    if command in ("load", "unload", "purge", "restore", "save"):
+    if command in ("load", "unload", "purge", "reset", "restore", "save"):
         try:
             exec(stdout.decode())
         except NameError:
