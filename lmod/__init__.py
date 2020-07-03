@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 import sys
 
 from collections import OrderedDict
@@ -8,6 +9,8 @@ from functools import partial, wraps
 LMOD_SYSTEM_NAME = os.environ.get("LMOD_SYSTEM_NAME", "")
 SITE_POSTFIX = os.path.join("lib", "python" + sys.version[:3], "site-packages")
 
+MODULE_REGEX = re.compile(r"^([a-zA-z0-9-_+.]{1,}\/[a-zA-z0-9-_+.]{1,})$", re.M)
+MODULE_REGEX_NO_HIDDEN =  re.compile(r"^([a-zA-z0-9-_+.]{1,}\/[a-zA-z0-9-_][a-zA-z0-9-_.]*)$", re.M)
 
 async def module(command, *args):
     cmd = os.environ["LMOD_CMD"], "python", "--terse", command, *args
@@ -76,10 +79,7 @@ class API(object):
     async def avail(self, *args):
         if self.avail_cache is None:
             string = await module("avail", *args)
-            modules = []
-            for entry in string.split():
-                if not (entry.startswith("/") or entry.endswith("/") or "@" in entry):
-                    modules.append(entry)
+            modules = re.findall(MODULE_REGEX, string)
             modules.sort(key=lambda v: v.split("/")[0])
             self.avail_cache = modules
         return self.avail_cache
@@ -89,10 +89,8 @@ class API(object):
             string = await module("list")
             string = string.strip()
             if string != "No modules loaded":
-                modules = string.split()
-                if hide_hidden:
-                    modules = [m for m in modules if m.rsplit("/", 1)[-1][0] != "."]
-                self.list_cache = modules
+                regex = MODULE_REGEX_NO_HIDDEN if hide_hidden else MODULE_REGEX
+                self.list_cache = re.findall(regex, string)
             else:
                 self.list_cache = []
         return self.list_cache
