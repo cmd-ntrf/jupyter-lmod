@@ -180,9 +180,9 @@ class API(object):
         if append:
             args = '-a', *args
         output = await module("use", *args)
-        print("module use", paths)
         if output:
             print(output)
+        self.invalidate_module_caches()
 
     @update_sys_path("PYTHONPATH")
     @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
@@ -190,6 +190,7 @@ class API(object):
         output = await module("unuse", *paths)
         if output:
             print(output)
+        self.invalidate_module_caches()
 
 
 _lmod = API()

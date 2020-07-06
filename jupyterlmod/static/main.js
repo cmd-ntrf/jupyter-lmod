@@ -27,6 +27,9 @@ define(function(require) {
 '            <div class="col-sm-4 no-padding tree-buttons">',
 '                <div class="pull-right">',
 '                    <div class="btn-group">',
+'                        <button class="btn btn-default btn-xs" id="edit-button">MODULEPATH</button>',
+'                    </div> ',
+'                    <div class="btn-group">',
 '                        <button class="btn btn-default btn-xs" id="save-button">Save</button>',
 '                    </div> ',
 '                    <div class="btn-group">',
@@ -61,6 +64,92 @@ define(function(require) {
 '   <input type="text" size="25" class="form-control" placeholder="default">',
 '</div>'
     ].join('\n'));
+
+    const modulepath_dialog_body = $([
+        '<div>',
+        '    <div id="lmod_toolbar" class="row list_toolbar">',
+        '            <input id="path_input" class="form-control" placeholder="Enter path to add..." style="width:100%;float:left;">',
+        '    </div>',
+        '   <div id="path_list" class="list_container">',
+        '   </div>',
+        '</div>'
+    ].join('\n'));
+
+    async function draw_modulepath_dialog() {
+        const paths = await lmod.paths();
+
+        const list = $("#path_list").html("");
+
+        $( "#path_input" )
+        .on('keyup', function (event) {
+            if (event.keyCode == $.ui.keyCode.ENTER) {
+                var paths = event.target.value;
+                if (paths != '') {
+                    lmod.use([paths])
+                    .then(draw_modulepath_dialog)
+                    .then(refresh_module_ui);
+                }
+                event.target.value = "";
+            }
+        })
+
+        var header = $('<div/>')
+            .addClass("list_header")
+            .addClass("row")
+            .appendTo(list);
+
+        var divheader = $('<div/>')
+            .addClass("col-sm-8")
+            .html("List of paths")
+            .appendTo(header);
+
+        paths.map(item => {
+            var row = $('<div/>')
+                .addClass("list_item")
+                .addClass("row")
+                .appendTo(list);
+
+            var div = $("<div/>")
+                .addClass("col-md-12")
+                .appendTo(row);
+            
+            var span = $("<span/>")
+                .addClass("item_name")
+                .html(item)
+                .appendTo(div);
+            
+            var divButton = $('<div/>')
+                .addClass('item_buttons')
+                .addClass('pull-right')
+                .appendTo(div);
+            
+            var button = $('<button/>')
+                .addClass('btn')
+                .addClass('btn-danger')
+                .addClass('btn-xs')
+                .html('unuse')
+                .click(e => lmod.unuse([item])
+                    .then(draw_modulepath_dialog)
+                    .then(refresh_module_ui)
+                )
+                .appendTo(divButton);
+        })
+    }
+
+    function edit_paths(event) {
+        var d = dialog.modal({
+            title: "Edit MODULEPATH",
+            body: modulepath_dialog_body,
+            keyboard_manager: this.keyboard_manager,
+            default_button: "Close",
+            buttons : {
+                "Close": {}
+            },
+            open : async function () {
+                await draw_modulepath_dialog();
+            }
+        });
+    }
 
     function save_collection(event) {
         var d = dialog.modal({
@@ -191,6 +280,7 @@ define(function(require) {
     function load() {
         if (!IPython.notebook_list) return;
         $(".tab-content").append(lmod_tab_html);
+        $("#edit-button").click(edit_paths);
         $("#save-button").click(save_collection);
         $("#tabs").append(
             $('<li>')
