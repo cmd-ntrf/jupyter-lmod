@@ -82,20 +82,23 @@ class API(object):
     async def avail(self, *args):
         if self.avail_cache is None:
             string = await module("avail", *args)
-            modules = re.findall(MODULE_REGEX, string)
-            modules.sort(key=lambda v: v.split("/")[0])
+            if string is not None:
+                modules = re.findall(MODULE_REGEX, string)
+                modules.sort(key=lambda v: v.split("/")[0])
+            else:
+                modules = []
             self.avail_cache = modules
         return self.avail_cache
 
     async def list(self, include_hidden=False):
         if self.list_cache is None:
+            self.list_cache = []
             string = await module("list")
-            string = string.strip()
-            if string != "No modules loaded":
-                regex = MODULE_REGEX_NO_HIDDEN if not include_hidden else MODULE_REGEX
-                self.list_cache = re.findall(regex, string)
-            else:
-                self.list_cache = []
+            if string is not None:
+                string = string.strip()
+                if string != "No modules loaded":
+                    regex = MODULE_REGEX_NO_HIDDEN if not include_hidden else MODULE_REGEX
+                    self.list_cache = re.findall(regex, string)
         return self.list_cache
 
     async def freeze(self):
