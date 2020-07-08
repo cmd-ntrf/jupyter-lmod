@@ -27,9 +27,6 @@ define(function(require) {
 '            <div class="col-sm-4 no-padding tree-buttons">',
 '                <div class="pull-right">',
 '                    <div class="btn-group">',
-'                        <button class="btn btn-default btn-xs" id="edit-button">MODULEPATH</button>',
-'                    </div> ',
-'                    <div class="btn-group">',
 '                        <button class="btn btn-default btn-xs" id="save-button">Save</button>',
 '                    </div> ',
 '                    <div class="btn-group">',
@@ -39,6 +36,9 @@ define(function(require) {
 '                        </button>',
 '                        <ul class="dropdown-menu", id="restore-menu"/>',
 '                    </div>',
+'                    <div class="btn-group">',
+'                        <button class="btn btn-default btn-xs" id="edit-button" title="Edit MODULEPATH"><i class="fa fa-pencil" aria-hidden="true"></i></button>',
+'                    </div> ',
 '                </div>',
 '            </div>',
 '        </div>',
@@ -66,7 +66,7 @@ define(function(require) {
     ].join('\n'));
 
     const modulepath_dialog_body = $([
-        '<div>',
+        '<div class="ui-front">',
         '    <div id="lmod_toolbar" class="row list_toolbar">',
         '            <input id="path_input" class="form-control" placeholder="Enter path to add..." style="width:100%;float:left;">',
         '    </div>',
@@ -92,6 +92,12 @@ define(function(require) {
                 event.target.value = "";
             }
         })
+        .autocomplete({
+            minLength: 1,
+            source: async function( request, response ) {
+                response(await lmod.folders(request.term));
+            },
+        });
 
         var header = $('<div/>')
             .addClass("list_header")
@@ -127,7 +133,7 @@ define(function(require) {
                 .addClass('btn')
                 .addClass('btn-danger')
                 .addClass('btn-xs')
-                .html('unuse')
+                .html('<i class="fa fa-trash-o" aria-hidden="true"></i>')
                 .click(e => lmod.unuse([item])
                     .then(draw_modulepath_dialog)
                     .then(refresh_module_ui)

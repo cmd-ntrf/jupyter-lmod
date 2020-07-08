@@ -123,6 +123,13 @@ class Lmod {
     }
   }
 
+  async folders(path) {
+    const response = await fetch(this.url + '/folders/' + path);
+    if (response.status == 200) {
+      return response.json();
+    }
+  }
+
   async use(paths, append=false) {
     const data = {
       'paths' : paths,

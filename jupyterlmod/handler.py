@@ -4,6 +4,7 @@ import os
 import lmod
 
 from functools import partial, wraps
+from glob import glob
 
 from tornado import web
 from jupyter_core.paths import jupyter_path
@@ -87,10 +88,10 @@ class LmodCollections(IPythonHandler):
         await lmod.restore(name)
         self.finish(json.dumps("SUCCESS"))
 
-class LmodPath(IPythonHandler):
+class LmodPaths(IPythonHandler):
     @web.authenticated
     async def get(self):
-        result = os.environ["MODULEPATH"].split(':')
+        result = os.environ.get("MODULEPATH", "").split(':')
         self.finish(json.dumps(result))
 
     @web.authenticated
@@ -112,11 +113,18 @@ class LmodPath(IPythonHandler):
         await lmod.unuse(*paths)
         self.finish(json.dumps("SUCCESS"))
 
+class FoldersHandler(IPythonHandler):
+    @web.authenticated
+    async def get(self, path):
+        result = glob(path + "*/")
+        result = [path[:-1] for path in result]
+        self.finish(json.dumps(result))
 
 default_handlers = [
     (r"/lmod", Lmod),
     (r"/lmod/modules", LmodModules),
     (r"/lmod/modules/(.*)", LmodModule),
     (r"/lmod/collections", LmodCollections),
-    (r"/lmod/paths", LmodPath),
+    (r"/lmod/paths", LmodPaths),
+    (r"/lmod/folders/(.*)", FoldersHandler)
 ]
