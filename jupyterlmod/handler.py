@@ -91,7 +91,11 @@ class LmodCollections(IPythonHandler):
 class LmodPaths(IPythonHandler):
     @web.authenticated
     async def get(self):
-        result = os.environ.get("MODULEPATH", "").split(':')
+        result = os.environ.get("MODULEPATH")
+        if result is not None:
+            result = result.split(":")
+        else:
+            result = []
         self.finish(json.dumps(result))
 
     @web.authenticated
