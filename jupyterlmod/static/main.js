@@ -37,7 +37,7 @@ define(function(require) {
 '                        <ul class="dropdown-menu", id="restore-menu"/>',
 '                    </div>',
 '                    <div class="btn-group">',
-'                        <button class="btn btn-default btn-xs" id="edit-button" title="Edit MODULEPATH"><i class="fa fa-pencil" aria-hidden="true"></i></button>',
+'                        <button class="btn btn-default btn-xs" id="edit-button" title="Edit MODULEPATH"><i class="fa fa-wrench" aria-hidden="true"></i></button>',
 '                    </div> ',
 '                </div>',
 '            </div>',
