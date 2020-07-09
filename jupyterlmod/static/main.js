@@ -27,10 +27,10 @@ define(function(require) {
 '            <div class="col-sm-4 no-padding tree-buttons">',
 '                <div class="pull-right">',
 '                    <div class="btn-group">',
-'                        <button class="btn btn-default btn-xs" id="save-button">Save</button>',
+'                        <button class="btn btn-default btn-xs" id="save-button" title="Save current module list to a collection">Save</button>',
 '                    </div> ',
 '                    <div class="btn-group">',
-'                        <button class="dropdown-toggle btn btn-default btn-xs" id="restore-buttons" data-toggle="dropdown">',
+'                        <button class="dropdown-toggle btn btn-default btn-xs" id="restore-buttons" title="Restore modules from a collection" data-toggle="dropdown">',
 '                            <span>Restore </span>',
 '                            <span class="caret"/>',
 '                        </button>',
@@ -51,7 +51,8 @@ define(function(require) {
 '   <div class="col-md-12">',
 '       <a href="#lmod_list"/>',
 '       <div class="item_buttons pull-right">',
-'           <button class="btn btn-warning btn-xs">Unload</button>',
+'           <button class="btn btn-default btn-xs" id="reload" title="Reload module"><i class="fa fa-refresh" aria-hidden="true"></i></button>',
+'           <button class="btn btn-default btn-xs" id="unload" title="Unload module"><i class="fa fa-trash-o" aria-hidden="true"></i></button>',
 '       </div>',
 '   </div>',
 '</div>',
@@ -164,6 +165,7 @@ define(function(require) {
                 .addClass('btn')
                 .addClass('btn-danger')
                 .addClass('btn-xs')
+                .attr("title", "Remove from MODULEPATH")
                 .html('<i class="fa fa-trash-o" aria-hidden="true"></i>')
                 .click(e => lmod.unuse([item])
                     .then(draw_modulepath_dialog)
@@ -236,7 +238,8 @@ define(function(require) {
         modulelist.map(item => {
             let li = lmod_list_line.clone();
             li.find('a').text(item).click(e => show_module(item));
-            li.find('button').click(e => lmod.unload([item]).then(refresh_module_ui));
+            li.find('#reload').click(e => lmod.load([item]).then(refresh_module_ui));
+            li.find('#unload').click(e => lmod.unload([item]).then(refresh_module_ui));
             list.append(li);
             avail_set.delete(item)
         });
