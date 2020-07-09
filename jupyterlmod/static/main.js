@@ -230,7 +230,7 @@ define(function(require) {
 
     async function refresh_module_ui() {
         const avail_set = new Set(await lmod.avail());
-        const modulelist = (await lmod.list()).sort();
+        const modulelist = await lmod.list();
 
         $("#list_header").nextAll().remove();
         const list = $("#lmod_list");
