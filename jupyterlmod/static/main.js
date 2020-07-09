@@ -68,7 +68,11 @@ define(function(require) {
     const modulepath_dialog_body = $([
         '<div class="ui-front">',
         '    <div id="lmod_toolbar" class="row list_toolbar">',
-        '            <input id="path_input" class="form-control" placeholder="Enter path to add..." style="width:100%;float:left;">',
+        '        <input id="path_input" class="form-control" placeholder="Enter path here..." style="width:70%;float:left;"">',
+        '        <div class="btn-group" style="width:30%;float:left;">',
+        '            <button class="btn btn-default" id="prepend_path" title="Prepend to MODULEPATH" style="width:50%;float:left;">Prepend <i class="fa fa-arrow-up" aria-hidden="true"></i></button>',
+        '            <button class="btn btn-default" id="append_path" title="Append to MODULEPATH" style="width:50%;float:left;">Append <i class="fa fa-arrow-down" aria-hidden="true"></i></button>',
+        '        </div>',
         '    </div>',
         '   <div id="path_list" class="list_container">',
         '   </div>',
@@ -80,7 +84,7 @@ define(function(require) {
 
         const list = $("#path_list").html("");
 
-        $( "#path_input" )
+        const path_input = $( "#path_input" )
         .on('keyup', function (event) {
             if (event.keyCode == $.ui.keyCode.ENTER) {
                 var paths = event.target.value;
@@ -99,6 +103,25 @@ define(function(require) {
             },
         });
 
+        $( "#prepend_path" ).click(function (e) {
+            const path = path_input.val();
+            if (path != '') {
+                path_input.val('')
+                lmod.use([path])
+                    .then(draw_modulepath_dialog)
+                    .then(refresh_module_ui);
+            }
+        });
+        $( "#append_path" ).click(async function(e) {
+            const path = path_input.val();
+            if (path != '') {
+                path_input.val('')
+                lmod.use([path], true)
+                    .then(draw_modulepath_dialog)
+                    .then(refresh_module_ui);
+            }
+        });
+
         var header = $('<div/>')
             .addClass("list_header")
             .addClass("row")
@@ -106,10 +129,10 @@ define(function(require) {
 
         var divheader = $('<div/>')
             .addClass("col-sm-8")
-            .html("List of paths")
+            .html("List of paths (decreasing order of priority)")
             .appendTo(header);
 
-        paths.map(item => {
+        paths.map((item, index) => {
             var row = $('<div/>')
                 .addClass("list_item")
                 .addClass("row")
@@ -118,17 +141,25 @@ define(function(require) {
             var div = $("<div/>")
                 .addClass("col-md-12")
                 .appendTo(row);
-            
+
             var span = $("<span/>")
                 .addClass("item_name")
-                .html(item)
+                .html(`${index+1}. `)
                 .appendTo(div);
-            
+
+            var link = $("<a/>")
+                .attr("href", "#path_input")
+                .click(function (e) {
+                    path_input.val(item);
+                })
+                .html(item)
+                .appendTo(span);
+
             var divButton = $('<div/>')
                 .addClass('item_buttons')
                 .addClass('pull-right')
                 .appendTo(div);
-            
+
             var button = $('<button/>')
                 .addClass('btn')
                 .addClass('btn-danger')
