@@ -77,6 +77,6 @@ launchers are displayed only when `rstudio` or `code-server` module are loaded.
 
 ## demo
 
-![Jupyter notebook demo](http://i.imgur.com/IP9uUJp.gif)
+![Jupyter notebook demo](https://i.imgur.com/pK1Q5gG.gif)
 
 ![JupyterLab demo](https://i.imgur.com/1HDH7iN.gif)
