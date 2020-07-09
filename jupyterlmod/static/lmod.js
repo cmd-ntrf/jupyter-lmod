@@ -16,8 +16,12 @@ class Lmod {
     }
   }
 
-  async list() {
-    const response = await fetch(this.url);
+  async list(include_hidden=false) {
+    let url = this.url;
+    if (include_hidden) {
+      url += '?all=true';
+    }
+    const response = await fetch(url);
     if (response.status == 200) {
       return response.json();
     }

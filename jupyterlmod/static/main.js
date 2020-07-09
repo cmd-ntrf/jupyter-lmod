@@ -27,6 +27,12 @@ define(function(require) {
 '            <div class="col-sm-4 no-padding tree-buttons">',
 '                <div class="pull-right">',
 '                    <div class="btn-group">',
+'                        <button title="Show hidden modules" id="show_hidden_btn" aria-label="Show hidden modules" type="button" class="btn btn-default btn-xs" role="checkbox" style="min-width:50px">',
+'                            <input type="checkbox" id="show_hidden" style="margin-left:0px;margin-right:4px;margin-top:3px;height=16px">',
+'                            <i class="fa fa-eye-slash" aria-hidden="true"></i>',
+'                        </button>',
+'                    </div>',
+'                    <div class="btn-group">',
 '                        <button class="btn btn-default btn-xs" id="save-button" title="Save current module list to a collection">Save</button>',
 '                    </div> ',
 '                    <div class="btn-group">',
@@ -229,9 +235,9 @@ define(function(require) {
     }
 
     async function refresh_module_ui() {
+        const show_hidden = $("#show_hidden")[0].checked;
         const avail_set = new Set(await lmod.avail());
-        const modulelist = await lmod.list();
-
+        const modulelist = await lmod.list(show_hidden);
         $("#list_header").nextAll().remove();
         const list = $("#lmod_list");
 
@@ -374,6 +380,15 @@ define(function(require) {
               return false;
             }
         });
+
+        const show_hidden_checkbox = $("#show_hidden");
+        const hidden_module_callback = function() {
+            show_hidden_checkbox[0].checked = ! show_hidden_checkbox[0].checked;
+            refresh_module_ui();
+        }
+        show_hidden_checkbox.click(hidden_module_callback);
+        $("#show_hidden_btn").click(hidden_module_callback);
+
         setup_proxy_infos();
         refresh_module_ui();
         refresh_restore_list();

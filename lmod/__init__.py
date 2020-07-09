@@ -92,14 +92,14 @@ class API(object):
 
     async def list(self, include_hidden=False):
         if self.list_cache is None:
-            self.list_cache = []
+            self.list_cache = {True: [], False:[]}
             string = await module("list")
             if string is not None:
                 string = string.strip()
                 if string != "No modules loaded":
-                    regex = MODULE_REGEX_NO_HIDDEN if not include_hidden else MODULE_REGEX
-                    self.list_cache = re.findall(regex, string)
-        return self.list_cache
+                    self.list_cache[False] = re.findall(MODULE_REGEX_NO_HIDDEN, string)
+                    self.list_cache[True] = re.findall(MODULE_REGEX, string)
+        return self.list_cache[include_hidden]
 
     async def freeze(self):
         modules = await self.list(include_hidden=False)

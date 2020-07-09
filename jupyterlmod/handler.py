@@ -23,8 +23,10 @@ class Lmod(IPythonHandler):
     @web.authenticated
     async def get(self):
         lang = self.get_query_argument(name="lang", default=None)
+        all = self.get_query_argument(name="all", default=None)
         if lang is None:
-            result = await lmod.list(include_hidden=False)
+            all = all is not None and all == "true"
+            result = await lmod.list(include_hidden=all)
         elif lang == "python":
             result = await lmod.freeze()
         else:
