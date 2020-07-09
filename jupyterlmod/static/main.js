@@ -33,14 +33,15 @@ define(function(require) {
 '                        </button>',
 '                    </div>',
 '                    <div class="btn-group">',
-'                        <button class="btn btn-default btn-xs" id="save-button" title="Save current module list to a collection">Save</button>',
-'                    </div> ',
-'                    <div class="btn-group">',
-'                        <button class="dropdown-toggle btn btn-default btn-xs" id="restore-buttons" title="Restore modules from a collection" data-toggle="dropdown">',
-'                            <span>Restore </span>',
+'                        <button class="dropdown-toggle btn btn-default btn-xs" data-toggle="dropdown">',
+'                            <span>Collection</span>',
 '                            <span class="caret"/>',
 '                        </button>',
-'                        <ul class="dropdown-menu", id="restore-menu"/>',
+'                        <ul class="dropdown-menu", id="restore-menu">',
+'                            <li id="save-collection"><a aria-label="save-collection" role="menuitem" href="#" title="Save module list to collection">Save</a></li>',
+'                            <li role="presentation" class="divider"></li>',
+'                            <li id="restore-header" role="menuitem" class="dropdown-header" style="font-size: 10px;border-bottom: 1px solid #e5e5e5;padding: 0 0 3px;margin: -3px 20px 0;">Restore:</li>',
+'                        </ul>',
 '                    </div>',
 '                    <div class="btn-group">',
 '                        <button class="btn btn-default btn-xs" id="edit-button" title="Edit MODULEPATH"><i class="fa fa-wrench" aria-hidden="true"></i></button>',
@@ -226,10 +227,14 @@ define(function(require) {
 
     async function refresh_restore_list() {
         const values = await lmod.savelist();
-        const list = $("#restore-menu").html("");
+        values.push('system');
+        const list = $("#restore-menu");
+        list.find('#restore-header').nextAll().remove();
         values.map(item => {
-            let li = $('<li>').append($('<a>', {'href': '#', "text" : item}))
-                                .click(e => lmod.restore(item).then(refresh_module_ui));
+            let li = $('<li>')
+                .append($('<a>', {'href': '#', "text" : item}))
+                .attr("title", `Restore collection "${item}"`)
+                .click(e => lmod.restore(item).then(refresh_module_ui));
             list.append(li);
         })
     }
@@ -327,7 +332,7 @@ define(function(require) {
         if (!IPython.notebook_list) return;
         $(".tab-content").append(lmod_tab_html);
         $("#edit-button").click(edit_paths);
-        $("#save-button").click(save_collection);
+        $("#save-collection").click(save_collection);
         $("#tabs").append(
             $('<li>')
             .append(
