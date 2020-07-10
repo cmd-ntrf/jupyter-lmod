@@ -27,15 +27,25 @@ define(function(require) {
 '            <div class="col-sm-4 no-padding tree-buttons">',
 '                <div class="pull-right">',
 '                    <div class="btn-group">',
-'                        <button class="btn btn-default btn-xs" id="save-button">Save</button>',
-'                    </div> ',
+'                        <button title="Show hidden modules" id="show_hidden_btn" aria-label="Show hidden modules" type="button" class="btn btn-default btn-xs" role="checkbox" style="min-width:50px">',
+'                            <input type="checkbox" id="show_hidden" style="margin-left:0px;margin-right:4px;margin-top:3px;height=16px">',
+'                            <i class="fa fa-eye-slash" aria-hidden="true"></i>',
+'                        </button>',
+'                    </div>',
 '                    <div class="btn-group">',
-'                        <button class="dropdown-toggle btn btn-default btn-xs" id="restore-buttons" data-toggle="dropdown">',
-'                            <span>Restore </span>',
+'                        <button class="dropdown-toggle btn btn-default btn-xs" data-toggle="dropdown">',
+'                            <span>Collection</span>',
 '                            <span class="caret"/>',
 '                        </button>',
-'                        <ul class="dropdown-menu", id="restore-menu"/>',
+'                        <ul class="dropdown-menu", id="restore-menu">',
+'                            <li id="save-collection"><a aria-label="save-collection" role="menuitem" href="#" title="Save module list to collection">Save</a></li>',
+'                            <li role="presentation" class="divider"></li>',
+'                            <li id="restore-header" role="menuitem" class="dropdown-header" style="font-size: 10px;border-bottom: 1px solid #e5e5e5;padding: 0 0 3px;margin: -3px 20px 0;">Restore:</li>',
+'                        </ul>',
 '                    </div>',
+'                    <div class="btn-group">',
+'                        <button class="btn btn-default btn-xs" id="edit-button" title="Edit MODULEPATH"><i class="fa fa-wrench" aria-hidden="true"></i></button>',
+'                    </div> ',
 '                </div>',
 '            </div>',
 '        </div>',
@@ -48,7 +58,8 @@ define(function(require) {
 '   <div class="col-md-12">',
 '       <a href="#lmod_list"/>',
 '       <div class="item_buttons pull-right">',
-'           <button class="btn btn-warning btn-xs">Unload</button>',
+'           <button class="btn btn-default btn-xs" id="reload" title="Reload module"><i class="fa fa-refresh" aria-hidden="true"></i></button>',
+'           <button class="btn btn-default btn-xs" id="unload" title="Unload module"><i class="fa fa-trash-o" aria-hidden="true"></i></button>',
 '       </div>',
 '   </div>',
 '</div>',
@@ -61,6 +72,130 @@ define(function(require) {
 '   <input type="text" size="25" class="form-control" placeholder="default">',
 '</div>'
     ].join('\n'));
+
+    const modulepath_dialog_body = $([
+        '<div class="ui-front">',
+        '    <div id="lmod_toolbar" class="row list_toolbar">',
+        '        <input id="path_input" class="form-control" placeholder="Enter path here..." style="width:70%;float:left;"">',
+        '        <div class="btn-group" style="width:30%;float:left;">',
+        '            <button class="btn btn-default" id="prepend_path" title="Prepend to MODULEPATH" style="width:50%;float:left;">Prepend <i class="fa fa-arrow-up" aria-hidden="true"></i></button>',
+        '            <button class="btn btn-default" id="append_path" title="Append to MODULEPATH" style="width:50%;float:left;">Append <i class="fa fa-arrow-down" aria-hidden="true"></i></button>',
+        '        </div>',
+        '    </div>',
+        '   <div id="path_list" class="list_container">',
+        '   </div>',
+        '</div>'
+    ].join('\n'));
+
+    async function draw_modulepath_dialog() {
+        const paths = await lmod.paths();
+
+        const list = $("#path_list").html("");
+
+        const path_input = $( "#path_input" )
+        .on('keyup', function (event) {
+            if (event.keyCode == $.ui.keyCode.ENTER) {
+                var paths = event.target.value;
+                if (paths != '') {
+                    lmod.use([paths])
+                    .then(draw_modulepath_dialog)
+                    .then(refresh_module_ui);
+                }
+                event.target.value = "";
+            }
+        })
+        .autocomplete({
+            minLength: 1,
+            source: async function( request, response ) {
+                response(await lmod.folders(request.term));
+            },
+        });
+
+        $( "#prepend_path" ).click(function (e) {
+            const path = path_input.val();
+            if (path != '') {
+                path_input.val('')
+                lmod.use([path])
+                    .then(draw_modulepath_dialog)
+                    .then(refresh_module_ui);
+            }
+        });
+        $( "#append_path" ).click(async function(e) {
+            const path = path_input.val();
+            if (path != '') {
+                path_input.val('')
+                lmod.use([path], true)
+                    .then(draw_modulepath_dialog)
+                    .then(refresh_module_ui);
+            }
+        });
+
+        var header = $('<div/>')
+            .addClass("list_header")
+            .addClass("row")
+            .appendTo(list);
+
+        var divheader = $('<div/>')
+            .addClass("col-sm-8")
+            .html("List of paths (decreasing order of priority)")
+            .appendTo(header);
+
+        paths.map((item, index) => {
+            var row = $('<div/>')
+                .addClass("list_item")
+                .addClass("row")
+                .appendTo(list);
+
+            var div = $("<div/>")
+                .addClass("col-md-12")
+                .appendTo(row);
+
+            var span = $("<span/>")
+                .addClass("item_name")
+                .html(`${index+1}. `)
+                .appendTo(div);
+
+            var link = $("<a/>")
+                .attr("href", "#path_input")
+                .click(function (e) {
+                    path_input.val(item);
+                })
+                .html(item)
+                .appendTo(span);
+
+            var divButton = $('<div/>')
+                .addClass('item_buttons')
+                .addClass('pull-right')
+                .appendTo(div);
+
+            var button = $('<button/>')
+                .addClass('btn')
+                .addClass('btn-danger')
+                .addClass('btn-xs')
+                .attr("title", "Remove from MODULEPATH")
+                .html('<i class="fa fa-trash-o" aria-hidden="true"></i>')
+                .click(e => lmod.unuse([item])
+                    .then(draw_modulepath_dialog)
+                    .then(refresh_module_ui)
+                )
+                .appendTo(divButton);
+        })
+    }
+
+    function edit_paths(event) {
+        var d = dialog.modal({
+            title: "Edit MODULEPATH",
+            body: modulepath_dialog_body,
+            keyboard_manager: this.keyboard_manager,
+            default_button: "Close",
+            buttons : {
+                "Close": {}
+            },
+            open : async function () {
+                await draw_modulepath_dialog();
+            }
+        });
+    }
 
     function save_collection(event) {
         var d = dialog.modal({
@@ -90,39 +225,38 @@ define(function(require) {
         });
     }
 
-    function refresh_restore_list() {
-        lmod.savelist()
-        .then(values => {
-            let list = $("#restore-menu").html("");
-            values.map(item => {
-                let li = $('<li>').append($('<a>', {'href': '#', "text" : item}))
-                                  .click(e => lmod.restore(item).then(refresh_module_ui));
-                list.append(li);
-            })
-        });
+    async function refresh_restore_list() {
+        const values = await lmod.savelist();
+        values.push('system');
+        const list = $("#restore-menu");
+        list.find('#restore-header').nextAll().remove();
+        values.map(item => {
+            let li = $('<li>')
+                .append($('<a>', {'href': '#', "text" : item}))
+                .attr("title", `Restore collection "${item}"`)
+                .click(e => lmod.restore(item).then(refresh_module_ui));
+            list.append(li);
+        })
     }
 
-    function refresh_module_ui() {
-        Promise.all([lmod.avail(), lmod.list()])
-        .then(values => {
-            let avail_set = new Set(values[0]);
-            let modulelist = values[1].sort();
+    async function refresh_module_ui() {
+        const show_hidden = $("#show_hidden")[0].checked;
+        const avail_set = new Set(await lmod.avail());
+        const modulelist = await lmod.list(show_hidden);
+        $("#list_header").nextAll().remove();
+        const list = $("#lmod_list");
 
-            $("#list_header").nextAll().remove();
-            let list = $("#lmod_list");
-
-            modulelist.map(item => {
-                let li = lmod_list_line.clone();
-                li.find('a').text(item).click(e => show_module(item));
-                li.find('button').click(e => lmod.unload(item).then(refresh_module_ui));
-                list.append(li);
-                avail_set.delete(item)
-            });
-
-            refresh_kernel_menu(modulelist);
-
-            search_source = Array.from(avail_set);
+        modulelist.map(item => {
+            let li = lmod_list_line.clone();
+            li.find('a').text(item).click(e => show_module(item));
+            li.find('#reload').click(e => lmod.load([item]).then(refresh_module_ui));
+            li.find('#unload').click(e => lmod.unload([item]).then(refresh_module_ui));
+            list.append(li);
+            avail_set.delete(item)
         });
+
+        refresh_kernel_menu(modulelist);
+        search_source = Array.from(avail_set);
     }
 
     function refresh_kernel_menu(modulelist) {
@@ -197,7 +331,8 @@ define(function(require) {
     function load() {
         if (!IPython.notebook_list) return;
         $(".tab-content").append(lmod_tab_html);
-        $("#save-button").click(save_collection);
+        $("#edit-button").click(edit_paths);
+        $("#save-collection").click(save_collection);
         $("#tabs").append(
             $('<li>')
             .append(
@@ -250,6 +385,15 @@ define(function(require) {
               return false;
             }
         });
+
+        const show_hidden_checkbox = $("#show_hidden");
+        const hidden_module_callback = function() {
+            show_hidden_checkbox[0].checked = ! show_hidden_checkbox[0].checked;
+            refresh_module_ui();
+        }
+        show_hidden_checkbox.click(hidden_module_callback);
+        $("#show_hidden_btn").click(hidden_module_callback);
+
         setup_proxy_infos();
         refresh_module_ui();
         refresh_restore_list();

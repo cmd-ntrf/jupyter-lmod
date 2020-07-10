@@ -3,88 +3,172 @@ function getCookie(name) {
   return r ? r[1] : undefined;
 }
 
-var $ = require('jquery');
-
 class Lmod {
   constructor(base_url) {
-    this._available = null;
-    this._loaded = null;
-    this._savelist = null;
-    this.url = base_url + 'lmod/'
+    this.url = base_url + 'lmod'
     this._xsrf = getCookie("_xsrf");
   }
 
-  avail() {
-    if(this._available == null){
-      this._available = this.get('avail', {});
+  async avail() {
+    const response = await fetch(this.url + '/modules');
+    if (response.status == 200) {
+      return response.json();
     }
-    return this._available;
   }
 
-  list() {
-    if(this._loaded == null) {
-      this._loaded = this.get('list', {});
+  async list(include_hidden=false) {
+    let url = this.url;
+    if (include_hidden) {
+      url += '?all=true';
     }
-    return this._loaded;
-  }
-
-  load(modules) {
-    this._available = null;
-    this._loaded = null;
-    return this.post('load', {'args' : modules});
-  }
-
-  restore(name) {
-    this._available = null;
-    this._loaded = null;
-    return this.post('restore', {'args' : name});
-  }
-
-  save(name) {
-    this._savelist = null;
-    return this.post('save', {'args' : name});
-  }
-
-  savelist() {
-    if (this._savelist == null) {
-      this._savelist = this.get('savelist', {});
+    const response = await fetch(url);
+    if (response.status == 200) {
+      return response.json();
     }
-    return this._savelist;
   }
 
-  show(module) {
-    return this.get('show', {'args' : module});
+  async load(modules) {
+    const data = {
+      'modules' : modules,
+    };
+    const response = await fetch(
+      this.url,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRFToken': this._xsrf
+        },
+        body: JSON.stringify(data),
+      }
+    )
+    return response.json();
   }
 
-  freeze() {
-    return this.get('freeze', {});
+  async restore(name) {
+    const data = {
+      'name' : name,
+    };
+    const response = await fetch(
+      this.url + '/collections',
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRFToken': this._xsrf
+        },
+        body: JSON.stringify(data),
+      }
+    )
+    return response.json();
   }
 
-  unload(modules) {
-    this._available = null;
-    this._loaded = null;
-    return this.post('unload', {'args' : modules});
+  async save(name) {
+    const data = {
+      'name' : name,
+    };
+    const response = await fetch(
+      this.url + '/collections',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRFToken': this._xsrf
+        },
+        body: JSON.stringify(data),
+      }
+    )
+    return response.json();
   }
 
-  get(action, options) {
-    return $.ajax({
-            url: this.url + action,
-            type: "GET",
-            dataType: "json",
-            data: options,
-            traditional: true
-        });
+  async savelist() {
+    const response = await fetch(this.url + '/collections');
+    if (response.status == 200) {
+      return response.json();
+    }
   }
 
-  post(action, options) {
-    options['_xsrf'] = this._xsrf;
-        return $.ajax({
-            url: this.url + action,
-            type: "POST",
-            dataType: "json",
-            data: options,
-            traditional: true
-        });
+  async show(module) {
+    const response = await fetch(this.url + '/modules/' + module);
+    if (response.status == 200) {
+      return response.json();
+    }
+  }
+
+  async freeze() {
+    const response = await fetch(this.url + '?lang=python');
+    if (response.status == 200) {
+      return response.json();
+    }
+  }
+
+  async unload(modules) {
+    const data = {
+      'modules' : modules,
+    };
+    const response = await fetch(
+      this.url,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRFToken': this._xsrf
+        },
+        body: JSON.stringify(data),
+      }
+    )
+    return response.json();
+  }
+
+  async paths() {
+    const response = await fetch(this.url + '/paths');
+    if (response.status == 200) {
+      return response.json();
+    }
+  }
+
+  async folders(path) {
+    const response = await fetch(this.url + '/folders/' + path);
+    if (response.status == 200) {
+      return response.json();
+    }
+  }
+
+  async use(paths, append=false) {
+    const data = {
+      'paths' : paths,
+      'append' : append,
+    };
+    const response = await fetch(
+      this.url + '/paths',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRFToken': this._xsrf
+        },
+        body: JSON.stringify(data),
+      }
+    )
+    return response.json();
+  }
+
+  async unuse(paths) {
+    const data = {
+      'paths' : paths,
+    };
+    const response = await fetch(
+      this.url + '/paths',
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRFToken': this._xsrf
+        },
+        body: JSON.stringify(data),
+      }
+    )
+    return response.json();
   }
 }
 
