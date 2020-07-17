@@ -144,7 +144,10 @@ class API(object):
     async def savelist(self):
         if self.savelist_cache is None:
             string = await module("savelist")
-            self.savelist_cache = string.split()
+            if string is not None:
+                self.savelist_cache = string.split()
+            else:
+                self.savelist_cache = []
         return self.savelist_cache
 
     @update_sys_path("PYTHONPATH")
