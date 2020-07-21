@@ -46,9 +46,9 @@ launchers are displayed only when `rstudio` or `code-server` module are loaded.
                 "code-server": {
                     "command": [
                         "code-server",
-                        "--no-auth",
+                        "--auth=none",
                         "--disable-telemetry",
-                        "--allow-http",
+                        "--host=127.0.0.1",
                         "--port={port}"
                     ],
                     "timeout": 20,
