@@ -56,7 +56,7 @@ define(function(require) {
     const lmod_list_line = $([
 '<div class="list_item row">',
 '   <div class="col-md-12">',
-'       <a href="#lmod_list"/>',
+'       <a href="#lmod_list"></a>',
 '       <div class="item_buttons pull-right">',
 '           <button class="btn btn-default btn-xs" id="reload" title="Reload module"><i class="fa fa-refresh" aria-hidden="true"></i></button>',
 '           <button class="btn btn-default btn-xs" id="unload" title="Unload module"><i class="fa fa-trash-o" aria-hidden="true"></i></button>',
