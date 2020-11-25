@@ -12,7 +12,7 @@ LMOD_CMD = os.environ["LMOD_CMD"]
 LMOD_SYSTEM_NAME = os.environ.get("LMOD_SYSTEM_NAME", "")
 SITE_POSTFIX = os.path.join("lib", "python" + sys.version[:3], "site-packages")
 
-MODULE_REGEX = re.compile(r"^([a-zA-z0-9-_+.]{1,}\/[a-zA-z0-9-_+.]{1,})$", re.M)
+MODULE_REGEX = re.compile(r"^([a-zA-Z0-9-_+.]+[/][a-zA-Z0-9-_+.]+|[a-zA-Z0-9-_+.]+[/][a-zA-Z0-9-_+.]+[/][a-zA-Z0-9-_+.]+)$", re.M)
 MODULE_REGEX_NO_HIDDEN =  re.compile(r"^([a-zA-z0-9-_+.]{1,}\/[a-zA-z0-9-_][a-zA-z0-9-_.]*)$", re.M)
 
 async def module(command, *args):
