@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-lmod",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Lmod JupyterLab extension.",
   "keywords": [
     "jupyter",
