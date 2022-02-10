@@ -237,13 +237,21 @@ class LmodWidget extends Widget {
   }
 }
 
-async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutRestorer) {
+async function setup_proxy_commands(app: JupyterFrontEnd, launcher: ILauncher, restorer: ILayoutRestorer) {
   const response = await fetch(PageConfig.getBaseUrl() + 'server-proxy/servers-info');
   if (!response.ok) {
     console.log('jupyter-lmod: could not communicate with jupyter-server-proxy API.');
     return;
   }
   const data = await response.json();
+
+  let launcher_pins = [];
+  const pin_response = await fetch(PageConfig.getBaseUrl() + 'lmod/launcher-pins');
+  if (response.ok) {
+    launcher_pins = (await pin_response.json()).launcher_pins;
+  } else {
+    console.log('jupyter-lmod: could not communicate with jupyter-lmod API.');
+  }
 
   const tmp_launcher = new Token<ILauncher>('@jupyterlab/launcher:ILauncher');
   serverproxy.default.activate(app, tmp_launcher, restorer);
@@ -269,7 +277,11 @@ async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutResto
     if (server_process.launcher_entry.icon_url) {
       launcher_item.kernelIconUrl =  server_process.launcher_entry.icon_url;
     }
-    server_proxy_infos[server_process.name] = launcher_item;
+    if (launcher_pins.includes(server_process.name.toLowerCase())) {
+      global_launcher.add(launcher_item)
+    } else {
+      server_proxy_infos[server_process.name] = launcher_item;
+    }
   }
 }
 
@@ -287,7 +299,7 @@ function activate(
   global_launcher = launcher;
   kernelspecs = app.serviceManager.kernelspecs;
 
-  setup_proxy_commands(app, restorer);
+  setup_proxy_commands(app, launcher, restorer);
 
 	restorer.add(widget, 'lmod-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });

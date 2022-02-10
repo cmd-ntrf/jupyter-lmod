@@ -309,6 +309,22 @@ define(function(require) {
             return;
         }
         const data = await response.json();
+
+        let launcher_pins = [];
+        const pin_response = await fetch(base_url + 'lmod/launcher-pins');
+        if (response.ok) {
+          launcher_pins = (await pin_response.json()).launcher_pins;
+        } else {
+          console.log('jupyter-lmod: could not communicate with jupyter-lmod API.');
+        }
+
+        let menu = $('.tree-buttons').find('.dropdown-menu');
+        if (data.server_processes.length > 0) {
+            /* add a divider to kernel menu */
+            let divider = $('<li>').attr('role', 'presentation').addClass('divider');
+            menu.append(divider);
+        }
+
         for (let server_process of data.server_processes) {
             /* create our list item */
             let entry_container = $('<li>')
@@ -324,7 +340,11 @@ define(function(require) {
                 .text(server_process.launcher_entry.title);
 
             entry_container.append(entry_link);
-            server_proxy_infos[server_process.name] = entry_container;
+            if (launcher_pins.includes(server_process.name.toLowerCase())) {
+                menu.append(entry_container);
+            } else {
+                server_proxy_infos[server_process.name] = entry_container;
+            }
         }
     }
 

@@ -31,10 +31,11 @@ jupyter labextension install jupyterlab-lmod
 
 ### Disable jupyter-server-proxy notebook and lab extensions
 
-To avoid having items in the launcher that cannot be launch because the binaries location are not in PATH,
-jupyter-lmod hides items that do not have a corresponding loaded module. jupyter-server-proxy notebook and
-lab extension always display the item. To avoid a situation where an item would be shown twice, we recommend
-disabling jupyter-server-proxy notebook and lab extensions.
+To avoid having items in the launcher that cannot be launched because the binaries location are not in PATH,
+jupyter-lmod hides launcher items that do not have a corresponding loaded module.
+jupyter-server-proxy notebook and lab extension always display the launcher item.
+To avoid a situation where an item would be shown twice, we recommend disabling jupyter-server-proxy
+notebook and lab extensions.
 
 This can be done with the following command for notebook:
 ```
@@ -44,6 +45,15 @@ jupyter nbextension disable --py jupyter_server_proxy --sys-prefix
 and with the following command for jupyterlab:
 ```
 jupyter labextension disable @jupyterlab/server-proxy
+```
+
+### Pinning launcher items
+
+If server proxies have do not have a corresponding modules, or you wish to have their launcher items
+displayed regardless of the loaded modules, you can define a list of items that will be pinned in
+the Jupyter notebook configuration file, like this:
+```
+c.Lmod.launcher_pins = ['Desktop', 'RStudio']
 ```
 
 ## demo

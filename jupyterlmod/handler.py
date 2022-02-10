@@ -10,6 +10,8 @@ from tornado import web
 from jupyter_core.paths import jupyter_path
 from notebook.base.handlers import IPythonHandler
 
+from jupyter_server.base.handlers import JupyterHandler
+
 def jupyter_path_decorator(func):
     @wraps(func)
     async def wrapper(self, *args, **kwargs):
@@ -125,6 +127,14 @@ class FoldersHandler(IPythonHandler):
         result = glob(path + "*/")
         result = [path[:-1] for path in result]
         self.finish(json.dumps(result))
+
+class PinsHandler(JupyterHandler):
+    def initialize(self, launcher_pins):
+        self.launcher_pins = launcher_pins
+
+    @web.authenticated
+    async def get(self):
+        self.write({'launcher_pins': self.launcher_pins})
 
 default_handlers = [
     (r"/lmod", Lmod),
