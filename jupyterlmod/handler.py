@@ -8,7 +8,6 @@ from glob import glob
 
 from tornado import web
 from jupyter_core.paths import jupyter_path
-from notebook.base.handlers import IPythonHandler
 
 from jupyter_server.base.handlers import JupyterHandler
 
@@ -21,7 +20,7 @@ def jupyter_path_decorator(func):
             self.kernel_spec_manager.kernel_dirs = jupyter_path("kernels")
     return wrapper
 
-class Lmod(IPythonHandler):
+class Lmod(JupyterHandler):
     @web.authenticated
     async def get(self):
         lang = self.get_query_argument(name="lang", default=None)
@@ -57,19 +56,19 @@ class Lmod(IPythonHandler):
         await lmod.unload(*modules)
         self.finish(json.dumps("SUCCESS"))
 
-class LmodModules(IPythonHandler):
+class LmodModules(JupyterHandler):
     @web.authenticated
     async def get(self):
         result = await lmod.avail()
         self.finish(json.dumps(result))
 
-class LmodModule(IPythonHandler):
+class LmodModule(JupyterHandler):
     @web.authenticated
     async def get(self, module=None):
         result = await lmod.show(module)
         self.finish(json.dumps(result))
 
-class LmodCollections(IPythonHandler):
+class LmodCollections(JupyterHandler):
     @web.authenticated
     async def get(self):
         result = await lmod.savelist()
@@ -92,7 +91,7 @@ class LmodCollections(IPythonHandler):
         await lmod.restore(name)
         self.finish(json.dumps("SUCCESS"))
 
-class LmodPaths(IPythonHandler):
+class LmodPaths(JupyterHandler):
     @web.authenticated
     async def get(self):
         result = os.environ.get("MODULEPATH")
@@ -121,7 +120,7 @@ class LmodPaths(IPythonHandler):
         await lmod.unuse(*paths)
         self.finish(json.dumps("SUCCESS"))
 
-class FoldersHandler(IPythonHandler):
+class FoldersHandler(JupyterHandler):
     @web.authenticated
     async def get(self, path):
         result = glob(path + "*/")
