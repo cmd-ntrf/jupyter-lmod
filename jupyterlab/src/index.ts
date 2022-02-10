@@ -6,6 +6,8 @@ import {
   Dialog, showDialog, ICommandPalette
 } from '@jupyterlab/apputils';
 
+import { Token } from '@lumino/coreutils';
+
 import {
   Widget
 } from '@lumino/widgets';
@@ -14,6 +16,8 @@ import { ILauncher } from '@jupyterlab/launcher';
 import { PageConfig } from '@jupyterlab/coreutils';
 
 import { Lmod } from '../../jupyterlmod/static/lmod.js';
+
+import * as serverproxy from '@jupyterlab/server-proxy';
 
 function createModuleItem(label: string, button: string) {
   const lmod_list_line = document.createElement('li');
@@ -233,13 +237,16 @@ class LmodWidget extends Widget {
   }
 }
 
-async function setup_proxy_commands() {
+async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutRestorer) {
   const response = await fetch(PageConfig.getBaseUrl() + 'server-proxy/servers-info');
   if (!response.ok) {
     console.log('jupyter-lmod: could not communicate with jupyter-server-proxy API.');
     return;
   }
   const data = await response.json();
+
+  const tmp_launcher = new Token<ILauncher>('@jupyterlab/launcher:ILauncher');
+  serverproxy.default.activate(app, tmp_launcher, restorer);
 
   const namespace = 'server-proxy';
   const command = namespace + ':' + 'open';
@@ -252,7 +259,7 @@ async function setup_proxy_commands() {
       command: command,
       args: {
         url: url,
-        title: title + (newBrowserTab ? ' [🡕]': ''),
+        title: title + (newBrowserTab ? ' [↗]': ''),
         newBrowserTab: newBrowserTab,
         id: id
       },
@@ -279,7 +286,8 @@ function activate(
 
   global_launcher = launcher;
   kernelspecs = app.serviceManager.kernelspecs;
-  setup_proxy_commands();
+
+  setup_proxy_commands(app, restorer);
 
 	restorer.add(widget, 'lmod-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });

@@ -32,7 +32,8 @@
   },
   "dependencies": {
     "@jupyterlab/application": "^2.0.0 || ^3.0.0",
-    "@jupyterlab/launcher": "^2.0.0 || ^3.0.0"
+    "@jupyterlab/launcher": "^2.0.0 || ^3.0.0",
+    "@jupyterlab/server-proxy": "^3.1.0"
   },
   "devDependencies": {
     "rimraf": "~2.6.2",
