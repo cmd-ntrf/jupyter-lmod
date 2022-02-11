@@ -1,6 +1,6 @@
 from jupyter_server.utils import url_path_join as ujoin
 
-from . config import Lmod as LmodConfig
+from .config import Lmod as LmodConfig
 from .handler import default_handlers, PinsHandler
 
 
