@@ -12,8 +12,10 @@ LMOD_CMD = os.environ["LMOD_CMD"]
 LMOD_SYSTEM_NAME = os.environ.get("LMOD_SYSTEM_NAME", "")
 SITE_POSTFIX = os.path.join("lib", "python" + sys.version[:3], "site-packages")
 
-MODULE_REGEX = re.compile(r"^([\w\-_+.\/]{1,}[^\/:])$", re.M)
-MODULE_REGEX_NO_HIDDEN = re.compile(r"^([^\W][\w\-_+.]*|[\w\-_+.\/]{1,}\/[\w][\w\-_+.]*[^\/:])$", re.M)
+MODULE_REGEX = re.compile(r"^[\w\-_+.\/]{1,}[^\/:]$", re.M)
+MODULE_HIDDEN_REGEX = re.compile(r"^(.+\/\..+|\..+)$", re.M)
+
+EMPTY_LIST_STR = "No modules loaded"
 
 async def module(command, *args):
     cmd = LMOD_CMD, "python", "--terse", command, *args
@@ -83,7 +85,7 @@ class API(object):
         if self.avail_cache is None:
             string = await module("avail", *args)
             if string is not None:
-                modules = re.findall(MODULE_REGEX, string)
+                modules = MODULE_REGEX.findall(string.strip())
                 modules.sort(key=lambda v: v.split("/")[0])
             else:
                 modules = []
@@ -92,13 +94,15 @@ class API(object):
 
     async def list(self, include_hidden=False):
         if self.list_cache is None:
-            self.list_cache = {True: [], False:[]}
+            self.list_cache = {True: [], False: []}
             string = await module("list")
-            if string is not None:
-                string = string.strip()
-                if string != "No modules loaded":
-                    self.list_cache[False] = re.findall(MODULE_REGEX_NO_HIDDEN, string)
-                    self.list_cache[True] = re.findall(MODULE_REGEX, string)
+            if string and not string.startswith(EMPTY_LIST_STR):
+                modules = string.split()
+                self.list_cache[True] = modules
+                self.list_cache[False] = [
+                    name for name in modules
+                    if not MODULE_HIDDEN_REGEX.match(name)
+                ]
         return self.list_cache[include_hidden]
 
     async def freeze(self):
