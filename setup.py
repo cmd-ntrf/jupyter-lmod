@@ -30,6 +30,7 @@ setup_args = dict(
     data_files=[
         ('share/jupyter/nbextensions/jupyterlmod', glob('jupyterlmod/static/*')),
         ('etc/jupyter/jupyter_notebook_config.d', ['jupyterlmod/etc/jupyterlmod_serverextension.json']),
+        ("etc/jupyter/jupyter_server_config.d", ['jupyterlmod/etc/jupyterlmod_jupyterserverextension.json']),
         ('etc/jupyter/nbconfig/tree.d', ['jupyterlmod/etc/jupyterlmod_nbextension.json'])
     ],
     zip_safe=False
