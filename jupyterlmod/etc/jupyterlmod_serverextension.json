@@ -1,8 +1,7 @@
 {
     "NotebookApp": {
         "nbserver_extensions": {
-        "jupyterlmod": true
+            "jupyterlmod": true
         }
     }
 }
-  

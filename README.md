@@ -29,50 +29,31 @@ pip install jupyterlmod
 jupyter labextension install jupyterlab-lmod
 ```
 
-### jupyterlab-server-proxy
+### Disable jupyter-server-proxy notebook and lab extensions
 
-To only display a server proxy launcher when its corresponding module is loaded, make sure to
-disable the launcher entry in jupyter-server-proxy configuration. Refer to
-[Server Process options docs](https://jupyter-server-proxy.readthedocs.io/en/latest/server-process.html)
-for more information.
+To avoid having items in the launcher that cannot be launched because the binaries location are not in PATH,
+jupyter-lmod hides launcher items that do not have a corresponding loaded module.
+jupyter-server-proxy notebook and lab extension always display the launcher item.
+To avoid a situation where an item would be shown twice, we recommend disabling jupyter-server-proxy
+notebook and lab extensions.
 
-This is an example of a `jupyter_notebook_config.json` file snippet where RStudio and Code Server
-launchers are displayed only when `rstudio` or `code-server` module are loaded.
-
+This can be done with the following command for notebook:
 ```
-    {
-        "ServerProxy": {
-            "servers": {
-                "code-server": {
-                    "command": [
-                        "code-server",
-                        "--auth=none",
-                        "--disable-telemetry",
-                        "--host=127.0.0.1",
-                        "--port={port}"
-                    ],
-                    "timeout": 20,
-                    "launcher_entry": {
-                        "title": "VS Code",
-                        "enabled" : false
-                    },
-                },
-                "rstudio": {
-                    "command": [
-                        "rserver",
-                        "--www-port={port}",
-                        "--www-frame-origin=same",
-                        "--www-address=127.0.0.1"
-                    ],
-                    "timeout": 20,
-                    "launcher_entry": {
-                            "title": "RStudio",
-                            "enabled" : false
-                    },
-                }
-            }
-        }
-    }
+jupyter nbextension disable --py jupyter_server_proxy --sys-prefix
+``` 
+
+and with the following command for jupyterlab:
+```
+jupyter labextension disable @jupyterlab/server-proxy
+```
+
+### Pinning launcher items
+
+If server proxies have do not have a corresponding modules, or you wish to have their launcher items
+displayed regardless of the loaded modules, you can define a list of items that will be pinned in
+the Jupyter notebook configuration file, like this:
+```
+c.Lmod.launcher_pins = ['Desktop', 'RStudio']
 ```
 
 ## demo

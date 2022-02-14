@@ -25,10 +25,12 @@ setup_args = dict(
     ],
     install_requires   = [
         'notebook>=5.3.0',
+        'jupyter-server>=1.0'
     ],
     data_files=[
         ('share/jupyter/nbextensions/jupyterlmod', glob('jupyterlmod/static/*')),
         ('etc/jupyter/jupyter_notebook_config.d', ['jupyterlmod/etc/jupyterlmod_serverextension.json']),
+        ("etc/jupyter/jupyter_server_config.d", ['jupyterlmod/etc/jupyterlmod_jupyterserverextension.json']),
         ('etc/jupyter/nbconfig/tree.d', ['jupyterlmod/etc/jupyterlmod_nbextension.json'])
     ],
     zip_safe=False
