@@ -41,7 +41,7 @@ notebook and lab extensions.
 This can be done with the following command for notebook:
 ```
 jupyter nbextension disable --py jupyter_server_proxy --sys-prefix
-``` 
+```
 
 and with the following command for jupyterlab:
 ```
