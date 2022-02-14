@@ -6,8 +6,6 @@ import {
   Dialog, showDialog, ICommandPalette
 } from '@jupyterlab/apputils';
 
-import { Token } from '@lumino/coreutils';
-
 import {
   Widget
 } from '@lumino/widgets';
@@ -237,52 +235,41 @@ class LmodWidget extends Widget {
   }
 }
 
-async function setup_proxy_commands(app: JupyterFrontEnd, launcher: ILauncher, restorer: ILayoutRestorer) {
-  const response = await fetch(PageConfig.getBaseUrl() + 'server-proxy/servers-info');
-  if (!response.ok) {
-    console.log('jupyter-lmod: could not communicate with jupyter-server-proxy API.');
-    return;
-  }
-  const data = await response.json();
 
+/**
+ * Class that intercepts items that would be
+ * added to JupyterLab launcher by jupyter-server-proxy
+ * to either add them to the launcher if their name
+ * is in the launcher pin list, or keep them in a
+ * seperate data structure until the corresponding
+ * module is loaded.
+ */
+class ILauncherProxy {
+  private launcher_pins: Array<String>;
+  constructor(launcher_pins: Array<String>) {
+    this.launcher_pins = launcher_pins;
+  }
+  add(item) {
+    let name = item.args.id.split(':')[1];
+    if (this.launcher_pins.includes(name.toLowerCase())) {
+      global_launcher.add(item)
+    } else {
+      server_proxy_infos[name] = item;
+    }
+  }
+}
+
+async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutRestorer) {
   let launcher_pins = [];
   const pin_response = await fetch(PageConfig.getBaseUrl() + 'lmod/launcher-pins');
-  if (response.ok) {
+  if (pin_response.ok) {
     launcher_pins = (await pin_response.json()).launcher_pins;
   } else {
     console.log('jupyter-lmod: could not communicate with jupyter-lmod API.');
   }
 
-  const tmp_launcher = new Token<ILauncher>('@jupyterlab/launcher:ILauncher');
+  let tmp_launcher = new ILauncherProxy(launcher_pins);
   serverproxy.default.activate(app, tmp_launcher, restorer);
-
-  const namespace = 'server-proxy';
-  const command = namespace + ':' + 'open';
-  for (let server_process of data.server_processes) {
-    const url = PageConfig.getBaseUrl() + server_process.name + '/';
-    const title = server_process.launcher_entry.title;
-    const newBrowserTab = server_process.new_browser_tab;
-    const id = namespace + ':' + server_process.name;
-    const launcher_item : ILauncher.IItemOptions = {
-      command: command,
-      args: {
-        url: url,
-        title: title + (newBrowserTab ? ' [↗]': ''),
-        newBrowserTab: newBrowserTab,
-        id: id
-      },
-      category: 'Notebook'
-    };
-
-    if (server_process.launcher_entry.icon_url) {
-      launcher_item.kernelIconUrl =  server_process.launcher_entry.icon_url;
-    }
-    if (launcher_pins.includes(server_process.name.toLowerCase())) {
-      global_launcher.add(launcher_item)
-    } else {
-      server_proxy_infos[server_process.name] = launcher_item;
-    }
-  }
 }
 
 /**
@@ -299,7 +286,7 @@ function activate(
   global_launcher = launcher;
   kernelspecs = app.serviceManager.kernelspecs;
 
-  setup_proxy_commands(app, launcher, restorer);
+  setup_proxy_commands(app, restorer);
 
 	restorer.add(widget, 'lmod-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });
