@@ -335,7 +335,7 @@ define(function(require) {
             let entry_link = $('<a>')
                 .attr('role', 'menuitem')
                 .attr('tabindex', '-1')
-                .attr('href', base_url + server_process.name + '/')
+                .attr('href', base_url + server_process.launcher_entry.path_info)
                 .attr('target', '_blank')
                 .text(server_process.launcher_entry.title);
 
