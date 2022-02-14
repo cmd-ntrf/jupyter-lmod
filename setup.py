@@ -6,7 +6,7 @@ from setuptools import setup
 setup_args = dict(
     name                = 'jupyterlmod',
     packages            = ['jupyterlmod', 'lmod'],
-    version             = "2.0.5",
+    version             = "3.0.0",
     description         = "jupyterlmod: notebook server extension to interact with Lmod system",
     long_description    = "Jupyter interactive notebook server extension that allows user to select software modules to load with Lmod before launching kernels.",
     author              = "Félix-Antoine Fortin",
@@ -19,12 +19,12 @@ setup_args = dict(
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
     ],
     install_requires   = [
-        'notebook>=5.3.0',
+        'notebook>=6.0.0',
         'jupyter-server>=1.0'
     ],
     data_files=[
