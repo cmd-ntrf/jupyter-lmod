@@ -263,7 +263,8 @@ async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutResto
   let launcher_pins = [];
   const pin_response = await fetch(PageConfig.getBaseUrl() + 'lmod/launcher-pins');
   if (pin_response.ok) {
-    launcher_pins = (await pin_response.json()).launcher_pins;
+    const data = await pin_response.json();
+    launcher_pins = data.launcher_pins.map(pin => pin.toLowerCase())
   } else {
     console.log('jupyter-lmod: could not communicate with jupyter-lmod API.');
   }
