@@ -46,11 +46,8 @@ jupyter nbextension disable --py jupyter_server_proxy --sys-prefix
 and with the following commands for jupyterlab:
 ```
 jupyter labextension disable @jupyterlab/server-proxy
-rm -rf $(dirname $(which jupyter))/../share/jupyter/labextensions/@jupyterlab/server-proxy
+jupyter labextension disable jupyterlab-server-proxy
 ```
-
-The second command is necessary because currently, the first command does not fully disable
-jupyter-server-proxy lab extension.
 
 ### Pinning launcher items
 
