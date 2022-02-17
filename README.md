@@ -51,7 +51,7 @@ jupyter labextension disable jupyterlab-server-proxy
 
 ### Pinning launcher items
 
-If server proxies have do not have a corresponding modules, or you wish to have their launcher items
+If server proxies do not have a corresponding modules, or you wish to have their launcher items
 displayed regardless of the loaded modules, you can define a list of items that will be pinned in
 the Jupyter notebook configuration file, like this:
 ```
