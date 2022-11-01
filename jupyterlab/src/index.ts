@@ -12,6 +12,8 @@ import {
 
 import { ILauncher } from '@jupyterlab/launcher';
 import { PageConfig } from '@jupyterlab/coreutils';
+import { KernelSpecManager } from '@jupyterlab/services/lib/kernelspec';
+import { IDisposable } from '@lumino/disposable';
 
 import { Lmod } from '../../jupyterlmod/static/lmod.js';
 
@@ -33,12 +35,12 @@ function createModuleItem(label: string, button: string) {
 
 const lmodAPI = new Lmod(PageConfig.getBaseUrl());
 
-var global_launcher = null;
-var kernelspecs = null;
-var server_proxy_infos = {};
-var server_proxy_launcher = {};
+var global_launcher:ILauncher = null;
+var kernelspecs:KernelSpecManager = null;
+var server_proxy_infos: Record<string, ILauncher.IItemOptions> = {};
+var server_proxy_launcher: Record<string, IDisposable> = {};
 
-function updateLauncher(modulelist) {
+function updateLauncher(modulelist:Array<string>) {
   for(let server_key in server_proxy_infos) {
     let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_key) });
     if(is_enabled) {
@@ -52,7 +54,7 @@ function updateLauncher(modulelist) {
   }
 }
 
-async function show_module(module) {
+async function show_module(module:string) {
     const data = await lmodAPI.show(module);
     const datalist = data.split('\n');
     const text = datalist.slice(3).join('\n').trim();
@@ -77,7 +79,7 @@ async function export_module() {
     });
 }
 
-function save_collection(event): Promise<void | undefined> {
+function save_collection(event: Event): Promise<void | undefined> {
   return showDialog({
         title: 'Save collection',
         body: new SaveWidget(),
@@ -164,19 +166,19 @@ class LmodWidget extends Widget {
     this.loadedUList.addEventListener('click', this.onClickModuleList.bind(this));
     this.availUList.addEventListener('click', this.onClickModuleList.bind(this));
 
-    const buttons = this.node.getElementsByClassName('jp-Lmod-collectionButton')
-    buttons['save-button'].addEventListener('click', save_collection);
-    buttons['restore-button'].addEventListener('click', this.restore.bind(this));
-    buttons['export-button'].addEventListener('click', export_module);
+    const buttons = this.node.getElementsByClassName('jp-Lmod-collectionButton');
+    buttons[0].addEventListener('click', save_collection); // Save collection
+    buttons[1].addEventListener('click', this.restore.bind(this)); // Restore collection
+    buttons[2].addEventListener('click', export_module); // Export collection
     this.searchInput.addEventListener('keyup', this.updateAvail.bind(this));
   }
 
-  protected async onClickModuleList(event) {
-    const target = event.target;
+  protected async onClickModuleList(event: MouseEvent) {
+    const target = event.target as HTMLElement;
     if (target.tagName == 'SPAN') {
       show_module(target.innerText);
     } else if(target.tagName == 'BUTTON') {
-      const span = event.target.closest('li').querySelector('span');
+      const span = target.closest('li').querySelector('span');
       const item = span.innerText;
       if(target.innerText == 'Load') {
         await lmodAPI.load([item]);
@@ -192,12 +194,12 @@ class LmodWidget extends Widget {
     .then(values => {
         const avail_set = new Set<string>(values[0]);
         const modulelist = values[1].sort();
-        const html_list = modulelist.map(item => createModuleItem(item, 'Unload'));
+        const html_list = modulelist.map((item:string) => createModuleItem(item, 'Unload'));
 
         this.loadedUList.innerText = '';
         this.loadedUList.append(...html_list);
 
-        modulelist.map(item => avail_set.delete(item));
+        modulelist.map((item:string) => avail_set.delete(item));
         this.searchSource = Array.from(avail_set);
         this.updateAvail();
         updateLauncher(modulelist);
@@ -217,7 +219,7 @@ class LmodWidget extends Widget {
     this.availUList.append(...html_list);
   }
 
-  protected restore(event): Promise<void | undefined> {
+  protected restore(event: Event): Promise<void | undefined> {
     return showDialog({
           title: 'Restore collection',
           body: new RestoreWidget(),
@@ -249,8 +251,8 @@ class ILauncherProxy {
   constructor(launcher_pins: Array<String>) {
     this.launcher_pins = launcher_pins;
   }
-  add(item) {
-    let name = item.args.id.split(':')[1];
+  add(item: ILauncher.IItemOptions) {
+    let name = item.args.id.toString().split(':')[1];
     if (this.launcher_pins.includes(name.toLowerCase())) {
       global_launcher.add(item)
     } else {
@@ -264,7 +266,7 @@ async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutResto
   const pin_response = await fetch(PageConfig.getBaseUrl() + 'lmod/launcher-pins');
   if (pin_response.ok) {
     const data = await pin_response.json();
-    launcher_pins = data.launcher_pins.map(pin => pin.toLowerCase())
+    launcher_pins = data.launcher_pins.map((pin:string) => pin.toLowerCase())
   } else {
     console.log('jupyter-lmod: could not communicate with jupyter-lmod API.');
   }
@@ -331,7 +333,7 @@ class RestoreWidget extends Widget {
     let selector = document.createElement('select');
     lmodAPI.savelist()
     .then(values => {
-        values.map((item, index) => {
+        values.map((item:string, index:number) => {
             let opt = document.createElement("option");
             opt.value = item;
             opt.text = item;
@@ -349,7 +351,7 @@ class RestoreWidget extends Widget {
 }
 
 class ModuleWidget extends Widget {
-  constructor(labelText, content) {
+  constructor(labelText:string, content:string) {
     let body = document.createElement('div');
 
     let label = document.createElement('label');
