@@ -1,21 +1,26 @@
 {
   "compilerOptions": {
-    "lib": ["es2017", "dom"],
-    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "declaration": true,
     "esModuleInterop" : true,
+    "incremental": true,
+    "jsx": "react",
+    "module": "esnext",
     "moduleResolution": "node",
     "noEmitOnError": true,
-    "noUnusedLocals": true,
-    "outDir": "./lib",
-    "target": "es2017",
-    "strict": true,
-    "strictNullChecks": false,
     "noImplicitAny": true,
-    "types": [],
-    "allowJs": true
+    "noUnusedLocals": true,
+    "preserveWatchOutput": true,
+    "resolveJsonModule": true,
+    "outDir": "lib",
+    "rootDir": "src",
+    "strict": true,
+    "strictNullChecks": true,
+    "target": "es2017",
+    "types": []
   },
   "include": [
-      "src/*",
-      "../jupyterlmod/static/lmod.js"
+      "src/*"
   ]
 }

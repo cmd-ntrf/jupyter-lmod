@@ -15,7 +15,7 @@ import { PageConfig } from '@jupyterlab/coreutils';
 import { KernelSpecManager } from '@jupyterlab/services/lib/kernelspec';
 import { IDisposable } from '@lumino/disposable';
 
-import { Lmod } from '../../jupyterlmod/static/lmod.js';
+import { Lmod } from './lmod.js';
 
 import * as serverproxy from '@jupyterlab/server-proxy';
 
@@ -35,8 +35,8 @@ function createModuleItem(label: string, button: string) {
 
 const lmodAPI = new Lmod(PageConfig.getBaseUrl());
 
-var global_launcher:ILauncher = null;
-var kernelspecs:KernelSpecManager = null;
+var global_launcher:ILauncher;
+var kernelspecs:KernelSpecManager;
 var server_proxy_infos: Record<string, ILauncher.IItemOptions> = {};
 var server_proxy_launcher: Record<string, IDisposable> = {};
 
@@ -160,8 +160,8 @@ class LmodWidget extends Widget {
           </div>
       </div>`);
 
-    this.loadedUList = this.node.querySelector('#lmod_loaded_list');
-    this.availUList = this.node.querySelector('#lmod_avail_list');
+    this.loadedUList = this.node.querySelector('#lmod_loaded_list') as HTMLUListElement;
+    this.availUList = this.node.querySelector('#lmod_avail_list')as HTMLUListElement;
 
     this.loadedUList.addEventListener('click', this.onClickModuleList.bind(this));
     this.availUList.addEventListener('click', this.onClickModuleList.bind(this));
@@ -171,6 +171,8 @@ class LmodWidget extends Widget {
     buttons[1].addEventListener('click', this.restore.bind(this)); // Restore collection
     buttons[2].addEventListener('click', export_module); // Export collection
     this.searchInput.addEventListener('keyup', this.updateAvail.bind(this));
+
+    this.searchSource = [];
   }
 
   protected async onClickModuleList(event: MouseEvent) {
@@ -178,7 +180,8 @@ class LmodWidget extends Widget {
     if (target.tagName == 'SPAN') {
       show_module(target.innerText);
     } else if(target.tagName == 'BUTTON') {
-      const span = target.closest('li').querySelector('span');
+      const li = target.closest('li')!;
+      const span = li.querySelector('span')!;
       const item = span.innerText;
       if(target.innerText == 'Load') {
         await lmodAPI.load([item]);
@@ -229,7 +232,7 @@ class LmodWidget extends Widget {
           ]
     }).then(result => {
       if (result.button.label === 'Restore') {
-        const name = result.value;
+        const name = result.value as string;
         lmodAPI.restore(name).then(() => this.update());
       }
       return;
@@ -252,11 +255,13 @@ class ILauncherProxy {
     this.launcher_pins = launcher_pins;
   }
   add(item: ILauncher.IItemOptions) {
-    let name = item.args.id.toString().split(':')[1];
-    if (this.launcher_pins.includes(name.toLowerCase())) {
-      global_launcher.add(item)
-    } else {
-      server_proxy_infos[name] = item;
+    if(item.args != undefined && item.args.id != null) {
+      const name = item.args.id.toString().split(':')[1];
+      if (this.launcher_pins.includes(name.toLowerCase())) {
+        global_launcher.add(item)
+      } else {
+        server_proxy_infos[name] = item;
+      }
     }
   }
 }
@@ -332,7 +337,7 @@ class RestoreWidget extends Widget {
 
     let selector = document.createElement('select');
     lmodAPI.savelist()
-    .then(values => {
+    .then((values:Array<string>) => {
         values.map((item:string, index:number) => {
             let opt = document.createElement("option");
             opt.value = item;
