@@ -3,7 +3,7 @@ import os
 import re
 import sys
 
-from asyncio import create_subprocess_shell
+from asyncio import create_subprocess_shell, get_event_loop
 from asyncio.subprocess import PIPE
 from collections import OrderedDict
 from functools import partial, wraps
@@ -204,6 +204,7 @@ class API(object):
 
 
 _lmod = API()
+get_event_loop().run_until_complete(_lmod.reset())
 
 avail = _lmod.avail
 list = _lmod.list
