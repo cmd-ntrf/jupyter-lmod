@@ -24,8 +24,8 @@ setup_args = dict(
         'Programming Language :: Python :: 3',
     ],
     install_requires   = [
-        'notebook>=6.0.0',
-        'jupyter-server>=1.0'
+        'jupyter-core',
+        'jupyter-server'
     ],
     data_files=[
         ('share/jupyter/nbextensions/jupyterlmod', glob('jupyterlmod/static/*')),
