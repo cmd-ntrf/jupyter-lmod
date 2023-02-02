@@ -4,7 +4,7 @@ from .config import Lmod as LmodConfig
 from .handler import default_handlers, PinsHandler
 
 
-def _jupyter_server_extension_paths():
+def _jupyter_server_extension_points():
     return [{"module": "jupyterlmod"}]
 
 
@@ -17,7 +17,7 @@ def _jupyter_nbextension_paths():
     ]
 
 
-def load_jupyter_server_extension(nbapp):
+def _load_jupyter_server_extension(nbapp):
     """
     Called when the extension is loaded.
 
@@ -36,3 +36,7 @@ def load_jupyter_server_extension(nbapp):
     web_app.add_handlers(".*$", [
         (ujoin(base_url, 'lmod/launcher-pins'), PinsHandler, {'launcher_pins': launcher_pins}),
     ])
+
+# For backward compatibility
+load_jupyter_server_extension = _load_jupyter_server_extension
+_jupyter_server_extension_paths = _jupyter_server_extension_points
