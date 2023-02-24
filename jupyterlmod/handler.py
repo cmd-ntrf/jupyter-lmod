@@ -3,7 +3,7 @@ import os
 
 import lmod
 
-from functools import partial, wraps
+from functools import wraps
 from glob import glob
 
 from tornado import web
@@ -20,6 +20,8 @@ def jupyter_path_decorator(func):
             self.kernel_spec_manager.kernel_dirs = jupyter_path("kernels")
     return wrapper
 
+LMOD = lmod.API()
+
 class Lmod(JupyterHandler):
     @web.authenticated
     async def get(self):
@@ -27,9 +29,9 @@ class Lmod(JupyterHandler):
         all = self.get_query_argument(name="all", default=None)
         if lang is None:
             all = all is not None and all == "true"
-            result = await lmod.list(include_hidden=all)
+            result = await LMOD.list(include_hidden=all)
         elif lang == "python":
-            result = await lmod.freeze()
+            result = await LMOD.freeze()
         else:
             raise web.HTTPError(400, u'Unknown value for lang argument')
         self.finish(json.dumps(result))
@@ -42,8 +44,8 @@ class Lmod(JupyterHandler):
             raise web.HTTPError(400, u'modules missing from body')
         elif not isinstance(modules, list):
             raise web.HTTPError(400, u'modules argument needs to be a list')
-        await lmod.load(*modules)
-        self.finish(json.dumps("SUCCESS"))
+        result = await LMOD.load(*modules)
+        self.finish(json.dumps(result))
 
     @web.authenticated
     @jupyter_path_decorator
@@ -53,25 +55,25 @@ class Lmod(JupyterHandler):
             raise web.HTTPError(400, u'modules missing from body')
         elif not isinstance(modules, list):
             raise web.HTTPError(400, u'modules argument needs to be a list')
-        await lmod.unload(*modules)
-        self.finish(json.dumps("SUCCESS"))
+        result = await LMOD.unload(*modules)
+        self.finish(json.dumps(result))
 
 class LmodModules(JupyterHandler):
     @web.authenticated
     async def get(self):
-        result = await lmod.avail()
+        result = await LMOD.avail()
         self.finish(json.dumps(result))
 
 class LmodModule(JupyterHandler):
     @web.authenticated
     async def get(self, module=None):
-        result = await lmod.show(module)
+        result = await LMOD.show(module)
         self.finish(json.dumps(result))
 
 class LmodCollections(JupyterHandler):
     @web.authenticated
     async def get(self):
-        result = await lmod.savelist()
+        result = await LMOD.savelist()
         self.finish(json.dumps(result))
 
     @web.authenticated
@@ -79,8 +81,8 @@ class LmodCollections(JupyterHandler):
         name = self.get_json_body().get('name')
         if not name:
             raise web.HTTPError(400, u'name argument missing')
-        await lmod.save(name)
-        self.finish(json.dumps("SUCCESS"))
+        result = await LMOD.save(name)
+        self.finish(json.dumps(result))
 
     @web.authenticated
     @jupyter_path_decorator
@@ -88,8 +90,8 @@ class LmodCollections(JupyterHandler):
         name = self.get_json_body().get('name')
         if not name:
             raise web.HTTPError(400, u'name argument missing')
-        await lmod.restore(name)
-        self.finish(json.dumps("SUCCESS"))
+        result = await LMOD.restore(name)
+        self.finish(json.dumps(result))
 
 class LmodPaths(JupyterHandler):
     @web.authenticated
@@ -108,8 +110,8 @@ class LmodPaths(JupyterHandler):
         append = self.get_json_body().get('append', False)
         if not paths:
             raise web.HTTPError(400, u'paths argument missing')
-        await lmod.use(*paths, append=append)
-        self.finish(json.dumps("SUCCESS"))
+        result = await LMOD.use(*paths, append=append)
+        self.finish(json.dumps(result))
 
     @web.authenticated
     @jupyter_path_decorator
@@ -117,8 +119,8 @@ class LmodPaths(JupyterHandler):
         paths = self.get_json_body().get('paths')
         if not paths:
             raise web.HTTPError(400, u'paths argument missing')
-        await lmod.unuse(*paths)
-        self.finish(json.dumps("SUCCESS"))
+        result = await LMOD.unuse(*paths)
+        self.finish(json.dumps(result))
 
 class FoldersHandler(JupyterHandler):
     @web.authenticated
