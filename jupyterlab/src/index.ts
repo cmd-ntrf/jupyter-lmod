@@ -72,9 +72,7 @@ async function load_module(module) {
         showDialog({
             title: "Module warning",
             body: new ModuleWidget("Warning", data),
-            buttons: [
-            Dialog.okButton()
-            ]
+            buttons: [Dialog.okButton()]
         });
     }
 }
@@ -195,7 +193,7 @@ class LmodWidget extends Widget {
       const span = event.target.closest('li').querySelector('span');
       const item = span.innerText;
       if(target.innerText == 'Load') {
-        load_module(item);
+        await load_module(item);
       } else if(target.innerText == 'Unload') {
         await lmodAPI.unload([item]);
       }
