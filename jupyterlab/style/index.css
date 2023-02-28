@@ -1,5 +1,6 @@
 :root {
     --jp-private-lmod-button-height: 24px;
+    --jp-private-lmod-search-height: 28px;
 }
 
 .jp-Lmod {
@@ -29,7 +30,25 @@
     background-color: var(--jp-input-active-background);
     height: 30px;
     box-shadow: inset 0 0 0 var(--jp-border-width) var(--jp-input-border-color);
-  }
+}
+
+.jp-Lmod-input {
+    background: transparent;
+    width: calc(100% - 18px);
+    float: left;
+    border: none;
+    outline: none;
+    font-size: var(--jp-ui-font-size1);
+    color: var(--jp-ui-font-color0);
+    line-height: var(--jp-private-lmod-search-height);
+}
+
+.jp-Lmod-input::-webkit-input-placeholder,
+.jp-Lmod-input::-moz-placeholder,
+.jp-Lmod-input:-ms-input-placeholder {
+    color: var(--jp-ui-font-color2);
+    font-size: var(--jp-ui-font-size1);
+}
 
 .jp-Lmod-section {
     display: flex;
