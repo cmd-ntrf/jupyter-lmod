@@ -109,7 +109,7 @@ class LmodWidget extends Widget {
     this.id = 'lmod-jupyterlab';
     this.title.caption = 'Softwares';
     this.title.iconClass = 'jp-LmodIcon jp-SideBar-tabIcon'
-    this.addClass('jp-RunningSessions');
+    this.addClass('jp-Lmod');
 
     const search_div = document.createElement('div');
     const search_div_wrapper = document.createElement('div');
