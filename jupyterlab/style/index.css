@@ -15,7 +15,13 @@
 
 .jp-Lmod-content {
     background-color: var(--jp-layout-color1);
-  }
+}
+
+.jp-Lmod-search {
+    padding: 4px;
+    background-color: var(--jp-layout-color1);
+    z-index: 2;
+}
 
 .jp-Lmod-section {
     display: flex;

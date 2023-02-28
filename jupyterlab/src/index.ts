@@ -114,7 +114,7 @@ class LmodWidget extends Widget {
     const search_div = document.createElement('div');
     const search_div_wrapper = document.createElement('div');
     this.searchInput = document.createElement('input');
-    search_div.setAttribute('class', 'lm-CommandPalette-search');
+    search_div.setAttribute('class', 'jp-Lmod-search');
     search_div_wrapper.setAttribute('class', 'lm-CommandPalette-wrapper');
     this.searchInput.setAttribute('id', 'modules');
     this.searchInput.setAttribute('class', 'lm-CommandPalette-input');
