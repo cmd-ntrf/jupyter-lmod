@@ -24,7 +24,7 @@ function createModuleItem(label: string, button: string) {
   lmod_list_line.append(lmod_list_label);
   lmod_list_line.append(lmod_list_button);
   lmod_list_line.setAttribute('class', 'jp-Lmod-item')
-  lmod_list_label.setAttribute('class', 'jp-RunningSessions-itemLabel');
+  lmod_list_label.setAttribute('class', 'jp-Lmod-itemLabel');
   lmod_list_label.innerText = label;
   lmod_list_button.setAttribute('class', 'jp-Lmod-itemButton jp-mod-styled')
   lmod_list_button.innerHTML = button;

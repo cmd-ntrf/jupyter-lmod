@@ -73,7 +73,20 @@
 .jp-Lmod-item:not(:hover) .jp-Lmod-itemButton {
     visibility: hidden;
     /* display: none; */
-  }
+}
+
+.jp-Lmod-itemLabel {
+    font-size: var(--jp-ui-font-size1);
+    flex: 1 1 55%;
+    padding: 0 4px 0 4px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.jp-Lmod-itemLabel:focus {
+    background-color: var(--jp-layout-color2);
+}
 
 .jp-LmodIcon {
     width: 100%;
