@@ -126,7 +126,7 @@ class LmodWidget extends Widget {
     this.node.insertAdjacentHTML('beforeend',
       `<div id="lmod" class="lm-CommandPalette-content">
           <div class="jp-Lmod-section">
-              <div class="jp-RunningSessions-sectionHeader"><H2>Loaded Modules</H2>
+              <div class="jp-Lmod-sectionHeader"><H2>Loaded Modules</H2>
                   <button
                     title="Create collection"
                     class="jp-Lmod-collectionButton jp-mod-styled jp-AddIcon"
@@ -149,7 +149,7 @@ class LmodWidget extends Widget {
               </div>
           </div>
           <div class="jp-Lmod-section">
-              <div class="jp-RunningSessions-sectionHeader" id="avail_header"><H2>Available Modules</H2>
+              <div class="jp-Lmod-sectionHeader" id="avail_header"><H2>Available Modules</H2>
               </div>
               <div class="jp-RunningSessions-sectionContainer">
                   <ul class="jp-RunningSessions-sectionList" id="lmod_avail_list">
