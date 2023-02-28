@@ -13,6 +13,10 @@
     font-size: var(--jp-ui-font-size1);
 }
 
+.jp-Lmod-content {
+    background-color: var(--jp-layout-color1);
+  }
+
 .jp-Lmod-section {
     display: flex;
     flex: 0 1 auto;

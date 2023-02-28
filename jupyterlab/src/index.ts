@@ -124,7 +124,7 @@ class LmodWidget extends Widget {
     this.node.insertAdjacentElement('afterbegin', search_div);
 
     this.node.insertAdjacentHTML('beforeend',
-      `<div id="lmod" class="lm-CommandPalette-content">
+      `<div id="lmod" class="jp-Lmod-content">
           <div class="jp-Lmod-section">
               <div class="jp-Lmod-sectionHeader"><H2>Loaded Modules</H2>
                   <button
