@@ -144,7 +144,7 @@ class LmodWidget extends Widget {
                   ></button>
               </div>
               <div class="jp-Lmod-sectionContainer">
-                  <ul class="jp-RunningSessions-sectionList" id="lmod_loaded_list">
+                  <ul class="jp-Lmod-sectionList" id="lmod_loaded_list">
                   </ul>
               </div>
           </div>
@@ -152,7 +152,7 @@ class LmodWidget extends Widget {
               <div class="jp-Lmod-sectionHeader" id="avail_header"><H2>Available Modules</H2>
               </div>
               <div class="jp-Lmod-sectionContainer">
-                  <ul class="jp-RunningSessions-sectionList" id="lmod_avail_list">
+                  <ul class="jp-Lmod-sectionList" id="lmod_avail_list">
                   </ul>
               </div>
           </div>
