@@ -1,5 +1,128 @@
 :root {
     --jp-private-lmod-button-height: 24px;
+    --jp-private-lmod-search-height: 28px;
+}
+
+.jp-Lmod {
+    display: flex;
+    flex-direction: column;
+    min-width: var(--jp-sidebar-min-width);
+    color: var(--jp-ui-font-color1);
+    background: var(--jp-layout-color1);
+    /* This is needed so that all font sizing of children done in ems is
+     * relative to this base size */
+    font-size: var(--jp-ui-font-size1);
+}
+
+.jp-Lmod-content {
+    background-color: var(--jp-layout-color1);
+}
+
+.jp-Lmod-search {
+    padding: 4px;
+    background-color: var(--jp-layout-color1);
+    z-index: 2;
+}
+
+.jp-Lmod-search-wrapper {
+    overflow: overlay;
+    padding: 0 9px;
+    background-color: var(--jp-input-active-background);
+    height: 30px;
+    box-shadow: inset 0 0 0 var(--jp-border-width) var(--jp-input-border-color);
+}
+
+.jp-Lmod-input {
+    background: transparent;
+    width: calc(100% - 18px);
+    float: left;
+    border: none;
+    outline: none;
+    font-size: var(--jp-ui-font-size1);
+    color: var(--jp-ui-font-color0);
+    line-height: var(--jp-private-lmod-search-height);
+}
+
+.jp-Lmod-input::-webkit-input-placeholder,
+.jp-Lmod-input::-moz-placeholder,
+.jp-Lmod-input:-ms-input-placeholder {
+    color: var(--jp-ui-font-color2);
+    font-size: var(--jp-ui-font-size1);
+}
+
+.jp-Lmod-section {
+    display: flex;
+    flex: 0 1 auto;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.jp-Lmod-sectionHeader {
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    height: 28px;
+    display: flex;
+    border-bottom: var(--jp-border-width) solid var(--jp-border-color2);
+    margin-top: 8px;
+  }
+
+.jp-Lmod-sectionHeader h2 {
+    flex: 0 0 auto;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: var(--jp-ui-font-size0);
+    padding: 8px 8px 8px 12px;
+    margin: 0px;
+}
+
+.jp-Lmod-sectionContainer {
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+.jp-Lmod-sectionList {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.jp-Lmod-item {
+    display: flex;
+    flex-direction: row;
+    color: var(--jp-ui-font-color1);
+    height: var(--jp-private-running-item-height);
+    line-height: var(--jp-private-running-item-height);
+    padding: 0 8px 0 8px;
+}
+
+.jp-Lmod-item:hover {
+    background-color: var(--jp-layout-color2);
+}
+
+.jp-Lmod-item .jp-Lmod-itemButton {
+    border-radius: 0px;
+}
+
+.jp-Lmod-item:not(:hover) .jp-Lmod-itemButton {
+    visibility: hidden;
+    /* display: none; */
+}
+
+.jp-Lmod-itemLabel {
+    font-size: var(--jp-ui-font-size1);
+    flex: 1 1 55%;
+    padding: 0 4px 0 4px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.jp-Lmod-itemLabel:focus {
+    background-color: var(--jp-layout-color2);
 }
 
 .jp-LmodIcon {
@@ -30,7 +153,7 @@
     background-color: rgba(153, 153, 153, 0.2);
 }
 
-.jp-RunningSessions-itemShutdown.jp-mod-styled {
+.jp-Lmod-itemButton.jp-mod-styled {
     height: inherit;
     line-height: inherit;
     background-color: lightgrey;
@@ -51,7 +174,7 @@ body.p-mod-override-cursor div.iframe-widget {
     position: relative;
     pointer-events: none;
 }
-  
+
 body.p-mod-override-cursor div.iframe-widget:before {
     content: '';
     position: absolute;

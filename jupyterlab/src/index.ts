@@ -23,10 +23,10 @@ function createModuleItem(label: string, button: string) {
   const lmod_list_button = document.createElement('button');
   lmod_list_line.append(lmod_list_label);
   lmod_list_line.append(lmod_list_button);
-  lmod_list_line.setAttribute('class', 'jp-RunningSessions-item')
-  lmod_list_label.setAttribute('class', 'jp-RunningSessions-itemLabel');
+  lmod_list_line.setAttribute('class', 'jp-Lmod-item')
+  lmod_list_label.setAttribute('class', 'jp-Lmod-itemLabel');
   lmod_list_label.innerText = label;
-  lmod_list_button.setAttribute('class', 'jp-RunningSessions-itemShutdown jp-mod-styled')
+  lmod_list_button.setAttribute('class', 'jp-Lmod-itemButton jp-mod-styled')
   lmod_list_button.innerHTML = button;
   return lmod_list_line;
 }
@@ -109,24 +109,24 @@ class LmodWidget extends Widget {
     this.id = 'lmod-jupyterlab';
     this.title.caption = 'Softwares';
     this.title.iconClass = 'jp-LmodIcon jp-SideBar-tabIcon'
-    this.addClass('jp-RunningSessions');
+    this.addClass('jp-Lmod');
 
     const search_div = document.createElement('div');
     const search_div_wrapper = document.createElement('div');
     this.searchInput = document.createElement('input');
-    search_div.setAttribute('class', 'lm-CommandPalette-search');
-    search_div_wrapper.setAttribute('class', 'lm-CommandPalette-wrapper');
+    search_div.setAttribute('class', 'jp-Lmod-search');
+    search_div_wrapper.setAttribute('class', 'jp-Lmod-search-wrapper');
     this.searchInput.setAttribute('id', 'modules');
-    this.searchInput.setAttribute('class', 'lm-CommandPalette-input');
+    this.searchInput.setAttribute('class', 'jp-Lmod-input');
     this.searchInput.setAttribute('placeholder', 'Search available modules...')
     search_div.appendChild(search_div_wrapper);
     search_div_wrapper.appendChild(this.searchInput);
     this.node.insertAdjacentElement('afterbegin', search_div);
 
     this.node.insertAdjacentHTML('beforeend',
-      `<div id="lmod" class="lm-CommandPalette-content">
-          <div class="jp-RunningSessions-section">
-              <div class="jp-RunningSessions-sectionHeader"><H2>Loaded Modules</H2>
+      `<div id="lmod" class="jp-Lmod-content">
+          <div class="jp-Lmod-section">
+              <div class="jp-Lmod-sectionHeader"><H2>Loaded Modules</H2>
                   <button
                     title="Create collection"
                     class="jp-Lmod-collectionButton jp-mod-styled jp-AddIcon"
@@ -143,16 +143,16 @@ class LmodWidget extends Widget {
                     id="export-button"
                   ></button>
               </div>
-              <div class="jp-RunningSessions-sectionContainer">
-                  <ul class="jp-RunningSessions-sectionList" id="lmod_loaded_list">
+              <div class="jp-Lmod-sectionContainer">
+                  <ul class="jp-Lmod-sectionList" id="lmod_loaded_list">
                   </ul>
               </div>
           </div>
-          <div class="jp-RunningSessions-section">
-              <div class="jp-RunningSessions-sectionHeader" id="avail_header"><H2>Available Modules</H2>
+          <div class="jp-Lmod-section">
+              <div class="jp-Lmod-sectionHeader" id="avail_header"><H2>Available Modules</H2>
               </div>
-              <div class="jp-RunningSessions-sectionContainer">
-                  <ul class="jp-RunningSessions-sectionList" id="lmod_avail_list">
+              <div class="jp-Lmod-sectionContainer">
+                  <ul class="jp-Lmod-sectionList" id="lmod_avail_list">
                   </ul>
               </div>
           </div>
