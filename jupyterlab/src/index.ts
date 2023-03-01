@@ -100,6 +100,7 @@ function save_collection(event): Promise<void | undefined> {
 class LmodWidget extends Widget {
   protected loadedUList: HTMLUListElement;
   protected availUList: HTMLUListElement;
+  protected availHeader: HTMLHeadingElement;
   protected searchInput: HTMLInputElement;
   protected searchSource: Array<string>;
 
@@ -118,7 +119,7 @@ class LmodWidget extends Widget {
     search_div_wrapper.setAttribute('class', 'jp-Lmod-search-wrapper');
     this.searchInput.setAttribute('id', 'modules');
     this.searchInput.setAttribute('class', 'jp-Lmod-input');
-    this.searchInput.setAttribute('placeholder', 'Search available modules...')
+    this.searchInput.setAttribute('placeholder', 'Filter available modules...')
     search_div.appendChild(search_div_wrapper);
     search_div_wrapper.appendChild(this.searchInput);
     this.node.insertAdjacentElement('afterbegin', search_div);
@@ -149,17 +150,19 @@ class LmodWidget extends Widget {
               </div>
           </div>
           <div class="jp-Lmod-section">
-              <div class="jp-Lmod-sectionHeader" id="avail_header"><H2>Available Modules</H2>
+              <div class="jp-Lmod-sectionHeader">
+                <h2 id="lmod_avail_header">Available Modules</h2>
               </div>
               <div class="jp-Lmod-sectionContainer">
-                  <ul class="jp-Lmod-sectionList" id="lmod_avail_list">
-                  </ul>
+                <ul class="jp-Lmod-sectionList" id="lmod_avail_list">
+                </ul>
               </div>
           </div>
       </div>`);
 
     this.loadedUList = this.node.querySelector('#lmod_loaded_list');
     this.availUList = this.node.querySelector('#lmod_avail_list');
+    this.availHeader = this.node.querySelector('#lmod_avail_header');
 
     this.loadedUList.addEventListener('click', this.onClickModuleList.bind(this));
     this.availUList.addEventListener('click', this.onClickModuleList.bind(this));
@@ -215,6 +218,7 @@ class LmodWidget extends Widget {
 
     const html_list = result.map(item => createModuleItem(item, 'Load'));
     this.availUList.append(...html_list);
+    this.availHeader.innerText = `Available Modules (${result.length})`;
   }
 
   protected restore(event): Promise<void | undefined> {
