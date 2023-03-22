@@ -194,7 +194,7 @@ class LmodWidget extends Widget {
     Promise.all([lmodAPI.avail(), lmodAPI.list()])
     .then(values => {
         const avail_set = new Set<string>(values[0]);
-        const modulelist = values[1].sort();
+        const modulelist = values[1];
         const html_list = modulelist.map(item => createModuleItem(item, 'Unload'));
 
         this.loadedUList.innerText = '';
