@@ -25,7 +25,8 @@ setup_args = dict(
     ],
     install_requires   = [
         'jupyter-core',
-        'jupyter-server'
+        'jupyter-server',
+        'natsort',
     ],
     data_files=[
         ('share/jupyter/nbextensions/jupyterlmod', glob('jupyterlmod/static/*')),

@@ -1,4 +1,3 @@
-import asyncio
 import os
 import re
 import sys
@@ -6,7 +5,9 @@ import sys
 from asyncio import create_subprocess_shell
 from asyncio.subprocess import PIPE
 from collections import OrderedDict
-from functools import partial, wraps
+from functools import wraps
+
+from natsort import natsort_keygen, IGNORECASE
 
 LMOD_CMD = os.environ["LMOD_CMD"]
 LMOD_SYSTEM_NAME = os.environ.get("LMOD_SYSTEM_NAME", "")
@@ -86,7 +87,7 @@ class API(object):
             string = await module("avail", *args)
             if string is not None:
                 modules = MODULE_REGEX.findall(string.strip())
-                modules.sort(key=lambda v: v.split("/")[0])
+                modules.sort(key=natsort_keygen(alg=IGNORECASE))
             else:
                 modules = []
             self.avail_cache = modules
