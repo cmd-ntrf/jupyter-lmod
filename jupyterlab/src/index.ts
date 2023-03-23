@@ -66,6 +66,17 @@ async function show_module(module) {
     });
 }
 
+async function load_module(module) {
+    const data = await lmodAPI.load([module]);
+    if(data != null){
+        showDialog({
+            title: "Module warning",
+            body: new ModuleWidget("Warning", data),
+            buttons: [Dialog.okButton()]
+        });
+    }
+}
+
 async function export_module() {
     const data = await lmodAPI.freeze();
     showDialog({
@@ -182,7 +193,7 @@ class LmodWidget extends Widget {
       const span = event.target.closest('li').querySelector('span');
       const item = span.innerText;
       if(target.innerText == 'Load') {
-        await lmodAPI.load([item]);
+        await load_module(item);
       } else if(target.innerText == 'Unload') {
         await lmodAPI.unload([item]);
       }

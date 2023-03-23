@@ -1,4 +1,3 @@
-import asyncio
 import os
 import re
 import sys
@@ -6,7 +5,7 @@ import sys
 from asyncio import create_subprocess_shell
 from asyncio.subprocess import PIPE
 from collections import OrderedDict
-from functools import partial, wraps
+from functools import wraps
 
 LMOD_CMD = os.environ["LMOD_CMD"]
 LMOD_SYSTEM_NAME = os.environ.get("LMOD_SYSTEM_NAME", "")
@@ -119,31 +118,27 @@ class API(object):
     @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
     async def load(self, *modules):
         output = await module("load", *modules)
-        if output:
-            print(output)
         self.invalidate_module_caches()
+        return output
 
     @update_sys_path("PYTHONPATH")
     @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
     async def reset(self):
         output = await module("reset")
-        if output:
-            print(output)
         self.invalidate_module_caches()
+        return output
 
     @update_sys_path("PYTHONPATH")
     @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
     async def restore(self, name):
         output = await module("restore", name)
-        if output:
-            print(output)
         self.invalidate_module_caches()
+        return output
 
     async def save(self, name):
         output = await module("save", name)
-        if output:
-            print(output)
         self.savelist_cache = None
+        return output
 
     async def savelist(self):
         if self.savelist_cache is None:
@@ -158,9 +153,8 @@ class API(object):
     @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
     async def unload(self, *modules):
         output = await module("unload", *modules)
-        if output:
-            print(output)
         self.invalidate_module_caches()
+        return output
 
     @update_sys_path("PYTHONPATH")
     @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
@@ -170,9 +164,8 @@ class API(object):
         else:
             args = ()
         output = await module("purge", *args)
-        if output:
-            print(output)
         self.invalidate_module_caches()
+        return output
 
     async def show(self, name):
         if not name in self.show_cache:
@@ -190,31 +183,37 @@ class API(object):
         if append:
             args = '-a', *args
         output = await module("use", *args)
-        if output:
-            print(output)
         self.invalidate_module_caches()
+        return output
 
     @update_sys_path("PYTHONPATH")
     @update_sys_path("EBPYTHONPREFIXES", SITE_POSTFIX)
     async def unuse(self, *paths):
         output = await module("unuse", *paths)
-        if output:
-            print(output)
         self.invalidate_module_caches()
+        return output
 
 
 _lmod = API()
 
+def print_output_decorator(function):
+    @wraps(function)
+    def wrapper(*args, **kargs):
+        output = function(*args, **kargs)
+        if output is not None:
+            print(output)
+    return wrapper
+
 avail = _lmod.avail
 list = _lmod.list
 freeze = _lmod.freeze
-load = _lmod.load
-reset = _lmod.reset
-restore = _lmod.restore
-save = _lmod.save
+load = print_output_decorator(_lmod.load)
+reset = print_output_decorator(_lmod.reset)
+restore = print_output_decorator(_lmod.restore)
+save = print_output_decorator(_lmod.save)
 savelist = _lmod.savelist
-unload = _lmod.unload
-purge = _lmod.purge
+unload = print_output_decorator(_lmod.unload)
+purge = print_output_decorator(_lmod.purge)
 show = _lmod.show
-use = _lmod.use
-unuse = _lmod.unuse
+use = print_output_decorator(_lmod.use)
+unuse = print_output_decorator(_lmod.unuse)
