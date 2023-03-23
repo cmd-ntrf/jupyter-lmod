@@ -86,7 +86,7 @@ class API(object):
             string = await module("avail", *args)
             if string is not None:
                 modules = MODULE_REGEX.findall(string.strip())
-                modules.sort(key=lambda v: v.split("/")[0])
+                modules.sort(key=lambda v: v.split("/")[0].lower())
             else:
                 modules = []
             self.avail_cache = modules
