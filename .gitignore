@@ -11,3 +11,4 @@ jupyterlmod.egg-info/
 *.lock
 *env*/
 package-lock.json
+jupyterlmod/labextension

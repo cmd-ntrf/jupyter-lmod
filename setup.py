@@ -1,43 +1,122 @@
 #!/usr/bin/env python
 # coding: utf-8
+
+"""jupyterlmod setup"""
+
+import json
 from glob import glob
-from setuptools import setup
+from pathlib import Path
+
+from jupyter_packaging import (
+    create_cmdclass,
+    install_npm,
+    ensure_targets,
+    combine_commands,
+    skip_if_exists,
+)
+import setuptools
+
+HERE = Path(__file__).parent.resolve()
+
+# The name of the project
+name = "jupyterlmod"
+
+lab_path = HERE / name / "labextension"
+
+# Representative files that should exist after a successful build
+jstargets = [
+    str(lab_path / "package.json"),
+]
+
+package_data_spec = {
+    name: ["*"],
+}
+
+labext_name = "@cmd-ntrf/jupyterlab-lmod"
+
+data_files_spec = [
+    ("share/jupyter/labextensions/%s" % labext_name, str(lab_path), "**"),
+    ("share/jupyter/labextensions/%s" % labext_name, str(HERE), "install.json"),
+    (
+        "etc/jupyter/jupyter_notebook_config.d",
+        "jupyterlmod/etc",
+        "jupyterlmod_serverextension.json"
+    ),
+    (
+        "etc/jupyter/jupyter_server_config.d",
+        "jupyterlmod/etc",
+        "jupyterlmod_jupyterserverextension.json"
+    ),
+    (
+        "etc/jupyter/nbconfig/tree.d",
+        "jupyterlmod/etc",
+        "jupyterlmod_nbextension.json",
+    )
+]
+
+cmdclass = create_cmdclass(
+    "jsdeps", package_data_spec=package_data_spec, data_files_spec=data_files_spec
+)
+
+js_command = combine_commands(
+    install_npm(HERE / "jupyterlab", build_cmd="build:prod", npm=["jlpm"]),
+    ensure_targets(jstargets),
+)
+
+is_repo = (HERE / ".git").exists()
+if is_repo:
+    cmdclass["jsdeps"] = js_command
+else:
+    cmdclass["jsdeps"] = skip_if_exists(jstargets, js_command)
+
+long_description = (HERE / "README.md").read_text()
+
+# Get the package info from package.json
+pkg_json = json.loads((HERE / "jupyterlab" / "package.json").read_bytes())
+
+settings_path = "./config/settings/*.json"
+
 
 setup_args = dict(
-    name                = 'jupyterlmod',
-    packages            = ['jupyterlmod', 'lmod'],
-    version             = "3.1.0",
-    description         = "jupyterlmod: notebook server extension to interact with Lmod system",
-    long_description    = "Jupyter interactive notebook server extension that allows user to select software modules to load with Lmod before launching kernels.",
-    author              = "Félix-Antoine Fortin",
-    author_email        = "felix-antoine.fortin@calculquebec.ca",
-    url                 = "http://www.calculquebec.ca",
-    license             = "MIT",
-    platforms           = "Linux, Mac OS X",
-    keywords            = ['Interactive', 'Interpreter', 'Shell', 'Web', 'Lmod'],
-    classifiers         = [
-        'Intended Audience :: Developers',
-        'Intended Audience :: System Administrators',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-    ],
-    install_requires   = [
+    name=name,
+    version=pkg_json["version"],
+    url=pkg_json["homepage"],
+    author=pkg_json["author"],
+    description=pkg_json["description"],
+    license=pkg_json["license"],
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    cmdclass=cmdclass,
+    packages=setuptools.find_packages(),
+    install_requires=[
         'jupyter-core',
         'jupyter-server'
     ],
     data_files=[
-        ('share/jupyter/nbextensions/jupyterlmod', glob('jupyterlmod/static/*')),
+        ('share/jupyter/nbextensions/jupyterlmod ', glob('jupyterlmod/static/*')),
         ('etc/jupyter/jupyter_notebook_config.d', ['jupyterlmod/etc/jupyterlmod_serverextension.json']),
         ("etc/jupyter/jupyter_server_config.d", ['jupyterlmod/etc/jupyterlmod_jupyterserverextension.json']),
         ('etc/jupyter/nbconfig/tree.d', ['jupyterlmod/etc/jupyterlmod_nbextension.json'])
     ],
-    zip_safe=False
+    zip_safe=False,
+    include_package_data=True,
+    python_requires=">=3.6",
+    platforms="Linux, Mac OS X, Windows",
+    keywords=["Jupyter", "JupyterLab", "JupyterLab3", "Modules", "Tmod"],
+    classifiers=[
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Framework :: Jupyter",
+    ],
 )
 
-def main():
-    setup(**setup_args)
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    setuptools.setup(**setup_args)
+
