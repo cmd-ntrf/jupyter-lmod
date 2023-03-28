@@ -1,7 +1,7 @@
 {
-  "name": "jupyterlab-lmod",
-  "version": "1.1.0",
-  "description": "Lmod JupyterLab extension.",
+  "name": "@cmd-ntrf/jupyterlab-lmod",
+  "version": "4.0.0",
+  "description": "Lmod JupyterLab extension",
   "keywords": [
     "jupyter",
     "jupyterlab",
@@ -12,8 +12,15 @@
     "url": "https://github.com/cmd-ntrf/jupyter-lmod/issues"
   },
   "license": "MIT",
-  "author": "Félix-Antoine Fortin <felix@calculquebec.ca>",
-  "contributors": ["Étienne Dubeau", "Guillaume Moutier", "Alex Domingo"],
+  "author": {
+    "name": "Felix-Antoine Fortin",
+    "email": "felix@calculquebec.ca"
+  },
+  "contributors": [
+    { "name": "Étienne Dubeau" },
+    { "name": "Guillaume Moutier" },
+    { "name": "Alex Domingo" }
+  ],
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
     "style/*.css"
@@ -43,7 +50,6 @@
     "watch": "run-p watch:src watch:labextension",
     "watch:src": "tsc -w",
     "watch:labextension": "jupyter labextension watch ."
-
   },
   "dependencies": {
     "@jupyterlab/application": "^2.0.0 || ^3.0.0",

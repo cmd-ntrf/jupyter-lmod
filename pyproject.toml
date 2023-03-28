@@ -1,4 +1,100 @@
 [build-system]
-requires = ["jupyter_packaging~=0.7.9", "jupyterlab~=3.0", "setuptools>=40.8.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = [
+    "hatch-jupyter-builder >=0.5",
+    "hatch-nodejs-version",
+    "hatchling >=1.4.0",
+    "jupyterlab >=3.4.7,<4.0.0",
+]
+build-backend = "hatchling.build"
 
+[project]
+name = "jupyterlmod"
+dynamic = [
+    "authors",
+    "description",
+    "keywords",
+    "urls",
+    "version",
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.6"
+classifiers = [
+    "Framework :: Jupyter",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+    "jupyter-core",
+    "jupyter-server",
+]
+
+[tool.hatch.metadata.hooks.nodejs]
+path = "jupyterlab/package.json"
+fields = ["description", "authors", "urls"]
+
+[tool.hatch.build]
+artifacts = [
+    "jupyterlmod.egg-info/",
+    "jupyterlmod/labextension",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["jupyterlmod", "lmod"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jupyterlmod/static" = "share/jupyter/nbextensions/jupyterlmod"
+"jupyterlmod/etc/jupyterlmod_serverextension.json" = "etc/jupyter/jupyter_notebook_config.d/jupyterlmod_serverextension.json"
+"jupyterlmod/etc/jupyterlmod_jupyterserverextension.json" = "etc/jupyter/jupyter_server_config.d/jupyterlmod_jupyterserverextension.json"
+"jupyterlmod/etc/jupyterlmod_nbextension.json" = "etc/jupyter/nbconfig/tree.d/jupyterlmod_nbextension.json"
+"jupyterlmod/labextension" = "share/jupyter/labextensions/@cmd-ntrf/jupyterlab-lmod"
+"./install.json" = "share/jupyter/labextensions/@cmd-ntrf/jupyterlab-lmod/install.json"
+
+[tool.hatch.version]
+source = "nodejs"
+path = "jupyterlab/package.json"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    ".github",
+]
+
+[tool.hatch.build.hooks.jupyter-builder]
+ensured-targets = [
+    "jupyterlmod/labextension/package.json",
+]
+dependencies = [
+    "hatch-jupyter-builder>=0.8.2",
+]
+build-function = "hatch_jupyter_builder.npm_builder"
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+path = "jupyterlab"
+build_cmd = "build:prod"
+npm = [
+    "jlpm",
+]
+
+[tool.tbump]
+field = [
+    { name = "channel", default = "" },
+    { name = "release", default = "" },
+]
+
+[tool.tbump.version]
+current = "4.0.0"
+regex = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)((?P<channel>a|b|rc|.dev)(?P<release>\\d+))?"
+
+[tool.tbump.git]
+message_template = "Bump to {new_version}"
+tag_template = "v{new_version}"
+
+[[tool.tbump.file]]
+src = "pyproject.toml"
+version_template = "version = \"{major}.{minor}.{patch}{channel}{release}\""
