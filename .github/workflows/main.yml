@@ -25,7 +25,6 @@ jobs:
     - name: Build dist
       run: |
         pyproject-build
-        cd dist && sha256sum * | tee SHA256SUMS
     - name: Publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
