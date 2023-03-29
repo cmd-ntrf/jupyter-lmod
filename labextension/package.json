@@ -25,8 +25,8 @@
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
     "style/*.css"
   ],
-  "main": "lib/jupyterlab/src/index.js",
-  "types": "lib/jupyterlab/src/index.d.ts",
+  "main": "lib/labextension/src/index.js",
+  "types": "lib/labextension/src/index.d.ts",
   "style": "style/index.css",
   "repository": {
     "type": "git",

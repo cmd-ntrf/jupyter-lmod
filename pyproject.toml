@@ -36,7 +36,7 @@ dependencies = [
 ]
 
 [tool.hatch.metadata.hooks.nodejs]
-path = "jupyterlab/package.json"
+path = "labextension/package.json"
 fields = ["description", "authors", "urls"]
 
 [tool.hatch.build]
@@ -58,7 +58,7 @@ packages = ["jupyterlmod", "lmod"]
 
 [tool.hatch.version]
 source = "nodejs"
-path = "jupyterlab/package.json"
+path = "labextension/package.json"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -75,7 +75,7 @@ dependencies = [
 build-function = "hatch_jupyter_builder.npm_builder"
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-path = "jupyterlab"
+path = "labextension"
 build_cmd = "build:prod"
 npm = [
     "jlpm",
