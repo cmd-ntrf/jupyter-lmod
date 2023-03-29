@@ -24,12 +24,6 @@ proxy server launchers to JupyterLab UI when modules with matching names are loa
 pip install jupyterlmod
 ```
 
-### jupyterlab
-
-```
-jupyter labextension install jupyterlab-lmod
-```
-
 ### Disable jupyter-server-proxy notebook and lab extensions
 
 To avoid having items in the launcher that cannot be launched because the binaries location are not in PATH,
@@ -63,3 +57,27 @@ c.Lmod.launcher_pins = ['Desktop', 'RStudio']
 ![Jupyter notebook demo](https://i.imgur.com/pK1Q5gG.gif)
 
 ![JupyterLab demo](https://i.imgur.com/1HDH7iN.gif)
+
+
+## develop
+
+### requirements
+
+- pip >= 23
+- [build](https://pypi.org/project/build/)
+- nodejs >= 18.x
+
+### build
+
+- wheel and tarball:
+    ```shell
+    pyproject-build
+    ```
+- labextension
+    ```shell
+    cd jupyterlab
+    npm install
+    npm run build
+    # To install extension in jupyterlab in develop mode:
+    npm run install:extension
+    ```

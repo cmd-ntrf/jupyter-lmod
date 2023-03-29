@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "lib": ["es2017", "dom"],
+    "lib": ["es2018", "dom"],
     "module": "commonjs",
     "esModuleInterop" : true,
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noUnusedLocals": true,
     "outDir": "./lib",
-    "target": "es2017",
+    "target": "es2018",
     "strict": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
