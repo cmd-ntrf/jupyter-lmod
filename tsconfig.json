@@ -16,6 +16,6 @@
   },
   "include": [
       "src/*",
-      "../jupyterlmod/static/lmod.js"
+      "jupyterlmod/static/module.js"
   ]
 }
