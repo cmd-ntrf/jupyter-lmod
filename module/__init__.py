@@ -21,7 +21,12 @@ except KeyError:
         # No such variable for tmod
         # MODULE_SYSTEM_NAME = ""
     except KeyError:
-        print("No module system found!")
+        MODULE_CMD = ''
+        MODULE_SYSTEM = ''
+        print(
+            "No module system found. Make sure environment variables "
+            "LMOD_CMD for lmod or MODULES_CMD for tmod are set"
+        )
 
 SITE_POSTFIX = os.path.join("lib", "python" + sys.version[:3], "site-packages")
 
@@ -41,6 +46,10 @@ async def module(command, *args):
     :return: Error message if command execution failed
     :rtype: str
     """
+    # If MODULE_CMD is empty return
+    if not MODULE_CMD:
+        return 'Module system not found'
+
     cmd = MODULE_CMD, "python", "--terse", command, *args
 
     proc = await create_subprocess_shell(

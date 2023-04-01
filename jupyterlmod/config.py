@@ -1,7 +1,7 @@
 from traitlets.config import Configurable
 from traitlets import List, Unicode
 
-# dfsdfsdf
+
 class Lmod(Configurable):
     """Configurable for Lmod"""
     launcher_pins = List(
