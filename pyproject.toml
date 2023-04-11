@@ -35,6 +35,15 @@ dependencies = [
     "jupyter-server",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-html",
+    "pytest-jupyter[server]>=0.6",
+]
+
 [tool.hatch.metadata.hooks.nodejs]
 path = "package.json"
 fields = ["description", "authors", "urls"]
@@ -70,10 +79,14 @@ exclude = [
 ensured-targets = [
     "jupyterlmod/labextension/package.json",
 ]
+skip-if-exists = [
+    "jupyterlmod/labextension/package.json",
+]
 dependencies = [
     "hatch-jupyter-builder>=0.8.2",
 ]
 build-function = "hatch_jupyter_builder.npm_builder"
+optional-editable-build = true
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
@@ -82,6 +95,13 @@ editable_build_cmd = "build"
 npm = [
     "jlpm",
 ]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+path = "."
+build_cmd = "build"
+npm = ["jlpm"]
+source_dir = "src"
+build_dir = "jupyterlmod/labextension"
 
 [tool.tbump]
 field = [
