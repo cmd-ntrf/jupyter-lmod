@@ -1,13 +1,11 @@
-import os
-import sys
+
 import json
 from jupyter_server.utils import url_path_join as ujoin
 from pathlib import Path
 
 from .config import Module as ModuleConfig
-from .handler import default_handlers, PinsHandler, ModuleSystemLogoHandler
+from .handler import default_handlers, logo_handler, PinsHandler
 
-from module import MODULE_SYSTEM
 
 HERE = Path(__file__).parent.resolve()
 
@@ -29,7 +27,8 @@ def _jupyter_server_extension_points():
 def _jupyter_nbextension_paths():
     return [
         dict(
-            section="tree", src="static", dest="jupyterlmod", require="jupyterlmod/main"
+            section="tree", src="static", dest="jupyterlmod",
+            require="jupyterlmod/main"
         )
     ]
 
@@ -54,16 +53,10 @@ def _load_jupyter_server_extension(nbapp):
     for path, class_ in default_handlers:
         web_app.add_handlers(".*$", [(ujoin(base_url, path), class_)])
 
+    web_app.add_handlers(".*$", logo_handler)
     web_app.add_handlers(".*$", [
-        (ujoin(base_url, 'module/launcher-pins'), PinsHandler, {'launcher_pins': launcher_pins}),
-    ])
-
-    logo_path = os.path.join(
-        sys.prefix, 'share', 'jupyter', 'nbextensions', 'jupyterlmod', 'logos',
-        f'{MODULE_SYSTEM}.png'
-    )
-    web_app.add_handlers(".*$", [
-        (ujoin(base_url, 'module/logo'), ModuleSystemLogoHandler, {'path': logo_path}),
+        (ujoin(base_url, 'module/launcher-pins'), PinsHandler,
+        {'launcher_pins': launcher_pins}),
     ])
 
 # For backward compatibility
