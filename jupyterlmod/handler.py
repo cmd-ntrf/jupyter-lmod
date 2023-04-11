@@ -1,9 +1,8 @@
 """List of handlers to register"""
 
-import json
 import os
-
-import module
+import sys
+import json
 
 from functools import wraps
 from glob import glob
@@ -12,6 +11,8 @@ from tornado import web
 from jupyter_core.paths import jupyter_path
 
 from jupyter_server.base.handlers import JupyterHandler
+
+import module
 
 
 def jupyter_path_decorator(func):
@@ -24,6 +25,10 @@ def jupyter_path_decorator(func):
     return wrapper
 
 
+LOGO_PATH = os.path.join(
+    sys.prefix, 'share', 'jupyter', 'nbextensions', 'jupyterlmod', 'logos',
+    f'{module.MODULE_SYSTEM}.png'
+)
 MODULE = module.ModuleAPI()
 
 
@@ -184,4 +189,8 @@ default_handlers = [
     (r"/module/collections", ModuleCollections),
     (r"/module/paths", ModulePaths),
     (r"/module/folders/(.*)", FoldersHandler)
+]
+
+logo_handler = [
+    (r"/module/logo", ModuleSystemLogoHandler, {'path': LOGO_PATH}),
 ]
