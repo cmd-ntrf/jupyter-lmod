@@ -8,7 +8,12 @@ jupyterlmod.egg-info/
 .ipynb_checkpoints/
 *.ipynb
 .vscode/
-*.lock
 *env*/
 package-lock.json
 jupyterlmod/labextension
+
+*.bundle.*
+lib/
+node_modules/
+*.egg-info/
+.ipynb_checkpoints

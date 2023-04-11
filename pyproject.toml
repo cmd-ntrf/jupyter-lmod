@@ -36,7 +36,7 @@ dependencies = [
 ]
 
 [tool.hatch.metadata.hooks.nodejs]
-path = "labextension/package.json"
+path = "package.json"
 fields = ["description", "authors", "urls"]
 
 [tool.hatch.build]
@@ -46,19 +46,19 @@ artifacts = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["jupyterlmod", "lmod"]
+packages = ["jupyterlmod", "module"]
 
 [tool.hatch.build.targets.wheel.shared-data]
 "jupyterlmod/static" = "share/jupyter/nbextensions/jupyterlmod"
 "jupyterlmod/etc/jupyterlmod_serverextension.json" = "etc/jupyter/jupyter_notebook_config.d/jupyterlmod_serverextension.json"
 "jupyterlmod/etc/jupyterlmod_jupyterserverextension.json" = "etc/jupyter/jupyter_server_config.d/jupyterlmod_jupyterserverextension.json"
 "jupyterlmod/etc/jupyterlmod_nbextension.json" = "etc/jupyter/nbconfig/tree.d/jupyterlmod_nbextension.json"
-"jupyterlmod/labextension" = "share/jupyter/labextensions/@cmd-ntrf/jupyterlab-lmod"
-"./install.json" = "share/jupyter/labextensions/@cmd-ntrf/jupyterlab-lmod/install.json"
+"jupyterlmod/labextension" = "share/jupyter/labextensions/@jupyterlab/jupyterlab-lmod"
+"install.json" = "share/jupyter/labextensions/@jupyterlab/jupyterlab-lmod/install.json"
 
 [tool.hatch.version]
 source = "nodejs"
-path = "labextension/package.json"
+path = "package.json"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -75,8 +75,9 @@ dependencies = [
 build-function = "hatch_jupyter_builder.npm_builder"
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-path = "labextension"
+path = "."
 build_cmd = "build:prod"
+editable_build_cmd = "build"
 npm = [
     "jlpm",
 ]

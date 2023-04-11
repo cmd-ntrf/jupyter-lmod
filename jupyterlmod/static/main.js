@@ -3,25 +3,25 @@ define(function(require) {
     var $ = require('jquery');
     var ui = require('jquery-ui');
     var dialog = require('base/js/dialog');
-    var lmod_class = require('./lmod');
+    var module_class = require('./module');
     var utils = require('base/js/utils');
 
     var base_url = utils.get_body_data("baseUrl");
 
-    var lmod = new lmod_class.Lmod(base_url);
+    var module = new module_class.Module(base_url);
     var search_source = null;
 
     var server_proxy_infos = {};
     var server_proxy_launcher = {};
 
-    const lmod_tab_html = $([
-'<div id="lmod" class="tab-pane">',
-'    <div id="lmod_toolbar" class="row list_toolbar">',
+    const module_tab_html = $([
+'<div id="module" class="tab-pane">',
+'    <div id="module_toolbar" class="row list_toolbar">',
 '        <div class="col-sm-18 no-padding">',
 '            <input id="modules" class="form-control input-lg" placeholder="Search available modules..." style="width:100%">',
 '        </div>',
 '    </div>',
-'    <div class="list_container" id="lmod_list">',
+'    <div class="list_container" id="module_list">',
 '        <div class="row list_header" id="list_header">',
 '            <div class="col-sm-8">Loaded Modules</div>',
 '            <div class="col-sm-4 no-padding tree-buttons">',
@@ -53,10 +53,10 @@ define(function(require) {
 '</div>',
     ].join('\n'));
 
-    const lmod_list_line = $([
+    const module_list_line = $([
 '<div class="list_item row">',
 '   <div class="col-md-12">',
-'       <a href="#lmod_list"></a>',
+'       <a href="#module_list"></a>',
 '       <div class="item_buttons pull-right">',
 '           <button class="btn btn-default btn-xs" id="reload" title="Reload module"><i class="fa fa-refresh" aria-hidden="true"></i></button>',
 '           <button class="btn btn-default btn-xs" id="unload" title="Unload module"><i class="fa fa-trash-o" aria-hidden="true"></i></button>',
@@ -75,7 +75,7 @@ define(function(require) {
 
     const modulepath_dialog_body = $([
         '<div class="ui-front">',
-        '    <div id="lmod_toolbar" class="row list_toolbar">',
+        '    <div id="module_toolbar" class="row list_toolbar">',
         '        <input id="path_input" class="form-control" placeholder="Enter path here..." style="width:70%;float:left;"">',
         '        <div class="btn-group" style="width:30%;float:left;">',
         '            <button class="btn btn-default" id="prepend_path" title="Prepend to MODULEPATH" style="width:50%;float:left;">Prepend <i class="fa fa-arrow-up" aria-hidden="true"></i></button>',
@@ -88,7 +88,7 @@ define(function(require) {
     ].join('\n'));
 
     async function draw_modulepath_dialog() {
-        const paths = await lmod.paths();
+        const paths = await module.paths();
 
         const list = $("#path_list").html("");
 
@@ -97,7 +97,7 @@ define(function(require) {
             if (event.keyCode == $.ui.keyCode.ENTER) {
                 var paths = event.target.value;
                 if (paths != '') {
-                    lmod.use([paths])
+                    module.use([paths])
                     .then(draw_modulepath_dialog)
                     .then(refresh_module_ui);
                 }
@@ -107,7 +107,7 @@ define(function(require) {
         .autocomplete({
             minLength: 1,
             source: async function( request, response ) {
-                response(await lmod.folders(request.term));
+                response(await module.folders(request.term));
             },
         });
 
@@ -115,7 +115,7 @@ define(function(require) {
             const path = path_input.val();
             if (path != '') {
                 path_input.val('')
-                lmod.use([path])
+                module.use([path])
                     .then(draw_modulepath_dialog)
                     .then(refresh_module_ui);
             }
@@ -124,7 +124,7 @@ define(function(require) {
             const path = path_input.val();
             if (path != '') {
                 path_input.val('')
-                lmod.use([path], true)
+                module.use([path], true)
                     .then(draw_modulepath_dialog)
                     .then(refresh_module_ui);
             }
@@ -174,7 +174,7 @@ define(function(require) {
                 .addClass('btn-xs')
                 .attr("title", "Remove from MODULEPATH")
                 .html('<i class="fa fa-trash-o" aria-hidden="true"></i>')
-                .click(e => lmod.unuse([item])
+                .click(e => module.unuse([item])
                     .then(draw_modulepath_dialog)
                     .then(refresh_module_ui)
                 )
@@ -209,7 +209,7 @@ define(function(require) {
                     class: "btn-primary",
                     click: function () {
                         var name = d.find('input').val();
-                        lmod.save(name ? name : 'default').then(refresh_restore_list);
+                        module.save(name ? name : 'default').then(refresh_restore_list);
                     }
                 }
             },
@@ -226,7 +226,7 @@ define(function(require) {
     }
 
     async function refresh_restore_list() {
-        const values = await lmod.savelist();
+        const values = await module.savelist();
         values.push('system');
         const list = $("#restore-menu");
         list.find('#restore-header').nextAll().remove();
@@ -234,23 +234,23 @@ define(function(require) {
             let li = $('<li>')
                 .append($('<a>', {'href': '#', "text" : item}))
                 .attr("title", `Restore collection "${item}"`)
-                .click(e => lmod.restore(item).then(refresh_module_ui));
+                .click(e => module.restore(item).then(refresh_module_ui));
             list.append(li);
         })
     }
 
     async function refresh_module_ui() {
         const show_hidden = $("#show_hidden")[0].checked;
-        const avail_set = new Set(await lmod.avail());
-        const modulelist = await lmod.list(show_hidden);
+        const avail_set = new Set(await module.avail());
+        const modulelist = await module.list(show_hidden);
         $("#list_header").nextAll().remove();
-        const list = $("#lmod_list");
+        const list = $("#module_list");
 
         modulelist.map(item => {
-            let li = lmod_list_line.clone();
+            let li = module_list_line.clone();
             li.find('a').text(item).click(e => show_module(item));
-            li.find('#reload').click(e => lmod.load([item]).then(refresh_module_ui));
-            li.find('#unload').click(e => lmod.unload([item]).then(refresh_module_ui));
+            li.find('#reload').click(e => module.load([item]).then(refresh_module_ui));
+            li.find('#unload').click(e => module.unload([item]).then(refresh_module_ui));
             list.append(li);
             avail_set.delete(item)
         });
@@ -280,7 +280,7 @@ define(function(require) {
     }
 
     async function show_module(module) {
-        let data = await lmod.show(module);
+        let data = await module.show(module);
         let datalist = data.split('\n');
         let textarea = $('<pre/>').text($.trim(datalist.slice(3).join('\n')));
         let dialogform = $('<div/>').append(textarea);
@@ -305,17 +305,17 @@ define(function(require) {
     async function setup_proxy_infos() {
         const response = await fetch(base_url + 'server-proxy/servers-info');
         if (!response.ok) {
-            console.log('jupyter-lmod: could not communicate with jupyter-server-proxy API.');
+            console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-server-proxy API.');
             return;
         }
         const data = await response.json();
 
         let launcher_pins = [];
-        const pin_response = await fetch(base_url + 'lmod/launcher-pins');
+        const pin_response = await fetch(base_url + 'module/launcher-pins');
         if (response.ok) {
           launcher_pins = (await pin_response.json()).launcher_pins;
         } else {
-          console.log('jupyter-lmod: could not communicate with jupyter-lmod API.');
+          console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
         }
 
         let menu = $('.tree-buttons').find('.dropdown-menu');
@@ -350,18 +350,18 @@ define(function(require) {
 
     function load() {
         if (!IPython.notebook_list) return;
-        $(".tab-content").append(lmod_tab_html);
+        $(".tab-content").append(module_tab_html);
         $("#edit-button").click(edit_paths);
         $("#save-collection").click(save_collection);
         $("#tabs").append(
             $('<li>')
             .append(
                 $('<a>')
-                .attr('href', '#lmod')
+                .attr('href', '#module')
                 .attr('data-toggle', 'tab')
                 .text('Softwares')
                 .click(function (e) {
-                    window.history.pushState(null, null, '#lmod');
+                    window.history.pushState(null, null, '#module');
                 })
             )
         );
@@ -378,7 +378,7 @@ define(function(require) {
                 var modules = split($.trim(event.target.value));
                 modules.pop();
 
-                lmod.load(modules).then(refresh_module_ui);
+                module.load(modules).then(refresh_module_ui);
                 event.target.value = "";
             }
         })
