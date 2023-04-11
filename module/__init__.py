@@ -49,7 +49,7 @@ async def module(command, *args):
     """
     # If MODULE_CMD is empty return
     if not MODULE_CMD:
-        return 'Module system not found'
+        return 'No module system found'
 
     cmd = MODULE_CMD, "python", "--terse", command, *args
 
@@ -116,7 +116,7 @@ def print_output_decorator(function):
     """
     Returns a wrapper that captures output, if produced and prints it
 
-    :param function: Callable function
+    :param function: Async callable function
     :type paths: callable
     :return: Wrapper function
     :rtype: callable
@@ -198,11 +198,15 @@ class ModuleAPI(object):
             self.list_cache = {True: [], False: []}
             string = await module("list")
             if string and not string.startswith(EMPTY_LIST_STR):
-                modules = string.split()
-                self.list_cache[True] = modules
+                loaded_modules = MODULE_REGEX.findall(string.strip())
+                loaded_hidden_modules = [
+                    name for name in loaded_modules
+                    if MODULE_HIDDEN_REGEX.match(name)
+                ]
+                self.list_cache[True] = loaded_modules
                 self.list_cache[False] = [
-                    name for name in modules
-                    if not MODULE_HIDDEN_REGEX.match(name)
+                    name for name in loaded_modules
+                    if name not in loaded_hidden_modules
                 ]
         return self.list_cache[include_hidden]
 
@@ -294,7 +298,9 @@ class ModuleAPI(object):
         if self.savelist_cache is None:
             string = await module("savelist")
             if string is not None:
-                self.savelist_cache = string.split()
+                self.savelist_cache = [
+                    m for m in string.splitlines() if 'Named collection list:' not in m
+                ]
             else:
                 self.savelist_cache = []
         return self.savelist_cache
