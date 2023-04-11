@@ -13,16 +13,19 @@ from functools import wraps
 try:
     MODULE_CMD = os.environ["LMOD_CMD"]
     MODULE_SYSTEM = 'lmod'
+    EMPTY_LIST_STR = 'No modules loaded'
     # MODULE_SYSTEM_NAME = os.environ.get("LMOD_SYSTEM_NAME", "")
 except KeyError:
     try:
         MODULE_CMD = os.environ["MODULES_CMD"]
         MODULE_SYSTEM = 'tmod'
+        EMPTY_LIST_STR = 'No Modulefiles Currently Loaded.'
         # No such variable for tmod
         # MODULE_SYSTEM_NAME = ""
     except KeyError:
         MODULE_CMD = ''
         MODULE_SYSTEM = ''
+        EMPTY_LIST_STR = 'No module system found'
         print(
             "No module system found. Make sure environment variables "
             "LMOD_CMD for lmod or MODULES_CMD for tmod are set"
@@ -33,8 +36,6 @@ SITE_POSTFIX = os.path.join("lib", "python" + sys.version[:3], "site-packages")
 # NOTE: Try to make these configurable as this can be platform dependent?
 MODULE_REGEX = re.compile(r"^[\w\-_+.\/]{1,}[^\/:]$", re.M)
 MODULE_HIDDEN_REGEX = re.compile(r"^(.+\/\..+|\..+)$", re.M)
-
-EMPTY_LIST_STR = "No modules loaded"
 
 
 async def module(command, *args):
@@ -247,7 +248,7 @@ class ModuleAPI(object):
         :return: Stderr if command failed
         :rtype: str
         """
-        if self.module_system == 'tmod':
+        if await self.module_system() == 'tmod':
             return 'subcommand reset does not exist in environment modules (tmod)'
         output = await module("reset")
         self.invalidate_module_caches()
