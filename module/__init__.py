@@ -13,16 +13,19 @@ from functools import wraps
 try:
     MODULE_CMD = os.environ["LMOD_CMD"]
     MODULE_SYSTEM = 'lmod'
+    EMPTY_LIST_STR = "No modules loaded"
     # MODULE_SYSTEM_NAME = os.environ.get("LMOD_SYSTEM_NAME", "")
 except KeyError:
     try:
         MODULE_CMD = os.environ["MODULES_CMD"]
         MODULE_SYSTEM = 'tmod'
+        EMPTY_LIST_STR = "No Modulefiles Currently Loaded."
         # No such variable for tmod
         # MODULE_SYSTEM_NAME = ""
     except KeyError:
         MODULE_CMD = ''
         MODULE_SYSTEM = ''
+        EMPTY_LIST_STR = "No module system found"
         print(
             "No module system found. Make sure environment variables "
             "LMOD_CMD for lmod or MODULES_CMD for tmod are set"
@@ -33,8 +36,6 @@ SITE_POSTFIX = os.path.join("lib", "python" + sys.version[:3], "site-packages")
 # NOTE: Try to make these configurable as this can be platform dependent?
 MODULE_REGEX = re.compile(r"^[\w\-_+.\/]{1,}[^\/:]$", re.M)
 MODULE_HIDDEN_REGEX = re.compile(r"^(.+\/\..+|\..+)$", re.M)
-
-EMPTY_LIST_STR = "No modules loaded"
 
 
 async def module(command, *args):
@@ -48,7 +49,7 @@ async def module(command, *args):
     """
     # If MODULE_CMD is empty return
     if not MODULE_CMD:
-        return 'Module system not found'
+        return 'No module system found'
 
     cmd = MODULE_CMD, "python", "--terse", command, *args
 
@@ -115,14 +116,14 @@ def print_output_decorator(function):
     """
     Returns a wrapper that captures output, if produced and prints it
 
-    :param function: Callable function
+    :param function: Async callable function
     :type paths: callable
     :return: Wrapper function
     :rtype: callable
     """
     @wraps(function)
-    def wrapper(*args, **kargs):
-        output = function(*args, **kargs)
+    async def wrapper(*args, **kargs):
+        output = await function(*args, **kargs)
         if output is not None:
             print(output)
     return wrapper
@@ -197,11 +198,15 @@ class ModuleAPI(object):
             self.list_cache = {True: [], False: []}
             string = await module("list")
             if string and not string.startswith(EMPTY_LIST_STR):
-                modules = string.split()
-                self.list_cache[True] = modules
+                loaded_modules = MODULE_REGEX.findall(string.strip())
+                loaded_hidden_modules = [
+                    name for name in loaded_modules
+                    if MODULE_HIDDEN_REGEX.match(name)
+                ]
+                self.list_cache[True] = loaded_modules
                 self.list_cache[False] = [
-                    name for name in modules
-                    if not MODULE_HIDDEN_REGEX.match(name)
+                    name for name in loaded_modules
+                    if name not in loaded_hidden_modules
                 ]
         return self.list_cache[include_hidden]
 
@@ -247,7 +252,7 @@ class ModuleAPI(object):
         :return: Stderr if command failed
         :rtype: str
         """
-        if self.module_system == 'tmod':
+        if await self.system() == 'tmod':
             return 'subcommand reset does not exist in environment modules (tmod)'
         output = await module("reset")
         self.invalidate_module_caches()
@@ -293,7 +298,9 @@ class ModuleAPI(object):
         if self.savelist_cache is None:
             string = await module("savelist")
             if string is not None:
-                self.savelist_cache = string.split()
+                self.savelist_cache = [
+                    m for m in string.splitlines() if 'Named collection list:' not in m
+                ]
             else:
                 self.savelist_cache = []
         return self.savelist_cache
