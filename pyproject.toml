@@ -120,3 +120,26 @@ tag_template = "v{new_version}"
 [[tool.tbump.file]]
 src = "pyproject.toml"
 version_template = "version = \"{major}.{minor}.{patch}{channel}{release}\""
+
+[tool.pytest.ini_options]
+cache_dir = "build/.cache/pytest"
+addopts = [
+    "-vv",
+    "--cov=jupyterlmod",
+    "--cov-branch",
+    "--cov-context=test",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html:build/coverage",
+    "--html=build/pytest/index.html",
+    "--color=yes",
+]
+
+[tool.coverage.run]
+data_file = "build/.coverage"
+concurrency = [
+    "multiprocessing",
+    "thread"
+]
+
+[tool.coverage.html]
+show_contexts = true
