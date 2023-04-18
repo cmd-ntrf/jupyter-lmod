@@ -58,7 +58,7 @@ jobs:
 
       - name: Install Python package
         run: |
-          pip install -vv '.\[test\]' 'jupyterlab~=${{ matrix.jupyterlab-version }}.0' 'jupyter_server~=${{ matrix.jupyter_server-version }}.0'
+          pip install -vv '.[test]' 'jupyterlab~=${{ matrix.jupyterlab-version }}.0' 'jupyter_server~=${{ matrix.jupyter_server-version }}.0'
 
       - name: List Python packages
         run: |
