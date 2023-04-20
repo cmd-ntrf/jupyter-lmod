@@ -126,6 +126,7 @@ cache_dir = "build/.cache/pytest"
 addopts = [
     "-vv",
     "--cov=jupyterlmod",
+    "--cov=module",
     "--cov-branch",
     "--cov-context=test",
     "--cov-report=term-missing:skip-covered",
