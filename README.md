@@ -1,17 +1,22 @@
-# Jupyter Lmod
+# Jupyter Lmod/Tmod
 
 Jupyter interactive notebook server extension that allows user
-to interact with environment modules before launching kernels.
-The extension use Lmod's Python interface to accomplish module
+to interact with environment modules (Lmod or Tmod) before launching kernels.
+The extension use environment module's Python interface to accomplish module
 related task like loading, unloading, saving collection, etc.
 
 ## requirements
 
 - [jupyter notebook](https://github.com/jupyter/notebook) >= 6.0
-- [Lmod](https://github.com/TACC/Lmod) >= 6.0
+- [Lmod](https://github.com/TACC/Lmod) >= 6.0 or [Tmod](https://modules.readthedocs.io/en/latest/) >= 5.0
 - optional: [jupyterlab](https://github.com/jupyter/notebook) >= 3.0
 - optional: [jupyter-server-proxy](https://github.com/jupyterhub/jupyter-server-proxy) >= 3.2.0
 - optional: [jupyterlab-server-proxy](https://github.com/jupyterhub/jupyter-server-proxy) >= 3.2.0
+
+**Note** that the extension supports Tmod < 5.0 too. However, if `MODULES_RUN_QUARANTINE` is not empty on the platform, module's Python API does
+not have correct behaviour. On default installations, `MODULES_RUN_QUARANTINE=LD_LIBRARY_PATH` is used. If `LD_LIBRARY_PATH` is not
+empty before loading a module, the existant paths in `LD_LIBRARY_PATH` is lost
+after loading the module. More discussion can be found [here](https://sourceforge.net/p/modules/mailman/message/36113970/).
 
 If jupyter-server-proxy and jupyterlab-server-proxy are detected, jupyter-lmod will add the
 proxy server launchers to JupyterLab UI when modules with matching names are loaded.
@@ -51,6 +56,11 @@ the Jupyter notebook configuration file, like this:
 ```
 c.Lmod.launcher_pins = ['Desktop', 'RStudio']
 ```
+or
+```
+c.Tmod.launcher_pins = ['Desktop', 'RStudio']
+```
+based on your module system.
 
 ## demo
 
@@ -75,7 +85,6 @@ c.Lmod.launcher_pins = ['Desktop', 'RStudio']
     ```
 - labextension
     ```shell
-    cd jupyterlab
     npm install
     npm run build
     # To install extension in jupyterlab in develop mode:

@@ -35,8 +35,17 @@ dependencies = [
     "jupyter-server",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-html",
+    "pytest-jupyter[server]>=0.6",
+]
+
 [tool.hatch.metadata.hooks.nodejs]
-path = "labextension/package.json"
+path = "package.json"
 fields = ["description", "authors", "urls"]
 
 [tool.hatch.build]
@@ -46,19 +55,19 @@ artifacts = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["jupyterlmod", "lmod"]
+packages = ["jupyterlmod", "module"]
 
 [tool.hatch.build.targets.wheel.shared-data]
 "jupyterlmod/static" = "share/jupyter/nbextensions/jupyterlmod"
 "jupyterlmod/etc/jupyterlmod_serverextension.json" = "etc/jupyter/jupyter_notebook_config.d/jupyterlmod_serverextension.json"
 "jupyterlmod/etc/jupyterlmod_jupyterserverextension.json" = "etc/jupyter/jupyter_server_config.d/jupyterlmod_jupyterserverextension.json"
 "jupyterlmod/etc/jupyterlmod_nbextension.json" = "etc/jupyter/nbconfig/tree.d/jupyterlmod_nbextension.json"
-"jupyterlmod/labextension" = "share/jupyter/labextensions/@cmd-ntrf/jupyterlab-lmod"
-"./install.json" = "share/jupyter/labextensions/@cmd-ntrf/jupyterlab-lmod/install.json"
+"jupyterlmod/labextension" = "share/jupyter/labextensions/@jupyterlab/jupyterlab-lmod"
+"install.json" = "share/jupyter/labextensions/@jupyterlab/jupyterlab-lmod/install.json"
 
 [tool.hatch.version]
 source = "nodejs"
-path = "labextension/package.json"
+path = "package.json"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -69,17 +78,29 @@ exclude = [
 ensured-targets = [
     "jupyterlmod/labextension/package.json",
 ]
+skip-if-exists = [
+    "jupyterlmod/labextension/package.json",
+]
 dependencies = [
     "hatch-jupyter-builder>=0.8.2",
 ]
 build-function = "hatch_jupyter_builder.npm_builder"
+optional-editable-build = true
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-path = "labextension"
+path = "."
 build_cmd = "build:prod"
+editable_build_cmd = "build"
 npm = [
     "jlpm",
 ]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+path = "."
+build_cmd = "build"
+npm = ["jlpm"]
+source_dir = "src"
+build_dir = "jupyterlmod/labextension"
 
 [tool.tbump]
 field = [
@@ -98,3 +119,27 @@ tag_template = "v{new_version}"
 [[tool.tbump.file]]
 src = "pyproject.toml"
 version_template = "version = \"{major}.{minor}.{patch}{channel}{release}\""
+
+[tool.pytest.ini_options]
+cache_dir = "build/.cache/pytest"
+addopts = [
+    "-vv",
+    "--cov=jupyterlmod",
+    "--cov=module",
+    "--cov-branch",
+    "--cov-context=test",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html:build/coverage",
+    "--html=build/pytest/index.html",
+    "--color=yes",
+]
+
+[tool.coverage.run]
+data_file = "build/.coverage"
+concurrency = [
+    "multiprocessing",
+    "thread"
+]
+
+[tool.coverage.html]
+show_contexts = true

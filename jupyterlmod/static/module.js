@@ -3,10 +3,17 @@ function getCookie(name) {
   return r ? r[1] : undefined;
 }
 
-class Lmod {
+class Module {
   constructor(base_url) {
-    this.url = base_url + 'lmod'
+    this.url = base_url + 'module'
     this._xsrf = getCookie("_xsrf");
+  }
+
+  async system() {
+    const response = await fetch(this.url + '/system');
+    if (response.status == 200) {
+      return response.json();
+    }
   }
 
   async avail() {
@@ -173,11 +180,11 @@ class Lmod {
 }
 
 define({
-  Lmod : Lmod
+  Module : Module
 });
 
 // Export is only used for TS. Try/Catch to avoid error in JS
 try {
-  exports.Lmod = Lmod;
+  exports.Module = Module;
 }
 catch (ReferenceError) {}
