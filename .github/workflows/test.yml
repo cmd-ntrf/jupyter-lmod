@@ -82,19 +82,18 @@ jobs:
       - name: Check the Notebook Server extension is installed
         run: |
           jupyter serverextension list
-          jupyter serverextension list 2>&1 | grep -iE "jupyterlmod.*OK" -
+          jupyter serverextension list 2>&1 | grep -iE "jupyterlab-lmod.*OK" -
 
       - name: Check the Jupyter Server extension is installed
         run: |
           pip install jupyter-server
           jupyter server extension list
-          jupyter server extension list 2>&1 | grep -iE "jupyterlmod.*OK" -
+          jupyter server extension list 2>&1 | grep -iE "jupyterlab-lmod.*OK" -
 
       - name: Install JupyterLab Extension
         if: matrix.jupyterlab-version == '2'
         run: |
           export NODE_OPTIONS=--openssl-legacy-provider
-          cd labextension
           jupyter labextension install . --no-build --debug
           jupyter lab build --minimize=False --debug
 
@@ -106,5 +105,5 @@ jobs:
         # if: ${{ !(matrix.jupyterlab-version == '2' && matrix.jupyter_server-version != '1') }}
         run: |
           jupyter labextension list
-          jupyter labextension list 2>&1 | grep -iE '@jupyterlab/jupyterlmod.*OK.*'
+          jupyter labextension list 2>&1 | grep -iE '@jupyterlab/jupyterlab-lmod.*OK.*'
           python -m jupyterlab.browser_check
