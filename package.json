@@ -1,7 +1,7 @@
 {
-  "name": "@jupyterlab/jupyterlab-lmod",
-  "version": "4.0.1",
-  "description": "Lmod/Tmod JupyterLab extension",
+  "name": "@cmd-ntrf/jupyterlab-lmod",
+  "version": "4.0.2",
+  "description": "Lmod JupyterLab extension",
   "keywords": [
     "jupyter",
     "jupyterlab",
