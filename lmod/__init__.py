@@ -199,7 +199,7 @@ _lmod = API()
 def print_output_decorator(function):
     @wraps(function)
     async def wrapper(*args, **kargs):
-        output = function(*args, **kargs)
+        output = await function(*args, **kargs)
         if output is not None:
             print(output)
     return wrapper
