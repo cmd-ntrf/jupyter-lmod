@@ -7,10 +7,22 @@ class Lmod {
   constructor(base_url) {
     this.url = base_url + 'lmod'
     this._xsrf = getCookie("_xsrf");
+    this._head_auth = {
+      'X-XSRFToken': this._xsrf,
+    };
+    this._head_auth_json = {
+      'Content-Type': 'application/json',
+      'X-XSRFToken': this._xsrf,
+    };
   }
 
   async avail() {
-    const response = await fetch(this.url + '/modules');
+    const response = await fetch(
+      this.url + '/modules',
+      {
+        headers: this._head_auth
+      },
+    );
     if (response.status == 200) {
       return response.json();
     }
@@ -21,7 +33,12 @@ class Lmod {
     if (include_hidden) {
       url += '?all=true';
     }
-    const response = await fetch(url);
+    const response = await fetch(
+      url,
+      {
+        headers: this._head_auth,
+      }
+    );
     if (response.status == 200) {
       return response.json();
     }
@@ -35,10 +52,7 @@ class Lmod {
       this.url,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-XSRFToken': this._xsrf
-        },
+        headers: this._head_auth_json,
         body: JSON.stringify(data),
       }
     )
@@ -53,10 +67,7 @@ class Lmod {
       this.url + '/collections',
       {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-XSRFToken': this._xsrf
-        },
+        headers: this._head_auth_json,
         body: JSON.stringify(data),
       }
     )
@@ -71,10 +82,7 @@ class Lmod {
       this.url + '/collections',
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-XSRFToken': this._xsrf
-        },
+        headers: this._head_auth_json,
         body: JSON.stringify(data),
       }
     )
@@ -82,21 +90,36 @@ class Lmod {
   }
 
   async savelist() {
-    const response = await fetch(this.url + '/collections');
+    const response = await fetch(
+      this.url + '/collections',
+      {
+        headers: this._head_auth,
+      }
+    );
     if (response.status == 200) {
       return response.json();
     }
   }
 
   async show(module) {
-    const response = await fetch(this.url + '/modules/' + module);
+    const response = await fetch(
+      this.url + '/modules/' + module,
+      {
+         headers: this._head_auth,
+      }
+    );
     if (response.status == 200) {
       return response.json();
     }
   }
 
   async freeze() {
-    const response = await fetch(this.url + '?lang=python');
+    const response = await fetch(
+      this.url + '?lang=python',
+      {
+        headers: this._head_auth,
+      }
+    );
     if (response.status == 200) {
       return response.json();
     }
@@ -110,10 +133,7 @@ class Lmod {
       this.url,
       {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-XSRFToken': this._xsrf
-        },
+        headers: this._head_auth_json,
         body: JSON.stringify(data),
       }
     )
@@ -121,14 +141,24 @@ class Lmod {
   }
 
   async paths() {
-    const response = await fetch(this.url + '/paths');
+    const response = await fetch(
+      this.url + '/paths',
+      {
+        headers: this._head_auth,
+      }
+    );
     if (response.status == 200) {
       return response.json();
     }
   }
 
   async folders(path) {
-    const response = await fetch(this.url + '/folders/' + path);
+    const response = await fetch(
+      this.url + '/folders/' + path,
+      {
+        headers: this._head_auth,
+      }
+    );
     if (response.status == 200) {
       return response.json();
     }
@@ -143,10 +173,7 @@ class Lmod {
       this.url + '/paths',
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-XSRFToken': this._xsrf
-        },
+        headers: this._head_auth_json,
         body: JSON.stringify(data),
       }
     )
@@ -161,10 +188,7 @@ class Lmod {
       this.url + '/paths',
       {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-XSRFToken': this._xsrf
-        },
+        headers: this._head_auth_json,
         body: JSON.stringify(data),
       }
     )

@@ -303,7 +303,12 @@ define(function(require) {
     }
 
     async function setup_proxy_infos() {
-        const response = await fetch(base_url + 'server-proxy/servers-info');
+        const response = await fetch(
+            base_url + 'server-proxy/servers-info',
+            {
+                headers: lmod._head_auth,
+            },
+        );
         if (!response.ok) {
             console.log('jupyter-lmod: could not communicate with jupyter-server-proxy API.');
             return;
@@ -311,7 +316,12 @@ define(function(require) {
         const data = await response.json();
 
         let launcher_pins = [];
-        const pin_response = await fetch(base_url + 'lmod/launcher-pins');
+        const pin_response = await fetch(
+            base_url + 'lmod/launcher-pins',
+            {
+                headers: lmod._head_auth,
+            },
+        );
         if (response.ok) {
           launcher_pins = (await pin_response.json()).launcher_pins;
         } else {
