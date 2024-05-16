@@ -276,7 +276,12 @@ class ILauncherProxy {
 
 async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutRestorer) {
   let launcher_pins = [];
-  const pin_response = await fetch(PageConfig.getBaseUrl() + 'lmod/launcher-pins');
+  const pin_response = await fetch(
+    PageConfig.getBaseUrl() + 'lmod/launcher-pins',
+    {
+      headers: lmodAPI._head_auth,
+    },
+  );
   if (pin_response.ok) {
     const data = await pin_response.json();
     launcher_pins = data.launcher_pins.map(pin => pin.toLowerCase())
