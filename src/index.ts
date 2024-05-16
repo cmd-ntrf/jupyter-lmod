@@ -15,7 +15,7 @@ import { PageConfig } from '@jupyterlab/coreutils';
 
 import { Module } from '../jupyterlmod/static/module.js';
 
-import * as serverproxy from '@jupyterlab/server-proxy';
+import * as serverproxy from '@jupyterhub/jupyter-server-proxy';
 
 function createModuleItem(label: string, button: string) {
   const module_list_line = document.createElement('li');
