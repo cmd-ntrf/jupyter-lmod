@@ -17,6 +17,21 @@ import { Module } from '../jupyterlmod/static/module.js';
 
 import * as serverproxy from '@jupyterhub/jupyter-server-proxy';
 
+import { LabIcon } from '@jupyterlab/ui-components';
+
+import lmodIconSvg from './assets/lmod.svg';
+import tmodIconSvg from './assets/tmod.svg';
+export const jplmodIcons = {
+    lmod: new LabIcon({
+      name: 'jupyter_lmod:lmod_logo',
+      svgstr: lmodIconSvg
+    }),
+    tmod: new LabIcon({
+      name: 'jupyter_lmod:tmod_logo',
+      svgstr: tmodIconSvg
+    })
+};
+
 function createModuleItem(label: string, button: string) {
   const module_list_line = document.createElement('li');
   const module_list_label = document.createElement('span');
@@ -119,7 +134,7 @@ class ModuleWidget extends Widget {
     super();
 
     this.id = 'module-jupyterlab';
-    this.title.caption = 'Softwares';
+    this.title.caption = 'Software Modules';
     this.addClass('jp-Module');
 
     const search_div = document.createElement('div');
@@ -187,14 +202,10 @@ class ModuleWidget extends Widget {
   public setIcon() {
     Promise.all([moduleAPI.system()])
     .then(values => {
-        const modulesys = values[0];
-        console.log("Module system found:", modulesys)
-        // Set icon based on module system
-        if (modulesys === 'lmod') {
-          this.title.iconClass = 'jp-LmodIcon jp-SideBar-tabIcon'
-        } else {
-          this.title.iconClass = 'jp-TmodIcon jp-SideBar-tabIcon'
-        }
+      const modulesys = values[0];
+      console.log("Module system found:", modulesys)
+      // Set icon based on module system
+      this.title.icon = jplmodIcons[modulesys];
     });
   }
 
@@ -324,7 +335,7 @@ function activate(
 
   setup_proxy_commands(app, restorer);
 
-	restorer.add(widget, 'module-sessions');
+  restorer.add(widget, 'module-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });
   widget.update();
   console.log('JupyterFrontEnd extension lmod/tmod is activated!');
