@@ -46,11 +46,12 @@
     "build:prod": "jlpm run build:lib && jlpm run build:labextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
-    "build:lib": "tsc",
+    "build:lib": "jlpm run copy && tsc",
     "clean": "jlpm run clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "clean:labextension": "rimraf jupyterlab-lmod/labextension",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
+    "copy": "mkdir -p lib/src && cp -r src/assets lib/src",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
     "eslint:check:junit": "eslint . --ext .ts,.tsx --format junit --output-file linting.xml",
@@ -61,19 +62,18 @@
     "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
-    "@jupyterlab/application": "^2.0.0 || ^3.0.0",
-    "@jupyterlab/launcher": "^2.0.0 || ^3.0.0",
-    "@jupyterhub/jupyter-server-proxy": "^4.1.0"
+    "@jupyterhub/jupyter-server-proxy": "^4.1.0",
+    "@jupyterlab/application": "^4.0.0",
+    "@jupyterlab/launcher": "^4.0.0"
   },
   "devDependencies": {
-    "@jupyterlab/builder": "^3.6.1",
+    "@jupyterlab/builder": "^4.2.0",
     "npm-run-all": "^4.1.5",
-    "rimraf": "~3.0.2",
-    "typescript": "~4.1.3"
+    "rimraf": "~5.0.7",
+    "typescript": "~5.4.5"
   },
   "jupyterlab": {
     "extension": true,
-    "schemaDir": "schema",
     "outputDir": "jupyterlmod/labextension"
   }
 }
