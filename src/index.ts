@@ -214,12 +214,21 @@ class ModuleWidget extends Widget {
     if (target.tagName == 'SPAN') {
       show_module(target.innerText);
     } else if(target.tagName == 'BUTTON') {
-      const span = event.target.closest('li').querySelector('span');
-      const item = span.innerText;
+      const parent_li = event.target.closest('li');
+      const mod_label = parent_li.querySelector('span');
+      const mod_name = mod_label.innerText;
       if(target.innerText == 'Load') {
-        await load_module(item);
+        target.innerText = 'Loading...';
+        target.style.visibility = 'visible';
+        target.style.backgroundColor = "#99b644";
+        parent_li.style.backgroundColor = "#dde6c0";
+        await load_module(mod_name);
       } else if(target.innerText == 'Unload') {
-        await moduleAPI.unload([item]);
+        target.innerText = 'Unloading...';
+        target.style.visibility = 'visible';
+        target.style.backgroundColor = "#ee8b44";
+        parent_li.style.backgroundColor = "#fad7c0";
+        await moduleAPI.unload([mod_name]);
       }
       this.update();
     }
