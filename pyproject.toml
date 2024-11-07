@@ -3,7 +3,7 @@ requires = [
     "hatch-jupyter-builder >=0.5",
     "hatch-nodejs-version",
     "hatchling >=1.4.0",
-    "jupyterlab >=3.4.7,<4.0.0",
+    "jupyterlab >=4.0.0",
 ]
 build-backend = "hatchling.build"
 
@@ -53,8 +53,8 @@ packages = ["jupyterlmod", "module"]
 "jupyterlmod/etc/jupyterlmod_serverextension.json" = "etc/jupyter/jupyter_notebook_config.d/jupyterlmod_serverextension.json"
 "jupyterlmod/etc/jupyterlmod_jupyterserverextension.json" = "etc/jupyter/jupyter_server_config.d/jupyterlmod_jupyterserverextension.json"
 "jupyterlmod/etc/jupyterlmod_nbextension.json" = "etc/jupyter/nbconfig/tree.d/jupyterlmod_nbextension.json"
-"jupyterlmod/labextension" = "share/jupyter/labextensions/@jupyterlab/jupyterlab-lmod"
-"install.json" = "share/jupyter/labextensions/@jupyterlab/jupyterlab-lmod/install.json"
+"jupyterlmod/labextension" = "share/jupyter/labextensions/@cmd-ntrf/jupyterlab-lmod"
+"install.json" = "share/jupyter/labextensions/@cmd-ntrf/jupyterlab-lmod/install.json"
 
 [tool.hatch.version]
 source = "nodejs"
