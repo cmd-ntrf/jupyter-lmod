@@ -1,6 +1,6 @@
 {
   "name": "@cmd-ntrf/jupyterlab-lmod",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "description": "Lmod/Tmod JupyterLab extension",
   "keywords": [
     "jupyter",
