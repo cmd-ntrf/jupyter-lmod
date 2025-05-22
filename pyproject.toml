@@ -63,6 +63,7 @@ path = "package.json"
 [tool.hatch.build.targets.sdist]
 exclude = [
     ".github",
+    ".yarn",
 ]
 
 [tool.hatch.build.hooks.jupyter-builder]
