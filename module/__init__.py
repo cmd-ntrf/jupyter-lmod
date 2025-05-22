@@ -122,8 +122,8 @@ def print_output_decorator(function):
     :rtype: callable
     """
     @wraps(function)
-    def wrapper(*args, **kargs):
-        output = function(*args, **kargs)
+    async def wrapper(*args, **kargs):
+        output = await function(*args, **kargs)
         if output is not None:
             print(output)
     return wrapper
