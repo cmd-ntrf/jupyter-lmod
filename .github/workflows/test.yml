@@ -61,16 +61,10 @@ jobs:
       - name: Run tests
         run: pytest -vvvv tests
 
-      - name: Check the Notebook Server extension is installed
-        run: |
-          jupyter serverextension list
-          jupyter serverextension list 2>&1 | grep -iE "jupyterlab-lmod.*OK" -
-
       - name: Check the Jupyter Server extension is installed
         run: |
-          pip install jupyter-server
           jupyter server extension list
-          jupyter server extension list 2>&1 | grep -iE "jupyterlab-lmod.*OK" -
+          jupyter server extension list 2>&1 | grep -iE "jupyterlmod.*OK" -
 
       - name: Check the lab extension
         run: |
