@@ -51,7 +51,7 @@ jobs:
 
       - name: Install Python package
         run: |
-          pip install -vv '.[test]'
+          pip install -vv '.[test]' 'jupyterlab>4.0'
 
       - name: List Python packages
         run: |
