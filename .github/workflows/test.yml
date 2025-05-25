@@ -20,31 +20,24 @@ on:
 
 jobs:
   test:
-    # NOTE: The worker environment running this job needs firefox and
-    #       geckowebdriver available. Before upgrading to ubuntu-24.04 in the
-    #       future, check and see its available in a location like this:
-    #       https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#browsers-and-drivers
-    #
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.11"]
-        jupyter_server-version: ["1", "2"]
-        jupyterlab-version: ["2", "3"]
+        python-version: ["3.9", "3.13"]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "${{ matrix.python-version }}"
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           cache: yarn
-          node-version: 18.x
+          node-version: 20.x
           registry-url: https://registry.npmjs.org
           cache-dependency-path: yarn.lock
 
@@ -58,7 +51,7 @@ jobs:
 
       - name: Install Python package
         run: |
-          pip install -vv '.[test]' 'jupyterlab~=${{ matrix.jupyterlab-version }}.0' 'jupyter_server~=${{ matrix.jupyter_server-version }}.0'
+          pip install -vv '.[test]'
 
       - name: List Python packages
         run: |
@@ -74,7 +67,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: |-
-            unit-tests-${{ matrix.python-version }}-${{ matrix.jupyterlab-version }}-${{ github.run_number }}
+            unit-tests-${{ matrix.python-version }}-${{ github.run_number }}
           path: |
             ./build/pytest
             ./build/coverage
@@ -90,20 +83,8 @@ jobs:
           jupyter server extension list
           jupyter server extension list 2>&1 | grep -iE "jupyterlab-lmod.*OK" -
 
-      - name: Install JupyterLab Extension
-        if: matrix.jupyterlab-version == '2'
-        run: |
-          export NODE_OPTIONS=--openssl-legacy-provider
-          jupyter labextension install . --no-build --debug
-          jupyter lab build --minimize=False --debug
-
       - name: Check the lab extension
-        # We test the labextension thoroughly in the acceptance tests below, so
-        # we have conditionally disabled this basic check is to avoid issues in
-        # jupyterlab.browser_check with jupyterlab 2 and jupyter_server 2+.
-        #
-        # if: ${{ !(matrix.jupyterlab-version == '2' && matrix.jupyter_server-version != '1') }}
         run: |
           jupyter labextension list
-          jupyter labextension list 2>&1 | grep -iE '@jupyterlab/jupyterlab-lmod.*OK.*'
+          jupyter labextension list 2>&1 | grep -iE '@cmd-ntrf/jupyterlab-lmod.*OK.*'
           python -m jupyterlab.browser_check
