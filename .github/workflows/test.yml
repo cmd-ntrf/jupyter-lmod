@@ -59,18 +59,7 @@ jobs:
           pip check
 
       - name: Run tests
-        run: |
-          pytest -vvvv tests
-
-      - name: Upload pytest and coverage reports
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: |-
-            unit-tests-${{ matrix.python-version }}-${{ github.run_number }}
-          path: |
-            ./build/pytest
-            ./build/coverage
+        run: pytest -vvvv tests
 
       - name: Check the Notebook Server extension is installed
         run: |
