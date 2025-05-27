@@ -198,6 +198,10 @@ class ModuleAPI(object):
             self.list_cache = {True: [], False: []}
             string = await module("list")
             if string and not string.startswith(EMPTY_LIST_STR):
+                # Extract module names using MODULE_REGEX. This regex matches valid module names
+                # (e.g., "module/version") while excluding invalid entries (e.g., paths with colons).
+                # Hidden modules (e.g., those starting with a dot or in hidden directories) are
+                # identified separately using MODULE_HIDDEN_REGEX.
                 loaded_modules = MODULE_REGEX.findall(string.strip())
                 loaded_hidden_modules = [
                     name for name in loaded_modules
