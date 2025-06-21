@@ -290,7 +290,7 @@ class ModuleWidget extends Widget {
  * added to JupyterLab launcher by jupyter-server-proxy
  * to either add them to the launcher if their name
  * is in the launcher pin list, or keep them in a
- * seperate data structure until the corresponding
+ * separate data structure until the corresponding
  * module is loaded.
  */
 class ILauncherProxy {
