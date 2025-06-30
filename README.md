@@ -62,6 +62,21 @@ c.Tmod.launcher_pins = ['Desktop', 'RStudio']
 ```
 based on your module system.
 
+### JupyterHub and loading module that add kernels
+
+If you have modules that modify `JUPYTER_PATH` and you access Jupyter through JupyterHub,
+make sure that `c.Spawner.disable_user_config = False`.
+
+When `disable_user_config = True`, JupyterHub single-user server monkey-patches the
+`jupyter_core.jupyter_path` function to remove any path related to home. In order to do
+that, they retrieve the value of `JUPYTER_PATH`, remove any paths related to home, then
+keep it in a global variable. The `jupyter_path` function is then patched to only return
+versions of the global variable, making the function no longer affected by changer to
+`JUPYTER_PATH`.
+
+The JupyterHub monkey-patching of `jupyter_path` can be read
+[here](https://github.com/jupyterhub/jupyterhub/blob/01a43f41f8b1554f2de659104284f6345d76636d/jupyterhub/singleuser/_disable_user_config.py#L57).
+
 ## demo
 
 ![Jupyter notebook demo](https://i.imgur.com/pK1Q5gG.gif)
