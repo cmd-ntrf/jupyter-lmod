@@ -62,6 +62,20 @@ c.Tmod.launcher_pins = ['Desktop', 'RStudio']
 ```
 based on your module system.
 
+### Mapping launcher items to modules
+
+If the name of the server proxies do not match a corresponding module, or you wish to have multiple
+launchers for a single module, you can define a map of server proxies to module names in the
+Jupyter notebook configuration file, like this:
+```
+c.Lmod.launcher_module_map = {'RStudio': 'rstudio-server', 'paraview': 'paraview-client'}
+```
+or
+```
+c.Tmod.launcher_module_map = {'RStudio': 'rstudio-server', 'paraview': 'paraview-client'}
+```
+based on your module system.
+
 ### JupyterHub and loading module that add kernels
 
 If you have modules that modify `JUPYTER_PATH` and you access Jupyter through JupyterHub,

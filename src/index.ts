@@ -55,7 +55,8 @@ var server_proxy_launcher = {};
 
 function updateLauncher(modulelist) {
   for(let server_key in server_proxy_infos) {
-    let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_key) });
+    let module_key = server_key.split(':')[0]
+    let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(module_key) });
     if(is_enabled) {
       if(!server_proxy_launcher.hasOwnProperty(server_key)) {
         server_proxy_launcher[server_key] = global_launcher.add(server_proxy_infos[server_key])
@@ -295,13 +296,17 @@ class ModuleWidget extends Widget {
  */
 class ILauncherProxy {
   private launcher_pins: Array<String>;
-  constructor(launcher_pins: Array<String>) {
+  private launcher_module_map: { [name: string]: string };
+  constructor(launcher_pins: Array<String>, launcher_module_map: { [name: string]: string} ) {
     this.launcher_pins = launcher_pins;
+    this.launcher_module_map = launcher_module_map;
   }
   add(item) {
     let name = item.args.id.split(':')[1];
     if (this.launcher_pins.includes(name.toLowerCase())) {
       global_launcher.add(item)
+    } else if (name in this.launcher_module_map) {
+      server_proxy_infos[this.launcher_module_map[name] + ':' + name] = item;
     } else {
       server_proxy_infos[name] = item;
     }
@@ -323,7 +328,21 @@ async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutResto
     console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
   }
 
-  let tmp_launcher = new ILauncherProxy(launcher_pins);
+  let launcher_module_map = {};
+  const module_map_response = await fetch(
+    PageConfig.getBaseUrl() + 'module/launcher-module-map',
+    {
+      headers: moduleAPI._head_auth,
+    },
+  );
+  if (module_map_response.ok) {
+    const data = await module_map_response.json();
+    launcher_module_map = data.launcher_module_map;
+  } else {
+    console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
+  }
+
+  let tmp_launcher = new ILauncherProxy(launcher_pins, launcher_module_map);
   serverproxy.default.activate(app, tmp_launcher, restorer);
 }
 

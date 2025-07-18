@@ -266,7 +266,8 @@ define(function(require) {
         let menu = $('.tree-buttons').find('.dropdown-menu');
 
         for (let server_key in server_proxy_infos) {
-            let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_key) });
+            let module_key = server_key.split(':')[0]
+            let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(module_key) });
             if (is_enabled) {
                 if(!server_proxy_launcher.hasOwnProperty(server_key)) {
                     menu.append(server_proxy_infos[server_key]);
@@ -328,6 +329,19 @@ define(function(require) {
           console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
         }
 
+	let launcher_module_map = {};
+        const module_map_response = await fetch(
+            base_url + 'module/launcher-module-map',
+            {
+                headers: module._head_auth,
+            },
+        );
+        if (response.ok) {
+          launcher_module_map = (await module_map_response.json()).launcher_module_map;
+        } else {
+          console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
+        }
+
         let menu = $('.tree-buttons').find('.dropdown-menu');
         if (data.server_processes.length > 0) {
             /* add a divider to kernel menu */
@@ -352,6 +366,8 @@ define(function(require) {
             entry_container.append(entry_link);
             if (launcher_pins.includes(server_process.name.toLowerCase())) {
                 menu.append(entry_container);
+            } else if (server_process.name.toLowerCase() in launcher_module_map) {
+                server_proxy_infos[launcher_module_map[server_process.name] + ':' + server_process.name] = entry_container;
             } else {
                 server_proxy_infos[server_process.name] = entry_container;
             }

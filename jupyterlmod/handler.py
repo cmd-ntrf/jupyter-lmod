@@ -176,6 +176,16 @@ class PinsHandler(JupyterHandler):
         self.write({'launcher_pins': self.launcher_pins})
 
 
+class ModuleMapHandler(JupyterHandler):
+    """Handler to get map of entrypoints to modules"""
+    def initialize(self, launcher_module_map):
+        self.launcher_module_map = launcher_module_map
+
+    @web.authenticated
+    async def get(self):
+        self.write({'launcher_module_map': self.launcher_module_map})
+
+
 default_handlers = [
     (r"/module/system", ModuleSystem),
     (r"/module", Module),
