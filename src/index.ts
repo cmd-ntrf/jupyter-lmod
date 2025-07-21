@@ -349,7 +349,7 @@ async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutResto
 /**
  * Activate the module widget extension.
  */
-function activate(
+async function activate(
   app: JupyterFrontEnd,
   palette: ICommandPalette,
   restorer: ILayoutRestorer,
@@ -361,7 +361,7 @@ function activate(
   global_launcher = launcher;
   kernelspecs = app.serviceManager.kernelspecs;
 
-  setup_proxy_commands(app, restorer);
+  await setup_proxy_commands(app, restorer);
 
   restorer.add(widget, 'module-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });
