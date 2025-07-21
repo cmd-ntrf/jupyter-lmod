@@ -367,7 +367,10 @@ define(function(require) {
             if (launcher_pins.includes(server_process.name.toLowerCase())) {
                 menu.append(entry_container);
             } else if (server_process.name.toLowerCase() in launcher_module_map) {
-                server_proxy_infos[launcher_module_map[server_process.name] + ':' + server_process.name] = entry_container;
+                let module_names = launcher_module_map[server_process.name]
+                module_names.forEach( (module_name) => {
+                  server_proxy_infos[module_name + ':' + server_process.name] = entry_container;
+                }
             } else {
                 server_proxy_infos[server_process.name] = entry_container;
             }

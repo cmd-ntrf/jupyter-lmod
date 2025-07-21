@@ -12,7 +12,7 @@ class Lmod(Configurable):
     ).tag(config=True)
 
     launcher_module_map = Dict(
-        trait=Unicode(),
+        trait=List(Unicode()),
         help="""
         Dictionary mapping of entry points to module names.
         """
@@ -29,7 +29,7 @@ class Tmod(Configurable):
     ).tag(config=True)
 
     launcher_module_map = Dict(
-        trait=Unicode(),
+        trait=List(Unicode()),
         help="""
         Dictionary mapping of entry points to module names.
         """

@@ -296,8 +296,8 @@ class ModuleWidget extends Widget {
  */
 class ILauncherProxy {
   private launcher_pins: Array<String>;
-  private launcher_module_map: { [name: string]: string };
-  constructor(launcher_pins: Array<String>, launcher_module_map: { [name: string]: string} ) {
+  private launcher_module_map: { [name: string]: Array<string> };
+  constructor(launcher_pins: Array<String>, launcher_module_map: { [name: string]: Array<string>} ) {
     this.launcher_pins = launcher_pins;
     this.launcher_module_map = launcher_module_map;
   }
@@ -306,7 +306,10 @@ class ILauncherProxy {
     if (this.launcher_pins.includes(name.toLowerCase())) {
       global_launcher.add(item)
     } else if (name in this.launcher_module_map) {
-      server_proxy_infos[this.launcher_module_map[name] + ':' + name] = item;
+      let module_names = this.launcher_module_map[name]
+      module_names.forEach( (module_name) => {
+        server_proxy_infos[module_name + ':' + name] = item;
+      })
     } else {
       server_proxy_infos[name] = item;
     }

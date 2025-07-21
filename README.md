@@ -68,11 +68,11 @@ If the name of the server proxies do not match a corresponding module, or you wi
 launchers for a single module, you can define a map of server proxies to module names in the
 Jupyter notebook configuration file, like this:
 ```
-c.Lmod.launcher_module_map = {'RStudio': 'rstudio-server', 'paraview': 'paraview-client'}
+c.Lmod.launcher_module_map = {'RStudio': ['rstudio-server'], 'paraview': ['paraview-client', 'paraview/5.13']}
 ```
 or
 ```
-c.Tmod.launcher_module_map = {'RStudio': 'rstudio-server', 'paraview': 'paraview-client'}
+c.Tmod.launcher_module_map = {'RStudio': ['rstudio-server'], 'paraview': ['paraview-client', 'paraview/5.13']}
 ```
 based on your module system.
 
