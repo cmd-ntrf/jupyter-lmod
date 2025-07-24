@@ -18,21 +18,30 @@ dynamic = [
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.6"
+requires-python = ">=3.9"
 classifiers = [
     "Framework :: Jupyter",
     "License :: OSI Approved :: BSD License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "jupyter-core",
     "jupyter-server",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-html",
+    "pytest-jupyter[server]>=0.6",
 ]
 
 [tool.hatch.metadata.hooks.nodejs]
@@ -70,10 +79,14 @@ exclude = [
 ensured-targets = [
     "jupyterlmod/labextension/package.json",
 ]
+skip-if-exists = [
+    "jupyterlmod/labextension/package.json",
+]
 dependencies = [
     "hatch-jupyter-builder>=0.8.2",
 ]
 build-function = "hatch_jupyter_builder.npm_builder"
+optional-editable-build = true
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
@@ -82,6 +95,13 @@ editable_build_cmd = "build"
 npm = [
     "jlpm",
 ]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+path = "."
+build_cmd = "build"
+npm = ["jlpm"]
+source_dir = "src"
+build_dir = "jupyterlmod/labextension"
 
 [tool.tbump]
 field = [
@@ -100,3 +120,27 @@ tag_template = "v{new_version}"
 [[tool.tbump.file]]
 src = "pyproject.toml"
 version_template = "version = \"{major}.{minor}.{patch}{channel}{release}\""
+
+[tool.pytest.ini_options]
+cache_dir = "build/.cache/pytest"
+addopts = [
+    "-vv",
+    "--cov=jupyterlmod",
+    "--cov=module",
+    "--cov-branch",
+    "--cov-context=test",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html:build/coverage",
+    "--html=build/pytest/index.html",
+    "--color=yes",
+]
+
+[tool.coverage.run]
+data_file = "build/.coverage"
+concurrency = [
+    "multiprocessing",
+    "thread"
+]
+
+[tool.coverage.html]
+show_contexts = true

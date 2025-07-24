@@ -17,3 +17,5 @@ lib/
 node_modules/
 *.egg-info/
 .ipynb_checkpoints
+.coverage
+.yarn/

@@ -1,0 +1,73 @@
+# This is a GitHub workflow defining a set of jobs with a set of steps.
+# ref: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+#
+name: Test
+
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "**.rst"
+      - ".github/workflows/*"
+      - "!.github/workflows/test.yaml"
+  push:
+    paths-ignore:
+      - "**.md"
+      - "**.rst"
+      - ".github/workflows/*"
+      - "!.github/workflows/test.yaml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python-version }}"
+
+      - uses: actions/setup-node@v4
+        with:
+          cache: yarn
+          node-version: 20.x
+          registry-url: https://registry.npmjs.org
+          cache-dependency-path: yarn.lock
+
+      - name: Update root build packages
+        run: |
+          pip install --upgrade build pip
+
+      - name: Build Python package
+        run: |
+          pyproject-build
+
+      - name: Install Python package
+        run: |
+          pip install -vv '.[test]' 'jupyterlab>4.0'
+
+      - name: List Python packages
+        run: |
+          pip freeze
+          pip check
+
+      - name: Run tests
+        run: pytest -vvvv tests
+
+      - name: Check the Jupyter Server extension is installed
+        run: |
+          jupyter server extension list
+          jupyter server extension list 2>&1 | grep -iE "jupyterlmod.*OK" -
+
+      - name: Check the lab extension
+        run: |
+          jupyter labextension list
+          jupyter labextension list 2>&1 | grep -iE '@cmd-ntrf/jupyterlab-lmod.*OK.*'
+          python -m jupyterlab.browser_check
