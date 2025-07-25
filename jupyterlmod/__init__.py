@@ -5,7 +5,7 @@ from jupyter_server.utils import url_path_join as ujoin
 from pathlib import Path
 
 from .config import Module as ModuleConfig
-from .handler import default_handlers, PinsHandler, ModuleSystemLogoHandler
+from .handler import default_handlers, ModuleMapHandler, PinsHandler, ModuleSystemLogoHandler
 
 from module import MODULE_SYSTEM
 
@@ -44,6 +44,7 @@ def _load_jupyter_server_extension(nbapp):
     nbapp.log.info("Loading lmod/tmod extension")
     module_config = ModuleConfig(parent=nbapp)
     launcher_pins = module_config.launcher_pins
+    launcher_module_map = module_config.launcher_module_map
 
     # As of now (31/march/2023) the extension is not working on jupyter
     # notebook using jupyter_server>2. See https://github.com/jupyter-server/jupyter_server/pull/1221
@@ -56,6 +57,9 @@ def _load_jupyter_server_extension(nbapp):
 
     web_app.add_handlers(".*$", [
         (ujoin(base_url, 'module/launcher-pins'), PinsHandler, {'launcher_pins': launcher_pins}),
+    ])
+    web_app.add_handlers(".*$", [
+        (ujoin(base_url, 'module/launcher-module-map'), ModuleMapHandler, {'launcher_module_map': launcher_module_map}),
     ])
 
     logo_path = os.path.join(

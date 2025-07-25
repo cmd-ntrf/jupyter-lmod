@@ -53,12 +53,13 @@ var kernelspecs = null;
 var server_proxy_infos = {};
 var server_proxy_launcher = {};
 
-function updateLauncher(modulelist) {
+function updateLauncher(modulelist: Array<string>, module_map: Record<string, string[]>) {
   for(let server_key in server_proxy_infos) {
-    let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_key) });
+    const candidate_modules = module_map[server_key] ?? [server_key];
+    const is_enabled = candidate_modules.some( (name: string) => modulelist.some( (module: string) => module.toLowerCase().startsWith(name) ) );
     if(is_enabled) {
       if(!server_proxy_launcher.hasOwnProperty(server_key)) {
-        server_proxy_launcher[server_key] = global_launcher.add(server_proxy_infos[server_key])
+        server_proxy_launcher[server_key] = global_launcher.add(server_proxy_infos[server_key]);
       }
     } else if(server_proxy_launcher.hasOwnProperty(server_key)) {
       server_proxy_launcher[server_key].dispose();
@@ -129,13 +130,16 @@ class ModuleWidget extends Widget {
   protected availHeader: HTMLHeadingElement;
   protected searchInput: HTMLInputElement;
   protected searchSource: Array<string>;
+  protected module_map: Record<string, string[]>;
 
-  constructor() {
+  constructor(module_map: Record<string, string[]>) {
     super();
 
     this.id = 'module-jupyterlab';
     this.title.caption = 'Software Modules';
     this.addClass('jp-Module');
+
+    this.module_map = module_map;
 
     const search_div = document.createElement('div');
     const search_div_wrapper = document.createElement('div');
@@ -248,7 +252,7 @@ class ModuleWidget extends Widget {
         modulelist.map(item => avail_set.delete(item));
         this.searchSource = Array.from(avail_set);
         this.updateAvail();
-        updateLauncher(modulelist);
+        updateLauncher(modulelist, this.module_map);
     });
     kernelspecs.refreshSpecs();
   }
@@ -310,6 +314,8 @@ class ILauncherProxy {
 
 async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutRestorer) {
   let launcher_pins = [];
+  let module_map: Record<string, string[]>;
+
   const pin_response = await fetch(
     PageConfig.getBaseUrl() + 'module/launcher-pins',
     {
@@ -323,27 +329,42 @@ async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutResto
     console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
   }
 
+  const module_map_response = await fetch(
+    PageConfig.getBaseUrl() + 'module/launcher-module-map',
+    {
+      headers: moduleAPI._head_auth,
+    },
+  );
+  if (module_map_response.ok) {
+    const data = await module_map_response.json();
+    module_map = data.launcher_module_map;
+  } else {
+    console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
+    module_map = {};
+  }
+
   let tmp_launcher = new ILauncherProxy(launcher_pins);
   serverproxy.default.activate(app, tmp_launcher, restorer);
+  return module_map;
 }
 
 /**
  * Activate the module widget extension.
  */
-function activate(
+async function activate(
   app: JupyterFrontEnd,
   palette: ICommandPalette,
   restorer: ILayoutRestorer,
   launcher: ILauncher
 ) {
-  const widget = new ModuleWidget();
-  widget.setIcon();
 
   global_launcher = launcher;
   kernelspecs = app.serviceManager.kernelspecs;
 
-  setup_proxy_commands(app, restorer);
+  const module_map = await setup_proxy_commands(app, restorer);
 
+  const widget = new ModuleWidget(module_map);
+  widget.setIcon();
   restorer.add(widget, 'module-sessions');
   app.shell.add(widget, 'left', { rank: 1000 });
   widget.update();

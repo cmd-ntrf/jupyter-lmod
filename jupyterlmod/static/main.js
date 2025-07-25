@@ -13,6 +13,7 @@ define(function(require) {
 
     var server_proxy_infos = {};
     var server_proxy_launcher = {};
+    var module_map = {};
 
     const module_tab_html = $([
 '<div id="module" class="tab-pane">',
@@ -266,7 +267,8 @@ define(function(require) {
         let menu = $('.tree-buttons').find('.dropdown-menu');
 
         for (let server_key in server_proxy_infos) {
-            let is_enabled = modulelist.some(module => { return module.toLowerCase().includes(server_key) });
+            const candidate_modules = module_map[server_key] ?? [server_key];
+            const is_enabled = candidate_modules.some( name => modulelist.some( module => module.toLowerCase().startsWith(name) ) )
             if (is_enabled) {
                 if(!server_proxy_launcher.hasOwnProperty(server_key)) {
                     menu.append(server_proxy_infos[server_key]);
@@ -322,8 +324,20 @@ define(function(require) {
                 headers: module._head_auth,
             },
         );
-        if (response.ok) {
+        if (pin_response.ok) {
           launcher_pins = (await pin_response.json()).launcher_pins;
+        } else {
+          console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
+        }
+
+        const module_map_response = await fetch(
+            base_url + 'module/launcher-module-map',
+            {
+                headers: module._head_auth,
+            },
+        );
+        if (module_map_response.ok) {
+          module_map = (await module_map_response.json()).launcher_module_map;
         } else {
           console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
         }

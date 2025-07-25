@@ -1,5 +1,5 @@
 from traitlets.config import Configurable
-from traitlets import List, Unicode
+from traitlets import Dict, List, Unicode
 
 
 class Lmod(Configurable):
@@ -11,6 +11,13 @@ class Lmod(Configurable):
         """
     ).tag(config=True)
 
+    launcher_module_map = Dict(
+        trait=List(Unicode()),
+        help="""
+        Dictionary mapping of entry points to module names.
+        """
+    ).tag(config=True)
+
 
 class Tmod(Configurable):
     """Configurable for Tmod"""
@@ -18,6 +25,13 @@ class Tmod(Configurable):
         trait=Unicode(),
         help="""
         Launcher items to be displayed regardless of the loaded modules
+        """
+    ).tag(config=True)
+
+    launcher_module_map = Dict(
+        trait=List(Unicode()),
+        help="""
+        Dictionary mapping of entry points to module names.
         """
     ).tag(config=True)
 
