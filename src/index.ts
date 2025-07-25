@@ -56,10 +56,10 @@ var server_proxy_launcher = {};
 function updateLauncher(modulelist: Array<string>, module_map: Record<string, string[]>) {
   for(let server_key in server_proxy_infos) {
     const candidate_modules = module_map[server_key] ?? [server_key];
-    const is_enabled = candidate_modules.some( (name: string) => modulelist.some( (module: string) => module.toLowerCase().startsWith(name) ) )
+    const is_enabled = candidate_modules.some( (name: string) => modulelist.some( (module: string) => module.toLowerCase().startsWith(name) ) );
     if(is_enabled) {
       if(!server_proxy_launcher.hasOwnProperty(server_key)) {
-        server_proxy_launcher[server_key] = global_launcher.add(server_proxy_infos[server_key])
+        server_proxy_launcher[server_key] = global_launcher.add(server_proxy_infos[server_key]);
       }
     } else if(server_proxy_launcher.hasOwnProperty(server_key)) {
       server_proxy_launcher[server_key].dispose();
