@@ -53,7 +53,7 @@ var kernelspecs = null;
 var server_proxy_infos = {};
 var server_proxy_launcher = {};
 
-function updateLauncher(modulelist: Array<string>, module_map: Object) {
+function updateLauncher(modulelist: Array<string>, module_map: Record<string, string[]>) {
   for(let server_key in server_proxy_infos) {
     const candidate_modules = module_map[server_key] ?? [server_key];
     const is_enabled = candidate_modules.some( (name: string) => modulelist.some( (module: string) => module.toLowerCase().startsWith(name) ) )
@@ -130,9 +130,9 @@ class ModuleWidget extends Widget {
   protected availHeader: HTMLHeadingElement;
   protected searchInput: HTMLInputElement;
   protected searchSource: Array<string>;
-  protected module_map: Object;
+  protected module_map: Record<string, string[]>;
 
-  constructor(module_map: Object) {
+  constructor(module_map: Record<string, string[]>) {
     super();
 
     this.id = 'module-jupyterlab';
@@ -314,7 +314,7 @@ class ILauncherProxy {
 
 async function setup_proxy_commands(app: JupyterFrontEnd, restorer: ILayoutRestorer) {
   let launcher_pins = [];
-  let module_map: Object;
+  let module_map: Record<string, string[]>;
 
   const pin_response = await fetch(
     PageConfig.getBaseUrl() + 'module/launcher-pins',
