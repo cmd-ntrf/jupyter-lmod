@@ -324,7 +324,7 @@ define(function(require) {
                 headers: module._head_auth,
             },
         );
-        if (response.ok) {
+        if (pin_response.ok) {
           launcher_pins = (await pin_response.json()).launcher_pins;
         } else {
           console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
@@ -336,7 +336,7 @@ define(function(require) {
                 headers: module._head_auth,
             },
         );
-        if (response.ok) {
+        if (module_map_response.ok) {
           module_map = (await module_map_response.json()).launcher_module_map;
         } else {
           console.log('jupyter-{lmod/tmod}: could not communicate with jupyter-{lmod/tmod} API.');
