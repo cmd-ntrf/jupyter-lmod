@@ -243,7 +243,7 @@ class ModuleAPI(object):
     async def reset(self):
         """
         Method to reset to default module(s) set in LMOD_SYSTEM_DEFAULT_MODULES.
-        Command sepecific for lmod systems
+        Command specific for lmod systems
 
         :return: Stderr if command failed
         :rtype: str

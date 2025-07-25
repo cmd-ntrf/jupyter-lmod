@@ -15,7 +15,7 @@ related task like loading, unloading, saving collection, etc.
 
 **Note** that the extension supports Tmod < 5.0 too. However, if `MODULES_RUN_QUARANTINE` is not empty on the platform, module's Python API does
 not have correct behaviour. On default installations, `MODULES_RUN_QUARANTINE=LD_LIBRARY_PATH` is used. If `LD_LIBRARY_PATH` is not
-empty before loading a module, the existant paths in `LD_LIBRARY_PATH` is lost
+empty before loading a module, the existent paths in `LD_LIBRARY_PATH` is lost
 after loading the module. More discussion can be found [here](https://sourceforge.net/p/modules/mailman/message/36113970/).
 
 If jupyter-server-proxy and jupyterlab-server-proxy are detected, jupyter-lmod will add the
