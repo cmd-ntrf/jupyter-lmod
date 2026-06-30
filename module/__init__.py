@@ -3,7 +3,6 @@
 import os
 import re
 import sys
-
 from asyncio import create_subprocess_shell
 from asyncio.subprocess import PIPE
 from collections import OrderedDict
@@ -83,13 +82,13 @@ def update_sys_path(env_var, postfix=""):
     """
     def decorator(function):
         @wraps(function)
-        def wrapper(*args, **kargs):
+        async def wrapper(*args, **kargs):
             if env_var in os.environ:
                 orig_paths = os.environ[env_var].split(os.pathsep)
                 orig_paths = [os.path.join(path, postfix) for path in orig_paths]
             else:
                 orig_paths = []
-            output = function(*args, **kargs)
+            output = await function(*args, **kargs)
             if env_var in os.environ:
                 new_paths = os.environ[env_var].split(os.pathsep)
                 new_paths = [os.path.join(path, postfix) for path in new_paths]
