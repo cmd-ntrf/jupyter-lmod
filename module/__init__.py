@@ -30,7 +30,7 @@ except KeyError:
             "LMOD_CMD for lmod or MODULES_CMD for tmod are set"
         )
 
-SITE_POSTFIX = os.path.join("lib", "python" + sys.version[:3], "site-packages")
+SITE_POSTFIX = os.path.join("lib", "python" + ".".join(str(v) for v in sys.version_info[:2]), "site-packages")
 
 # NOTE: Try to make these configurable as this can be platform dependent?
 MODULE_REGEX = re.compile(r"^[\w\-_+.\/]{1,}[^\/:]$", re.M)
